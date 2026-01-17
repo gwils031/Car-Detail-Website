@@ -1,0 +1,34 @@
+{
+  "packages": [
+    {
+      "name": "Interior Refresh",
+      "price": 119,
+      "description": "Deep interior cleaning for a fresh cabin.",
+      "features": ["Full vacuum", "Steam clean mats", "Interior wipe-down", "Leather conditioning"],
+      "addons": [
+        { "name": "Pet Hair Removal", "price": 30 },
+        { "name": "Ozone Odor Treatment", "price": 40 }
+      ]
+    },
+    {
+      "name": "Full Detail",
+      "price": 249,
+      "description": "Comprehensive inside and out detail for showroom shine.",
+      "features": ["Two-bucket hand wash", "Clay bar decontamination", "Machine polish", "Sealant application", "Interior deep clean"],
+      "addons": [
+        { "name": "Ceramic Coating (1 year)", "price": 199 },
+        { "name": "Headlight Restoration", "price": 60 }
+      ]
+    },
+    {
+      "name": "Custom",
+      "price": null,
+      "description": "Tailored detailing for boats, RVs, trailers, fleets, and specialty vehicles.",
+      "features": [],
+      "addons": [],
+      "ctaLabel": "Contact Us",
+      "ctaHref": "/contact.html",
+      "priceLabel": "Free Quote"
+    }
+  ]
+}

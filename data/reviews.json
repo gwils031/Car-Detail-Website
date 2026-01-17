@@ -1,0 +1,14 @@
+{
+  "reviews": [
+    { "author": "Sarah L.", "stars": 5, "text": "My SUV looks brand new! Fast, friendly, and thorough." },
+    { "author": "Marcus D.", "stars": 5, "text": "Fantastic attention to detail—swirls gone and interior spotless." },
+    { "author": "Elena G.", "stars": 4, "text": "Great value for the Full Detail package. Will rebook." },
+    { "author": "Tom K.", "stars": 5, "text": "Ceramic coating is incredible—water just beads off." },
+    { "author": "Rina P.", "stars": 5, "text": "Prompt and professional. Interior smells fresh again!" },
+    { "author": "Victor N.", "stars": 4, "text": "Polish removed most swirls. Friendly team." },
+    { "author": "Hannah S.", "stars": 5, "text": "Mobile service was super convenient—no hassle at all." },
+    { "author": "Jen M.", "stars": 5, "text": "Best detail I’ve had. Worth every dollar." },
+    { "author": "Omar B.", "stars": 4, "text": "Great job on the wheels and tires." },
+    { "author": "Nate W.", "stars": 5, "text": "Paint correction gave my car a mirror finish." }
+  ]
+}

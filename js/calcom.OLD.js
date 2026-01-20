@@ -1,7 +1,6 @@
-/**
- * Cal.com API Integration for Southern Utah Detailing (SECURE)
- * Handles booking submission through Cloudflare Worker proxy
- * API key is securely stored on Cloudflare, NOT exposed to frontend
+﻿/**
+ * Cal.com API Integration for Southern Utah Detailing
+ * Handles booking submission only (availability fetching in date-time-picker.js)
  */
 
 // Cloudflare Worker proxy URL - API key is secure on Cloudflare
@@ -33,7 +32,7 @@ async function handleBookingSubmit(e) {
   const name = document.getElementById('name').value;
   const email = document.getElementById('email').value;
   const phone = document.getElementById('phone').value;
-  const service = document.getElementById('service').value;
+  const service = document.getElementById('selected-service').value;
   const timeSlot = document.getElementById('selected-time').value;
 
   if (!name || !email || !phone || !service || !timeSlot) {
@@ -44,7 +43,8 @@ async function handleBookingSubmit(e) {
   try {
     showLoading('Confirming your booking...');
 
-    const eventTypeSlug = CAL_COM_CONFIG.eventTypes[service];
+    // Use the slug stored by service-selector.js
+    const eventTypeSlug = window.selectedServiceSlug || CAL_COM_CONFIG.eventTypes[service];
     const startTime = new Date(timeSlot).toISOString();
 
     const bookingData = {
@@ -64,7 +64,6 @@ async function handleBookingSubmit(e) {
 
     console.log('Creating booking:', bookingData);
 
-    // Call through Cloudflare Worker (API key is secure)
     const response = await fetch(
       `${WORKER_URL}/bookings`,
       {
@@ -90,6 +89,13 @@ async function handleBookingSubmit(e) {
     document.getElementById('booking-form').reset();
     document.getElementById('date-time-input').textContent = 'Select date and time';
     document.getElementById('date-time-dropdown').classList.add('hide');
+    
+    // Reset service selector
+    if (window.serviceSelector && window.serviceSelector.selectedCard) {
+      window.serviceSelector.selectedCard.classList.remove('selected');
+      window.serviceSelector.selectedCard = null;
+      window.selectedServiceSlug = null;
+    }
   } catch (error) {
     console.error('Booking error:', error);
     hideLoading();
@@ -126,7 +132,7 @@ function hideLoading() {
 function showError(message) {
   const errorDiv = document.getElementById('form-errors');
   if (errorDiv) {
-    errorDiv.textContent = '⚠ ' + message;
+    errorDiv.textContent = ' ' + message;
     errorDiv.style.background = 'rgba(211, 47, 47, 0.1)';
     errorDiv.style.color = 'var(--cd-primary)';
     errorDiv.style.padding = '16px';
@@ -140,7 +146,7 @@ function showError(message) {
 function showSuccess(message) {
   const errorDiv = document.getElementById('form-errors');
   if (errorDiv) {
-    errorDiv.textContent = '✓ ' + message;
+    errorDiv.textContent = ' ' + message;
     errorDiv.style.background = 'rgba(76, 175, 80, 0.1)';
     errorDiv.style.color = '#4CAF50';
     errorDiv.style.padding = '16px';

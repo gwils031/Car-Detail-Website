@@ -44,6 +44,12 @@
               <!-- Services will be populated here -->
             </div>
             <input type="hidden" id="selected-service" name="service" required />
+            <select id="service" style="display: none;">
+              <option value="">Select a service</option>
+              <option>Express Wash</option>
+              <option>Interior Refresh</option>
+              <option>Full Detail</option>
+            </select>
             <div class="service-error hide" id="service-error" style="color: #D32F2F; font-size: 0.9rem; margin-top: 8px; display: none;">Please select a service to continue</div>
           </div>
         </div>
@@ -76,7 +82,10 @@
                 </div>
                 <div class="calendar-grid" id="calendar-grid"></div>
                 <div class="time-select-container hide" id="time-select-container">
-                  <div class="time-grid" id="time-grid"></div>
+                  <label for="time" class="muted" style="display:block; margin-bottom: 8px;">Select Time</label>
+                  <select id="time" class="select" style="width: 100%;">
+                    <option value="">Select a time</option>
+                  </select>
                 </div>
               </div>
               <input type="hidden" id="selected-date" name="date" />

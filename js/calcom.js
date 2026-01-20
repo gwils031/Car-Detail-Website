@@ -4,9 +4,6 @@
  * API key is securely stored on Cloudflare, NOT exposed to frontend
  */
 
-// Cloudflare Worker proxy URL - API key is secure on Cloudflare
-const WORKER_URL = 'https://calcom-proxy.southernutahdetail.workers.dev';
-
 const CAL_COM_CONFIG = {
   username: 'peter-nielsen-joxtue',
   eventTypes: {
@@ -66,7 +63,7 @@ async function handleBookingSubmit(e) {
 
     // Call through Cloudflare Worker (API key is secure)
     const response = await fetch(
-      `${WORKER_URL}/bookings`,
+      `https://calcom-proxy.southernutahdetail.workers.dev/bookings`,
       {
         method: 'POST',
         headers: {

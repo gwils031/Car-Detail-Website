@@ -103,6 +103,14 @@ class ServiceSelector {
     // Update hidden input with service name (for form submission)
     this.hiddenInput.value = service.name;
     
+    // Update the hidden select element for date-time-picker compatibility
+    const serviceSelect = document.getElementById('service');
+    if (serviceSelect) {
+      serviceSelect.value = service.name;
+      // Trigger change event so date-time-picker knows to refresh
+      serviceSelect.dispatchEvent(new Event('change'));
+    }
+    
     // Store the slug for Cal.com API
     window.selectedServiceSlug = service.slug;
     console.log('Service selected:', service.name, 'Slug:', service.slug);

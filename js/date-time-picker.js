@@ -280,7 +280,8 @@ class DateTimePicker {
     }
 
     slots.forEach(slot => {
-      const timeValue = slot.time || slot;
+      // Cal.com returns time strings directly in the array
+      const timeValue = slot;
       const time = new Date(timeValue);
       const timeStr = time.toLocaleTimeString('en-US', {
         hour: '2-digit',

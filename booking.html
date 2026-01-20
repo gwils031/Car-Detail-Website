@@ -1,11 +1,11 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Booking • Southern Utah Detailing</title>
+    <title>Booking  Southern Utah Detailing</title>
     <meta name="description" content="Book premium mobile car detailing: wash, interior refresh, full detail." />
-    <meta property="og:title" content="Booking • Southern Utah Detailing" />
+    <meta property="og:title" content="Booking  Southern Utah Detailing" />
     <meta property="og:description" content="Book premium mobile car detailing: wash, interior refresh, full detail." />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://images.unsplash.com/photo-1607860108855-39f85d4b45da?q=80&w=1200&auto=format&fit=crop" />
@@ -15,7 +15,7 @@
 <body>
   <header class="header">
     <div class="container nav cd-navbar">
-      <button class="nav-toggle" aria-label="Toggle menu">☰</button>
+      <button class="nav-toggle" aria-label="Toggle menu"></button>
       <a href="/index.html" class="nav-brand cd-logo">Southern Utah Detailing</a>
       <nav class="nav-menu" aria-label="Primary">
         <a href="/services.html">Services</a>
@@ -32,11 +32,22 @@
   <section class="section">
     <div class="container">
       <h1 class="h1">Book Your Detail</h1>
-      <p class="muted">Fill out the form and we'll confirm by phone or email.</p>
+      <p class="muted">Select your preferred date and time to schedule your service.</p>
 
       <div id="form-errors" class="card mb-16 hide" role="alert" aria-live="assertive"></div>
 
       <form id="booking-form" class="form" aria-label="Booking form">
+        <div class="form-row">
+          <div>
+            <label for="service" class="muted">Service <span class="required">*</span></label>
+            <div class="service-grid" id="service-grid">
+              <!-- Services will be populated here -->
+            </div>
+            <input type="hidden" id="selected-service" name="service" required />
+            <div class="service-error hide" id="service-error" style="color: #D32F2F; font-size: 0.9rem; margin-top: 8px; display: none;">Please select a service to continue</div>
+          </div>
+        </div>
+
         <div class="form-row grid cols-2" aria-label="Contact details">
           <div>
             <label for="name" class="muted">Full Name</label>
@@ -47,75 +58,47 @@
             <input id="email" name="email" class="input" type="email" required />
           </div>
         </div>
-        <div class="form-row grid cols-2" aria-label="Vehicle details">
+
+        <div class="form-row grid cols-2" aria-label="Contact info">
           <div>
             <label for="phone" class="muted">Phone</label>
-            <input id="phone" name="phone" class="input" type="tel" placeholder="(555) 123-4567" required />
+            <input id="phone" name="phone" class="input" type="tel" placeholder="(435) 999-4052" required />
           </div>
           <div>
-            <label for="vehicle" class="muted">Vehicle Type</label>
-            <input id="vehicle" name="vehicle" class="input" type="text" placeholder="SUV, Sedan, Truck" required />
+            <label for="date-time-picker" class="muted">Date & Time</label>
+            <div id="date-time-picker" class="date-time-picker">
+              <button type="button" class="date-time-input" id="date-time-input">Select date and time</button>
+              <div class="date-time-dropdown hide" id="date-time-dropdown">
+                <div class="calendar-header">
+                  <button type="button" class="calendar-nav" id="prev-month">←</button>
+                  <div class="calendar-title" id="calendar-title">January 2026</div>
+                  <button type="button" class="calendar-nav" id="next-month">→</button>
+                </div>
+                <div class="calendar-grid" id="calendar-grid"></div>
+                <div class="time-select-container hide" id="time-select-container">
+                  <div class="time-grid" id="time-grid"></div>
+                </div>
+              </div>
+              <input type="hidden" id="selected-date" name="date" />
+              <input type="hidden" id="selected-time" name="time" />
+            </div>
           </div>
         </div>
-        <div class="form-row grid cols-2" aria-label="Service selection">
-          <div>
-            <label for="service" class="muted">Service</label>
-            <select id="service" name="service" class="select" required>
-              <option value="">Select a service</option>
-              <option>Express Wash</option>
-              <option>Interior Refresh</option>
-              <option>Full Detail</option>
-            </select>
-          </div>
-          <div>
-            <label for="addons" class="muted">Add-ons (optional)</label>
-            <input id="addons" name="addons" class="input" type="text" placeholder="e.g., Ceramic Coating" />
-          </div>
-        </div>
-        <div class="card mt-16" aria-live="polite">
-          <div class="card-body" id="service-details">
-            <p class="muted">Select a service to see details and pricing.</p>
-          </div>
-        </div>
-        <div class="form-row grid cols-2">
-          <div>
-            <label for="date" class="muted">Preferred Date</label>
-            <input id="date" name="date" class="input" type="date" required />
-          </div>
-          <div>
-            <label for="time" class="muted">Preferred Time</label>
-            <input id="time" name="time" class="input" type="time" required />
-          </div>
-        </div>
-        <div>
-          <label for="notes" class="muted">Notes (optional)</label>
-          <textarea id="notes" name="notes" class="input textarea" placeholder="Anything we should know?"></textarea>
-        </div>
+
         <div class="grid cols-2">
-          <button type="submit" class="button">Request Booking</button>
-          <a href="tel:+15551234567" class="button outline">Call Now</a>
+          <button type="submit" class="button">Confirm Booking</button>
+          <a href="tel:+14359994052" class="button outline">Call Us Instead</a>
         </div>
       </form>
-
-      <div class="card mt-24">
-        <div class="card-body">
-          <div class="h3">Payment Options</div>
-          <p class="muted">Complete your booking with secure payment. Click below to test the payment flow (test mode enabled).</p>
-          <div class="grid cols-2 mt-16">
-            <button id="pay-stripe" class="button">Pay with Stripe</button>
-            <button id="pay-square" class="button secondary">Pay with Square</button>
-          </div>
-          <p class="muted mt-8"><small>Test mode active. In production, these buttons will redirect to secure checkout.</small></p>
-        </div>
-      </div>
     </div>
   </section>
 
   <footer class="footer">
-    <div class="container legal">© <span class="js-year"></span> Southern Utah Detailing. All rights reserved.</div>
+    <div class="container legal"> <span class="js-year"></span> Southern Utah Detailing. All rights reserved.</div>
   </footer>
 
   <script src="/js/main.js" defer></script>
-  <script src="/js/booking.js" defer></script>
+  <script src="/js/service-selector.js" defer></script>  <script src="/js/date-time-picker.js" defer></script>
+  <script src="/js/calcom.js" defer></script>
 </body>
 </html>

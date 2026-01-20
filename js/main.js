@@ -9,6 +9,7 @@
     initCarousel();
     initLightbox();
     initNewsletter();
+    initContactMailto();
     setYear();
     loadServices();
     loadReviews();
@@ -96,6 +97,35 @@
       // Placeholder: hook to backend/newsletter service
       alert('Thanks! You\'re subscribed.');
       form.reset();
+    });
+  }
+
+  // Prefill contact mailto with subject/body from form inputs
+  function initContactMailto() {
+    const sendLink = $('#send-message-link');
+    if (!sendLink) return;
+    sendLink.addEventListener('click', (e) => {
+      // Collect inputs
+      const name = ($('#c-name')?.value || '').trim();
+      const phone = ($('#c-phone')?.value || '').trim();
+      const msg = ($('#c-msg')?.value || '').trim();
+
+      // Build subject and body
+      const subject = 'Website Referral';
+      const parts = [];
+      if (name) parts.push(`Name: ${name}`);
+      if (phone) parts.push(`Phone: ${phone}`);
+      if (msg) {
+        parts.push('', 'Message:', msg);
+      }
+      const body = parts.join('\n');
+
+      const to = 'SouthernUtahDetail@gmail.com';
+      const mailto = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+      // Update href just before navigation
+      sendLink.href = mailto;
+      // Allow default navigation to proceed
     });
   }
 

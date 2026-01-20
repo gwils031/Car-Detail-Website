@@ -280,14 +280,17 @@ class DateTimePicker {
     }
 
     slots.forEach(slot => {
-      // Cal.com returns time strings directly in the array
-      const timeValue = slot;
+      // Cal.com /slots can return either ISO strings or objects with { start, end }
+      const timeValue = slot?.start || slot?.time || slot;
       const time = new Date(timeValue);
-      const timeStr = time.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      });
+      const timeStr = time.toString() === 'Invalid Date'
+        ? 'Invalid Date'
+        : time.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+          });
+
       const option = document.createElement('option');
       option.value = timeValue;
       option.textContent = timeStr;

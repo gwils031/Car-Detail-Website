@@ -60,7 +60,7 @@ a:hover { color: var(--cd-primary-dark); }
   background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
   opacity: 0; transition: opacity var(--cd-transition);
 }
-.button:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(211, 47, 47, 0.5); background: var(--cd-primary-dark); }
+.button:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(211, 47, 47, 0.5); background: var(--cd-primary-dark); color: #ffffff; }
 .button:hover::before { opacity: 1; }
 .button:active { transform: translateY(-1px); }
 .button.secondary { background: var(--cd-surface); color: var(--cd-text); box-shadow: var(--cd-shadow); }
@@ -87,9 +87,9 @@ a:hover { color: var(--cd-primary-dark); }
 .card:hover {
   transform: translateY(-4px);
   box-shadow: var(--cd-shadow-lg);
-  border-color: rgba(14, 165, 233, 0.3);
+  border-color: rgba(211, 47, 47, 0.3);
 }
-.card-body { padding: 28px; }
+.card-body { padding: 28px; display: flex; flex-direction: column; height: 100%; }
 .card-title { font-size: 1.35rem; font-weight: 700; margin: 0 0 10px; color: var(--cd-text); }
 .card-subtitle { color: var(--cd-muted); margin: 0 0 18px; font-size: 15px; }
 
@@ -429,6 +429,7 @@ label {
 /* Date/Time Picker - Modern SaaS Style */
 .date-time-picker {
   position: relative;
+  width: 100%;
 }
 
 .date-time-input {
@@ -470,6 +471,10 @@ label {
   z-index: 1000;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
+  width: 100%;
+  max-width: 560px;
+  min-width: 320px;
+  overflow: hidden;
 }
 
 .date-time-dropdown.hide {
@@ -513,9 +518,10 @@ label {
 
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
   gap: 10px;
   margin-bottom: 0;
+  width: 100%;
 }
 
 .calendar-weekday {
@@ -594,8 +600,9 @@ label {
 
 .time-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  width: 100%;
 }
 
 .time-button {

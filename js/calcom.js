@@ -8,12 +8,7 @@
 const WORKER_URL = 'https://calcom-proxy.southernutahdetail.workers.dev';
 
 const CAL_COM_CONFIG = {
-  username: 'peter-nielsen-joxtue',
-  eventTypes: {
-    'Express Wash': 'express-wash',
-    'Interior Refresh': 'interior-refresh',
-    'Full Detail': 'full-detail'
-  }
+  username: 'peter-nielsen-joxtue'
 };
 
 // Initialize form listeners
@@ -33,23 +28,30 @@ async function handleBookingSubmit(e) {
   const name = document.getElementById('name').value;
   const email = document.getElementById('email').value;
   const phone = document.getElementById('phone').value;
-  const service = document.getElementById('service').value;
+  const streetAddress = document.getElementById('street-address').value;
+  const city = document.getElementById('city').value;
+  const state = document.getElementById('state').value;
+  const zip = document.getElementById('zip').value;
+  const fullAddress = `${streetAddress}, ${city}, ${state} ${zip}`;
+  const selectedServiceInput = document.getElementById('selected-service');
+  const serviceSelectEl = document.getElementById('service');
+  const serviceName = selectedServiceInput ? selectedServiceInput.value : (serviceSelectEl ? serviceSelectEl.value : '');
+  const serviceSlug = window.selectedServiceSlug || (CAL_COM_CONFIG.eventTypes ? CAL_COM_CONFIG.eventTypes[serviceName] : null);
   const timeSlot = document.getElementById('selected-time').value;
 
-  if (!name || !email || !phone || !service || !timeSlot) {
-    showError('Please fill in all required fields and select a date and time.');
+  if (!name || !email || !phone || !streetAddress || !city || !state || !zip || !serviceName || !serviceSlug || !timeSlot) {
+    showError('Please fill in all fields: service, date, time, and contact information.');
     return;
   }
 
   try {
     showLoading('Confirming your booking...');
 
-    const eventTypeSlug = CAL_COM_CONFIG.eventTypes[service];
     const startTime = new Date(timeSlot).toISOString();
 
     const bookingData = {
       username: CAL_COM_CONFIG.username,
-      eventTypeSlug: eventTypeSlug,
+      eventTypeSlug: serviceSlug,
       start: startTime,
       attendee: {
         name: name,
@@ -57,6 +59,7 @@ async function handleBookingSubmit(e) {
         timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         language: 'en'
       },
+      location: fullAddress,
       metadata: {
         phone: phone
       }
@@ -65,21 +68,28 @@ async function handleBookingSubmit(e) {
     console.log('Creating booking:', bookingData);
 
     // Call through Cloudflare Worker (API key is secure)
-    const response = await fetch(
-      `${WORKER_URL}/bookings`,
-      {
+    let response = await fetch(`${WORKER_URL}/bookings`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(bookingData)
+    });
+
+    // Fallback if Worker is mounted under /api
+    if (!response.ok && response.status === 404) {
+      response = await fetch(`${WORKER_URL}/api/bookings`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bookingData)
-      }
-    );
+      });
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Booking error response:', response.status, errorText);
-      throw new Error(`Booking failed: ${response.status}`);
+      const hint = errorText || 'Please try again in a moment.';
+      throw new Error(`Booking failed (${response.status}): ${hint}`);
     }
 
     const result = await response.json();
@@ -93,7 +103,7 @@ async function handleBookingSubmit(e) {
   } catch (error) {
     console.error('Booking error:', error);
     hideLoading();
-    showError('Failed to create booking. Please try again.');
+    showError('We could not confirm the booking. Please check your connection and try again.');
   }
 }
 

@@ -19,7 +19,7 @@ Your codebase is **75% production ready** with several critical and moderate iss
 
 **Current Code:**
 ```javascript
-apiKey: 'cal_live_aaa84c31991566bd19a9bbeb74803f85'
+apiKey: '<REDACTED>'
 ```
 
 **Risk:** Anyone can view your API key in browser DevTools and make unauthorized bookings or access your Cal.com account.

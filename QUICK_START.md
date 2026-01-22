@@ -26,8 +26,8 @@ Once you have your Cloudflare Worker URL, update these files:
 **Step A: Update calcom.js**
 ```bash
 # Rename the secure version
-mv js/calcom.js js/calcom.OLD.js
-mv js/calcom.secure.js js/calcom.js
+The project now uses a single script: `js/calcom.js`.
+Legacy files `js/calcom.OLD.js` and `js/calcom.secure.js` have been removed.
 ```
 
 **Step B: Update date-time-picker.js**
@@ -96,7 +96,7 @@ Browser → Cloudflare Worker → Cal.com API
 
 1. **`.gitignore`** - Protects sensitive files from git
 2. **`CLOUDFLARE_SETUP.md`** - Complete setup guide
-3. **`js/calcom.secure.js`** - API calls through Cloudflare (no API key!)
+3. `js/calcom.js` - API calls through Cloudflare (no API key!)
 4. **`js/date-time-picker.secure.js`** - Availability fetching through Cloudflare
 5. **`QUICK_START.md`** - This file
 
@@ -172,7 +172,7 @@ Browser → Cloudflare Worker → Cal.com API
 
 After this is working:
 
-1. **Remove old files**: Delete `js/calcom.OLD.js` and `js/date-time-picker.OLD.js`
+1. Clean up: Optionally delete `js/date-time-picker.OLD.js` if not needed.
 2. **Add custom domain**: Set up `api.yourdomain.com` in Cloudflare
 3. **Restrict CORS**: Change `'*'` to your actual domain in Worker
 4. **Monitor logs**: Check Cloudflare dashboard weekly

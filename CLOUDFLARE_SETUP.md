@@ -39,7 +39,7 @@ Cloudflare Workers allows you to:
 // Secures API key and adds rate limiting
 
 const CAL_COM_CONFIG = {
-  apiKey: 'cal_live_aaa84c31991566bd19a9bbeb74803f85', // Your API key (secure in Cloudflare)
+  apiKey: '<REDACTED>', // Do NOT hardcode. Store via Wrangler secret (CAL_API_KEY)
   username: 'peter-nielsen-joxtue',
   baseUrl: 'https://api.cal.com/v2'
 };

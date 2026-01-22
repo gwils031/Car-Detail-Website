@@ -10,25 +10,25 @@ class ServiceSelector {
     // Service data - matching Cal.com event types
     this.services = [
       {
-        name: 'Express Wash',
-        slug: 'express-wash',
-        price: 79,
-        duration: '45 mins',
-        description: 'Quick exterior wash and dry for a clean shine.'
-      },
-      {
-        name: 'Interior Refresh',
-        slug: 'interior-refresh',
-        price: 119,
+        name: 'Basic Detail',
+        slug: 'basic-detail',
+        price: 129,
         duration: '1.5 hours',
-        description: 'Deep interior cleaning for a fresh cabin.'
+        description: 'Essential exterior and light interior cleaning.'
       },
       {
-        name: 'Full Detail',
-        slug: 'full-detail',
+        name: 'Standard Detail',
+        slug: 'standard-detail',
+        price: 179,
+        duration: '2.5 hours',
+        description: 'Everything in Basic Detail plus interior vacuum and thorough interior cleaning.'
+      },
+      {
+        name: 'Premium Detail',
+        slug: 'premium-detail',
         price: 249,
         duration: '3-4 hours',
-        description: 'Comprehensive inside and out detail for showroom shine.'
+        description: 'Complete detailing with all premium services included.'
       }
     ];
     

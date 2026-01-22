@@ -7,7 +7,9 @@
 @media (max-width: 767px) { .cd-phone { display: inline-flex; } }
 
 /* Service Card */
-.cd-service { display: grid; grid-template-columns: 1fr; }
+.cd-service { display: flex; flex-direction: column; height: 100%; }
+.cd-service footer { margin-top: 32px; display: flex; justify-content: center; }
+.cd-service footer .button { width: 100%; }
 .cd-service .cd-features {
   display: grid; gap: 10px;
   color: var(--cd-muted);

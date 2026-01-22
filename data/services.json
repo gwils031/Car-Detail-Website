@@ -1,20 +1,33 @@
 {
   "packages": [
     {
-      "name": "Interior Refresh",
-      "price": 119,
-      "description": "Deep interior cleaning for a fresh cabin.",
-      "features": ["Full vacuum", "Steam clean mats", "Interior wipe-down", "Leather conditioning"],
+      "name": "Basic Detail",
+      "price": 129,
+      "description": "Essential exterior and light interior cleaning.",
+      "features": ["Exterior wash", "Door jam clean", "Light interior detail", "Interior glass clean"],
       "addons": [
         { "name": "Pet Hair Removal", "price": 30 },
-        { "name": "Ozone Odor Treatment", "price": 40 }
+        { "name": "Odor Removal", "price": 40 },
+        { "name": "Wax", "price": 50 },
+        { "name": "Full Interior Detail", "price": 60 }
       ]
     },
     {
-      "name": "Full Detail",
+      "name": "Standard Detail",
+      "price": 179,
+      "description": "Everything in Basic Detail plus interior vacuum and thorough interior cleaning.",
+      "features": ["Everything in Basic Detail PLUS", "Interior vacuum", "Interior detail"],
+      "addons": [
+        { "name": "Pet Hair Removal", "price": 30 },
+        { "name": "Odor Removal", "price": 40 },
+        { "name": "Leather Seat Conditioning", "price": 50 }
+      ]
+    },
+    {
+      "name": "Premium Detail",
       "price": 249,
-      "description": "Comprehensive inside and out detail for showroom shine.",
-      "features": ["Two-bucket hand wash", "Clay bar decontamination", "Machine polish", "Sealant application", "Interior deep clean"],
+      "description": "Complete detailing with all premium services included.",
+      "features": ["Everything in Standard Detail PLUS", "Pet hair removal", "Odor removal", "Leather seat conditioning"],
       "addons": [
         { "name": "Ceramic Coating (1 year)", "price": 199 },
         { "name": "Headlight Restoration", "price": 60 }
@@ -27,8 +40,7 @@
       "features": [],
       "addons": [],
       "ctaLabel": "Contact Us",
-      "ctaHref": "/contact.html",
-      "priceLabel": "Free Quote"
+      "ctaHref": "/contact.html"
     }
   ]
 }

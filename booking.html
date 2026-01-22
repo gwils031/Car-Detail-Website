@@ -65,6 +65,28 @@
             <input id="phone" name="phone" class="input" type="tel" placeholder="(435) 999-4052" required />
           </div>
           <div>
+            <label for="street-address" class="muted">Street Address</label>
+            <input id="street-address" name="street-address" class="input" type="text" autocomplete="street-address" required />
+          </div>
+        </div>
+
+        <div class="form-row grid cols-2" aria-label="Address details">
+          <div>
+            <label for="city" class="muted">City</label>
+            <input id="city" name="address-level2" class="input" type="text" autocomplete="address-level2" required />
+          </div>
+          <div>
+            <label for="state" class="muted">State</label>
+            <input id="state" name="address-level1" class="input" type="text" autocomplete="address-level1" required />
+          </div>
+        </div>
+
+        <div class="form-row grid cols-2" aria-label="Postal info">
+          <div>
+            <label for="zip" class="muted">ZIP Code</label>
+            <input id="zip" name="postal-code" class="input" type="text" autocomplete="postal-code" required />
+          </div>
+          <div>
             <label for="date-time-picker" class="muted">Date & Time</label>
             <div id="date-time-picker" class="date-time-picker">
               <button type="button" class="date-time-input" id="date-time-input">Select date and time</button>

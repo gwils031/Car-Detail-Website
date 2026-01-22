@@ -139,7 +139,7 @@
       const data = await res.json();
       // Expose for other modules (e.g., booking)
       window.__servicesData = data;
-      container.innerHTML = data.packages.map(pkg => {
+      container.innerHTML = data.packages.map((pkg, idx) => {
         const ctaLabel = pkg.ctaLabel || `Book ${pkg.name}`;
         const ctaHref = pkg.ctaHref || `/booking.html?service=${encodeURIComponent(pkg.name)}`;
         let priceDisplay = '';
@@ -148,9 +148,10 @@
         } else if (pkg.price !== null && pkg.price !== undefined) {
           priceDisplay = `$${pkg.price}`;
         }
+        const isCustom = pkg.name === 'Custom';
         return `
-        <article class="card anim-fade-up">
-          <div class="card-body cd-service">
+        <article class="card anim-fade-up" ${isCustom ? 'style="grid-column: 1 / -1;"' : ''}>
+          <div class="card-body cd-service" ${isCustom ? 'style="max-width: 400px; margin: 0 auto;"' : ''}>
             <header>
               <h3 class="card-title">${pkg.name}</h3>
               <p class="card-subtitle">${pkg.description}</p>
@@ -159,7 +160,6 @@
             <section class="cd-features">
               ${pkg.features.map(f => `<div>• ${f}</div>`).join('')}
             </section>
-            ${pkg.addons?.length ? `<section class="cd-addons"><div class="h3">Add-ons</div>${pkg.addons.map(a => `<div>- ${a.name} (+$${a.price})</div>`).join('')}</section>` : ''}
             <footer class="mt-16">
               <a href="${ctaHref}" class="button">${ctaLabel}</a>
             </footer>

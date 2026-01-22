@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Add mobile header CSS and fix booking hamburger",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-Command",
+				"Set-Content -Path css\\style.mobile.tmp -Value ((Get-Content css\\style.css -Raw) + \"`n@media (max-width: 767px) {`n  .nav { height: 56px; }`n  .nav-brand { font-size: 0.9rem; }`n  .nav-logo { height: 40px; max-width: 56px; }`n  .nav-actions .button { display: none; }`n}`n\"); Move-Item css\\style.mobile.tmp css\\style.css -Force; (Get-Content booking.html -Raw) -replace '<button class=\\\"nav-toggle\\\" aria-label=\\\"Toggle menu\\\"></button>','<button class=\\\"nav-toggle\\\" aria-label=\\\"Toggle menu\\\">☰</button>' | Set-Content booking.html -Encoding UTF8"
+			],
+			"group": "build"
+		}
+	]
+}

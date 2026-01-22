@@ -426,6 +426,14 @@ label {
   .grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
+/* Mobile tweaks */
+@media (max-width: 767px) {
+  .nav { height: 56px; }
+  .nav-brand { font-size: 0.9rem; }
+  .nav-logo { height: 40px; max-width: 56px; }
+  .nav-actions .button { display: none; }
+}
+
 /* Date/Time Picker - Modern SaaS Style */
 .date-time-picker {
   position: relative;

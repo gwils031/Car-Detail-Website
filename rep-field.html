@@ -26,8 +26,9 @@
     .rep-actions{display:flex;gap:8px;flex-wrap:wrap}
     .rep-note{font-size:.8rem;color:var(--tx2);margin-top:6px}
     .rep-map{height:320px;border:1px solid var(--bdr);border-radius:10px;overflow:hidden;background:#e5e7eb}
-    .rep-dot-actions{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0}
-    .rep-dot-actions .rep-actions{gap:6px}
+    .rep-popup-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .rep-popup-btn{padding:6px 10px;border-radius:8px;border:1px solid #c9ced8;background:#ffffff;color:#1f2937;font-size:.78rem;font-weight:700;cursor:pointer}
+    .rep-popup-btn:hover{border-color:#111827}
     .rep-map-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px}
     .rep-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--bdr);border-radius:999px;background:var(--srf2);font-size:.75rem;color:var(--tx2)}
     .rep-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
@@ -125,14 +126,6 @@
         <div class="rep-card">
           <div class="section-title">Map Quick Log</div>
           <p class="rep-note">Tap and hold on the map to place a pin, then choose outcome: Not Home, Not Interested, Call Back, or Sale Made.</p>
-          <div class="rep-dot-actions rep-hidden" id="map-dot-actions">
-            <div class="rep-chip">Dot Actions</div>
-            <div class="rep-actions">
-              <button class="button outline" id="map-dot-move-btn" type="button">Move</button>
-              <button class="button outline" id="map-dot-edit-btn" type="button">Edit</button>
-              <button class="button outline" id="map-dot-delete-btn" type="button">Delete</button>
-            </div>
-          </div>
           <div id="rep-map" class="rep-map" aria-label="Rep route map"></div>
           <div class="rep-map-meta">
             <div class="rep-chip" id="map-pin-label">No pin selected</div>
@@ -325,10 +318,6 @@
   const mapHistoryStatus=document.getElementById('map-history-status');
   const mapLegend=document.getElementById('map-legend');
   const mapPinLabel=document.getElementById('map-pin-label');
-  const mapDotActions=document.getElementById('map-dot-actions');
-  const mapDotMoveBtn=document.getElementById('map-dot-move-btn');
-  const mapDotEditBtn=document.getElementById('map-dot-edit-btn');
-  const mapDotDeleteBtn=document.getElementById('map-dot-delete-btn');
   const mapMyLocationBtn=document.getElementById('map-my-location-btn');
   const mapClearBtn=document.getElementById('map-clear-btn');
   const mapModal=document.getElementById('map-modal');
@@ -351,6 +340,7 @@
   let liveLocationWatchId=null;
   let hasCenteredOnLiveLocation=false;
   let mapHistoryLayer=null;
+  const mapHistoryMarkersById=new Map();
   let mapHoldTimer=null;
   let mapInitialized=false;
   let isMovePinMode=false;
@@ -525,6 +515,35 @@
     return [item.addressLine1||'', item.city||'', item.state||'', item.postalCode||''].filter(Boolean).join(', ');
   }
 
+  function encodePopupData(value){
+    return encodeURIComponent(String(value==null?'':value));
+  }
+
+  function decodePopupData(value){
+    try{return decodeURIComponent(String(value==null?'':value));}catch(_e){return String(value==null?'':value);}
+  }
+
+  function popupActionButtons(params){
+    const p=params||{};
+    const baseAttrs=[
+      `data-dot-source="${esc(p.source||'')}"`,
+      `data-dot-lat="${esc(String(p.lat||''))}"`,
+      `data-dot-lng="${esc(String(p.lng||''))}"`,
+      `data-dot-marker-id="${esc(String(p.markerId||''))}"`,
+      `data-dot-address="${esc(encodePopupData(p.addressLine1||''))}"`,
+      `data-dot-city="${esc(encodePopupData(p.city||''))}"`,
+      `data-dot-state="${esc(encodePopupData(p.state||''))}"`,
+      `data-dot-postal="${esc(encodePopupData(p.postalCode||''))}"`,
+      `data-dot-outcome="${esc(encodePopupData(p.outcome||''))}"`,
+      `data-dot-detail="${esc(encodePopupData(p.outcomeDetail||''))}"`,
+    ].join(' ');
+    return `<div class="rep-popup-actions">
+      <button class="rep-popup-btn" type="button" data-dot-action="move" ${baseAttrs}>Move</button>
+      <button class="rep-popup-btn" type="button" data-dot-action="edit" ${baseAttrs}>Edit</button>
+      <button class="rep-popup-btn" type="button" data-dot-action="delete" ${baseAttrs}>Delete</button>
+    </div>`;
+  }
+
   function renderMapLegend(byOutcome, total){
     if(!mapLegend) return;
     const entries=Object.keys(OUTCOME_MAP_META)
@@ -545,12 +564,54 @@
     const when=item.happenedAt?new Date(item.happenedAt).toLocaleString('en-US'):'Unknown time';
     const addr=popupAddress(item)||'No address';
     const detail=item.outcomeDetail?esc(item.outcomeDetail):'';
+    const markerId=String(item.id||'');
     return `<div style="min-width:220px">
       <div style="font-weight:800;color:${meta.color}">${esc(meta.label)}</div>
       <div style="font-size:.82rem;color:#d1d5db">${esc(when)}</div>
       <div style="margin-top:6px;font-size:.84rem">${esc(addr)}</div>
       ${detail?`<div style="margin-top:6px;font-size:.8rem;color:#9ca3af">${detail}</div>`:''}
+      ${popupActionButtons({
+        source:'history',
+        markerId,
+        lat:item.lat,
+        lng:item.lng,
+        addressLine1:item.addressLine1,
+        city:item.city,
+        state:item.state,
+        postalCode:item.postalCode,
+        outcome:item.outcome,
+        outcomeDetail:item.outcomeDetail,
+      })}
     </div>`;
+  }
+
+  function activeMarkerPopupHtml(){
+    if(!latestPin) return '<div>No pin selected</div>';
+    const addr=popupAddress(latestPin)||`${formatCoord(latestPin.lat)}, ${formatCoord(latestPin.lng)}`;
+    return `<div style="min-width:220px">
+      <div style="font-weight:800;color:#1f2937">Selected Dot</div>
+      <div style="font-size:.82rem;color:#6b7280">${esc(addr)}</div>
+      ${popupActionButtons({
+        source:'active',
+        lat:latestPin.lat,
+        lng:latestPin.lng,
+        addressLine1:latestPin.addressLine1,
+        city:latestPin.city,
+        state:latestPin.state,
+        postalCode:latestPin.postalCode,
+        outcome:val('de-outcome'),
+        outcomeDetail:val('de-notes'),
+      })}
+    </div>`;
+  }
+
+  function syncRepMarkerPopup(){
+    if(!repMarker||!latestPin) return;
+    if(repMarker.getPopup()){
+      repMarker.setPopupContent(activeMarkerPopupHtml());
+    }else{
+      repMarker.bindPopup(activeMarkerPopupHtml());
+    }
   }
 
   async function refreshMapHistory(){
@@ -562,6 +623,7 @@
       const byOutcome=(data&&data.byOutcome&&typeof data.byOutcome==='object')?data.byOutcome:{};
 
       mapHistoryLayer.clearLayers();
+      mapHistoryMarkersById.clear();
       if(!items.length){
         renderMapLegend({},0);
         setMapHistoryStatus('No map pins found for selected history window.', false);
@@ -583,6 +645,7 @@
         });
         marker.bindPopup(markerHtml(item));
         marker.addTo(mapHistoryLayer);
+        if(item.id) mapHistoryMarkersById.set(String(item.id), marker);
         bounds.push([lat,lng]);
       });
 
@@ -777,12 +840,6 @@
     mapModalAddress.textContent=latestPin.label || `${formatCoord(latestPin.lat)}, ${formatCoord(latestPin.lng)}`;
   }
 
-  function showDotActions(enabled){
-    if(!mapDotActions) return;
-    const shouldShow=Boolean(enabled && latestPin);
-    mapDotActions.classList.toggle('rep-hidden', !shouldShow);
-  }
-
   function openDotEditForm(){
     if(!latestPin){
       setMapStatus('Drop a dot first, then tap Edit.', true);
@@ -803,6 +860,90 @@
     setMapStatus('Edit mode: update address, notes, or outcome in the form below.', false);
   }
 
+  function applyPopupDotSelection(data){
+    const lat=Number(data.lat);
+    const lng=Number(data.lng);
+    if(!Number.isFinite(lat)||!Number.isFinite(lng)) return false;
+
+    setPin(lat,lng,false);
+    latestPin=Object.assign({},latestPin,{
+      addressLine1:data.addressLine1||latestPin.addressLine1||'',
+      city:data.city||latestPin.city||'',
+      state:data.state||latestPin.state||'',
+      postalCode:data.postalCode||latestPin.postalCode||'',
+      label:[data.addressLine1||'',data.city||'',data.state||'',data.postalCode||''].filter(Boolean).join(', ') || latestPin.label,
+    });
+
+    if(data.addressLine1) setVal('de-address',data.addressLine1);
+    if(data.city) setVal('de-city',data.city);
+    if(data.outcome && OUTCOME_MAP_META[data.outcome]) setVal('de-outcome',data.outcome);
+    if(data.outcomeDetail && !val('de-notes')) setVal('de-notes',data.outcomeDetail);
+
+    if(mapPinLabel){
+      const label=latestPin.label||`Pin ${formatCoord(latestPin.lat)}, ${formatCoord(latestPin.lng)}`;
+      mapPinLabel.textContent=label.length>90?`${label.slice(0,87)}...`:label;
+    }
+    syncRepMarkerPopup();
+    updateCoordinateNote();
+    return true;
+  }
+
+  function handleMapPopupActionClick(evt){
+    const btn=evt.target&&typeof evt.target.closest==='function'
+      ? evt.target.closest('[data-dot-action]')
+      : null;
+    if(!btn) return;
+
+    evt.preventDefault();
+    evt.stopPropagation();
+
+    const action=String(btn.getAttribute('data-dot-action')||'').trim().toLowerCase();
+    const source=String(btn.getAttribute('data-dot-source')||'').trim().toLowerCase();
+    const markerId=String(btn.getAttribute('data-dot-marker-id')||'').trim();
+    const payload={
+      lat:Number(btn.getAttribute('data-dot-lat')),
+      lng:Number(btn.getAttribute('data-dot-lng')),
+      addressLine1:decodePopupData(btn.getAttribute('data-dot-address')),
+      city:decodePopupData(btn.getAttribute('data-dot-city')),
+      state:decodePopupData(btn.getAttribute('data-dot-state')),
+      postalCode:decodePopupData(btn.getAttribute('data-dot-postal')),
+      outcome:decodePopupData(btn.getAttribute('data-dot-outcome')),
+      outcomeDetail:decodePopupData(btn.getAttribute('data-dot-detail')),
+    };
+
+    if(action==='delete'){
+      if(source==='history' && markerId && mapHistoryMarkersById.has(markerId)){
+        const marker=mapHistoryMarkersById.get(markerId);
+        if(marker&&mapHistoryLayer) mapHistoryLayer.removeLayer(marker);
+        mapHistoryMarkersById.delete(markerId);
+        if(repMap) repMap.closePopup();
+        setMapStatus('Event dot removed from current map view only.', false);
+        return;
+      }
+      clearPin();
+      if(repMap) repMap.closePopup();
+      return;
+    }
+
+    const selected=applyPopupDotSelection(payload);
+    if(!selected){
+      setMapStatus('Could not select this dot.', true);
+      return;
+    }
+
+    if(action==='move'){
+      setMovePinMode(true);
+      if(repMap) repMap.closePopup();
+      setMapStatus('Move mode on. Tap once on the map to reposition the dot.', false);
+      return;
+    }
+
+    if(action==='edit'){
+      if(repMap) repMap.closePopup();
+      openDotEditForm();
+    }
+  }
+
   function clearPin(){
     cancelPendingModalOpen();
     setMovePinMode(false);
@@ -815,14 +956,12 @@
       repMarker=null;
     }
     if(mapPinLabel) mapPinLabel.textContent='No pin selected';
-    showDotActions(false);
     updateCoordinateNote();
     setMapStatus('Pin cleared.', false);
   }
 
   function setMovePinMode(enabled){
     isMovePinMode=Boolean(enabled);
-    if(mapDotMoveBtn) mapDotMoveBtn.textContent=isMovePinMode?'Tap Map To Move':'Move';
   }
 
   function attachRepMarkerInteractions(){
@@ -842,8 +981,9 @@
       if(shouldRemove) clearPin();
     });
     repMarker.on('click',()=>{
-      showDotActions(true);
-      setMapStatus('Dot opened. Use top actions: Move, Edit, or Delete.', false);
+      syncRepMarkerPopup();
+      if(repMarker) repMarker.openPopup();
+      setMapStatus('Dot opened. Use Move, Edit, or Delete in the popup.', false);
     });
   }
 
@@ -875,8 +1015,8 @@
       }
       repMap.panTo([latestPin.lat,latestPin.lng]);
     }
+    syncRepMarkerPopup();
     if(mapPinLabel) mapPinLabel.textContent=`Pin ${formatCoord(latestPin.lat)}, ${formatCoord(latestPin.lng)}`;
-    showDotActions(true);
     setMapStatus(openModalFlag ? 'Pin dropped. Opening quick outcome...' : 'Pin dropped. Choose an outcome.', false);
     updateMapModalAddress();
     if(openModalFlag){
@@ -919,6 +1059,7 @@
     if(parsed.addressLine1&&!val('de-address')) setVal('de-address',parsed.addressLine1);
     if(parsed.city&&!val('de-city')) setVal('de-city',parsed.city);
     if(mapPinLabel) mapPinLabel.textContent=latestPin.label.length>90?`${latestPin.label.slice(0,87)}...`:latestPin.label;
+    syncRepMarkerPopup();
     updateMapModalAddress();
   }
 
@@ -1119,6 +1260,10 @@
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(repMap);
     mapHistoryLayer=L.layerGroup().addTo(repMap);
     mapInitialized=true;
+    if(mapEl && !mapEl.dataset.popupActionBound){
+      mapEl.addEventListener('click', handleMapPopupActionClick);
+      mapEl.dataset.popupActionBound='1';
+    }
 
     const beginHold=(evt)=>{
       const latlng=evt&&evt.latlng;
@@ -1168,31 +1313,6 @@
           if(repMap) repMap.setView([lat,lng],16);
         }
       },()=>setMapStatus('Could not get current location.', true),{enableHighAccuracy:true,timeout:10000});
-    });
-
-    mapDotMoveBtn&&mapDotMoveBtn.addEventListener('click',()=>{
-      if(!latestPin){
-        setMapStatus('Drop a dot first, then use Move.', true);
-        return;
-      }
-      setMovePinMode(!isMovePinMode);
-      if(isMovePinMode){
-        setMapStatus('Move mode on. Tap once on the map to reposition the dot.', false);
-      }else{
-        setMapStatus('Move mode off.', false);
-      }
-    });
-
-    mapDotEditBtn&&mapDotEditBtn.addEventListener('click',()=>{
-      openDotEditForm();
-    });
-
-    mapDotDeleteBtn&&mapDotDeleteBtn.addEventListener('click',()=>{
-      if(!latestPin){
-        setMapStatus('No dot to remove.', true);
-        return;
-      }
-      clearPin();
     });
 
     mapClearBtn&&mapClearBtn.addEventListener('click',clearPin);

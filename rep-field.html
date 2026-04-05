@@ -26,6 +26,8 @@
     .rep-actions{display:flex;gap:8px;flex-wrap:wrap}
     .rep-note{font-size:.8rem;color:var(--tx2);margin-top:6px}
     .rep-map{height:320px;border:1px solid var(--bdr);border-radius:10px;overflow:hidden;background:#e5e7eb}
+    .rep-dot-actions{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0}
+    .rep-dot-actions .rep-actions{gap:6px}
     .rep-map-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px}
     .rep-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--bdr);border-radius:999px;background:var(--srf2);font-size:.75rem;color:var(--tx2)}
     .rep-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
@@ -123,6 +125,14 @@
         <div class="rep-card">
           <div class="section-title">Map Quick Log</div>
           <p class="rep-note">Tap and hold on the map to place a pin, then choose outcome: Not Home, Not Interested, Call Back, or Sale Made.</p>
+          <div class="rep-dot-actions rep-hidden" id="map-dot-actions">
+            <div class="rep-chip">Dot Actions</div>
+            <div class="rep-actions">
+              <button class="button outline" id="map-dot-move-btn" type="button">Move</button>
+              <button class="button outline" id="map-dot-edit-btn" type="button">Edit</button>
+              <button class="button outline" id="map-dot-delete-btn" type="button">Delete</button>
+            </div>
+          </div>
           <div id="rep-map" class="rep-map" aria-label="Rep route map"></div>
           <div class="rep-map-meta">
             <div class="rep-chip" id="map-pin-label">No pin selected</div>
@@ -315,6 +325,10 @@
   const mapHistoryStatus=document.getElementById('map-history-status');
   const mapLegend=document.getElementById('map-legend');
   const mapPinLabel=document.getElementById('map-pin-label');
+  const mapDotActions=document.getElementById('map-dot-actions');
+  const mapDotMoveBtn=document.getElementById('map-dot-move-btn');
+  const mapDotEditBtn=document.getElementById('map-dot-edit-btn');
+  const mapDotDeleteBtn=document.getElementById('map-dot-delete-btn');
   const mapMyLocationBtn=document.getElementById('map-my-location-btn');
   const mapClearBtn=document.getElementById('map-clear-btn');
   const mapModal=document.getElementById('map-modal');
@@ -333,9 +347,13 @@
 
   let repMap=null;
   let repMarker=null;
+  let liveLocationMarker=null;
+  let liveLocationWatchId=null;
+  let hasCenteredOnLiveLocation=false;
   let mapHistoryLayer=null;
   let mapHoldTimer=null;
   let mapInitialized=false;
+  let isMovePinMode=false;
   let latestPin=null;
   let latestPinSeq=0;
   let modalOpenDelayTimer=null;
@@ -395,6 +413,55 @@
     if(!mapHistoryStatus) return;
     mapHistoryStatus.textContent=msg;
     mapHistoryStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
+  }
+
+  function stopLiveLocationWatch(){
+    if(liveLocationWatchId===null) return;
+    if(navigator.geolocation&&typeof navigator.geolocation.clearWatch==='function'){
+      navigator.geolocation.clearWatch(liveLocationWatchId);
+    }
+    liveLocationWatchId=null;
+  }
+
+  function renderLiveLocation(lat, lng, accuracyMeters){
+    if(!repMap) return;
+    const point=[lat,lng];
+
+    if(!liveLocationMarker){
+      liveLocationMarker=L.circleMarker(point,{
+        radius:7,
+        color:'#ffffff',
+        weight:3,
+        fillColor:'#2b7cff',
+        fillOpacity:1,
+        interactive:false
+      }).addTo(repMap);
+    }else{
+      liveLocationMarker.setLatLng(point);
+    }
+
+    liveLocationMarker.bringToFront();
+    if(!hasCenteredOnLiveLocation && !latestPin){
+      repMap.panTo(point);
+      hasCenteredOnLiveLocation=true;
+    }
+  }
+
+  function startLiveLocationWatch(){
+    if(!repMap||!navigator.geolocation||liveLocationWatchId!==null) return;
+    liveLocationWatchId=navigator.geolocation.watchPosition((pos)=>{
+      const lat=pos&&pos.coords?pos.coords.latitude:null;
+      const lng=pos&&pos.coords?pos.coords.longitude:null;
+      const accuracy=pos&&pos.coords?pos.coords.accuracy:null;
+      if(!Number.isFinite(lat)||!Number.isFinite(lng)) return;
+      renderLiveLocation(lat,lng,accuracy);
+    },()=>{
+      // Keep silent when unavailable; map remains usable without location permission.
+    },{
+      enableHighAccuracy:true,
+      maximumAge:15000,
+      timeout:20000
+    });
   }
 
   function val(id){
@@ -590,6 +657,7 @@
 
   async function signOut(){
     try{ await api('/field/auth/logout','POST'); }catch(_e){}
+    stopLiveLocationWatch();
     clearRepSession();
     closeMapModal();
     showLogin();
@@ -605,6 +673,7 @@
     const repId=rep.id||'';
     setBookingLink(`/booking.html?src=field_sales&rep_id=${encodeURIComponent(repId)}`);
     if(!mapInitialized) initMap();
+    startLiveLocationWatch();
   }
 
   function showLogin(){
@@ -708,8 +777,35 @@
     mapModalAddress.textContent=latestPin.label || `${formatCoord(latestPin.lat)}, ${formatCoord(latestPin.lng)}`;
   }
 
+  function showDotActions(enabled){
+    if(!mapDotActions) return;
+    const shouldShow=Boolean(enabled && latestPin);
+    mapDotActions.classList.toggle('rep-hidden', !shouldShow);
+  }
+
+  function openDotEditForm(){
+    if(!latestPin){
+      setMapStatus('Drop a dot first, then tap Edit.', true);
+      return;
+    }
+    closeMapModal();
+    const addressInput=document.getElementById('de-address');
+    const cityInput=document.getElementById('de-city');
+    if(latestPin.addressLine1&&!val('de-address')) setVal('de-address',latestPin.addressLine1);
+    if(latestPin.city&&!val('de-city')) setVal('de-city',latestPin.city);
+    if(addressInput){
+      addressInput.scrollIntoView({behavior:'smooth',block:'center'});
+      addressInput.focus();
+    }else if(cityInput){
+      cityInput.scrollIntoView({behavior:'smooth',block:'center'});
+      cityInput.focus();
+    }
+    setMapStatus('Edit mode: update address, notes, or outcome in the form below.', false);
+  }
+
   function clearPin(){
     cancelPendingModalOpen();
+    setMovePinMode(false);
     latestPin=null;
     latestPinSeq=0;
     setVal('de-lat','');
@@ -719,12 +815,41 @@
       repMarker=null;
     }
     if(mapPinLabel) mapPinLabel.textContent='No pin selected';
+    showDotActions(false);
     updateCoordinateNote();
     setMapStatus('Pin cleared.', false);
   }
 
+  function setMovePinMode(enabled){
+    isMovePinMode=Boolean(enabled);
+    if(mapDotMoveBtn) mapDotMoveBtn.textContent=isMovePinMode?'Tap Map To Move':'Move';
+  }
+
+  function attachRepMarkerInteractions(){
+    if(!repMarker) return;
+    repMarker.on('dragstart',()=>{
+      cancelPendingModalOpen();
+      setMapStatus('Dragging dot... release to update location.', false);
+    });
+    repMarker.on('dragend',(evt)=>{
+      const ll=evt&&evt.target&&typeof evt.target.getLatLng==='function' ? evt.target.getLatLng() : null;
+      if(!ll||!Number.isFinite(ll.lat)||!Number.isFinite(ll.lng)) return;
+      setPin(ll.lat,ll.lng,false);
+      setMapStatus('Dot updated. Drag to edit again, or long-press/right-click to remove.', false);
+    });
+    repMarker.on('contextmenu',()=>{
+      const shouldRemove=window.confirm('Remove this map dot?');
+      if(shouldRemove) clearPin();
+    });
+    repMarker.on('click',()=>{
+      showDotActions(true);
+      setMapStatus('Dot opened. Use top actions: Move, Edit, or Delete.', false);
+    });
+  }
+
   function setPin(lat, lng, openModalFlag){
     cancelPendingModalOpen();
+    setMovePinMode(false);
     const clippedLat=Math.max(-90,Math.min(90,Number(lat)));
     const clippedLng=Math.max(-180,Math.min(180,Number(lng)));
     latestPinSeq+=1;
@@ -745,11 +870,13 @@
       if(repMarker){
         repMarker.setLatLng([latestPin.lat,latestPin.lng]);
       }else{
-        repMarker=L.marker([latestPin.lat,latestPin.lng]).addTo(repMap);
+        repMarker=L.marker([latestPin.lat,latestPin.lng],{draggable:true}).addTo(repMap);
+        attachRepMarkerInteractions();
       }
       repMap.panTo([latestPin.lat,latestPin.lng]);
     }
     if(mapPinLabel) mapPinLabel.textContent=`Pin ${formatCoord(latestPin.lat)}, ${formatCoord(latestPin.lng)}`;
+    showDotActions(true);
     setMapStatus(openModalFlag ? 'Pin dropped. Opening quick outcome...' : 'Pin dropped. Choose an outcome.', false);
     updateMapModalAddress();
     if(openModalFlag){
@@ -996,6 +1123,7 @@
     const beginHold=(evt)=>{
       const latlng=evt&&evt.latlng;
       if(!latlng) return;
+      if(isMovePinMode) return;
       if(mapHoldTimer) clearTimeout(mapHoldTimer);
       mapHoldTimer=setTimeout(()=>{
         mapHoldTimer=null;
@@ -1016,6 +1144,13 @@
     repMap.on('touchend',stopHold);
     repMap.on('dragstart',stopHold);
     repMap.on('mouseout',stopHold);
+    repMap.on('click',(evt)=>{
+      if(!isMovePinMode) return;
+      const ll=evt&&evt.latlng;
+      if(!ll) return;
+      setPin(ll.lat,ll.lng,false);
+      setMapStatus('Dot moved. You can save the door event now.', false);
+    });
     repMap.on('contextmenu',(evt)=>setPin(evt.latlng.lat,evt.latlng.lng,true));
 
     mapMyLocationBtn&&mapMyLocationBtn.addEventListener('click',()=>{
@@ -1026,15 +1161,43 @@
       navigator.geolocation.getCurrentPosition((pos)=>{
         const lat=pos&&pos.coords?pos.coords.latitude:null;
         const lng=pos&&pos.coords?pos.coords.longitude:null;
+        const accuracy=pos&&pos.coords?pos.coords.accuracy:null;
         if(Number.isFinite(lat)&&Number.isFinite(lng)){
+          renderLiveLocation(lat,lng,accuracy);
           setPin(lat,lng,false);
           if(repMap) repMap.setView([lat,lng],16);
         }
       },()=>setMapStatus('Could not get current location.', true),{enableHighAccuracy:true,timeout:10000});
     });
 
+    mapDotMoveBtn&&mapDotMoveBtn.addEventListener('click',()=>{
+      if(!latestPin){
+        setMapStatus('Drop a dot first, then use Move.', true);
+        return;
+      }
+      setMovePinMode(!isMovePinMode);
+      if(isMovePinMode){
+        setMapStatus('Move mode on. Tap once on the map to reposition the dot.', false);
+      }else{
+        setMapStatus('Move mode off.', false);
+      }
+    });
+
+    mapDotEditBtn&&mapDotEditBtn.addEventListener('click',()=>{
+      openDotEditForm();
+    });
+
+    mapDotDeleteBtn&&mapDotDeleteBtn.addEventListener('click',()=>{
+      if(!latestPin){
+        setMapStatus('No dot to remove.', true);
+        return;
+      }
+      clearPin();
+    });
+
     mapClearBtn&&mapClearBtn.addEventListener('click',clearPin);
-    setMapStatus('Map ready. Press and hold to drop a pin.', false);
+    startLiveLocationWatch();
+    setMapStatus('Map ready. Blue dot shows your location when allowed. Press and hold to drop a pin.', false);
   }
 
   loginBtn.addEventListener('click',signIn);

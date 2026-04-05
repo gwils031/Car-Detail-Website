@@ -65,7 +65,14 @@
       .admin-grid{grid-template-columns:1fr}
       .funnel-track{grid-template-columns:1fr}
     }
+    /* Field sales map styles */
+    #field-map{width:100%;height:420px;border-radius:12px;border:1px solid var(--bdr);}
+    #leads-list{overflow:auto;max-height:420px;padding:6px;background:var(--srf2);border-radius:8px}
+    .lead-row{padding:10px;border-bottom:1px solid var(--bdr);cursor:pointer}
+    .lead-row:hover{background:var(--srf)}
   </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 </head>
 <body>
 <header class="header" id="site-header">
@@ -284,7 +291,7 @@
     </section>
 
     <section class="tab-panel" id="tab-field" role="tabpanel" aria-labelledby="tab-field-btn" data-tab-panel="field" hidden>
-      <div class="admin-grid" style="grid-template-columns:repeat(6,minmax(0,1fr))">
+      <div class="admin-grid" style="grid-template-columns:repeat(7,minmax(0,1fr))">
         <div class="admin-card">
           <div class="admin-k">Doors Knocked</div>
           <div class="admin-v" id="fs-doors">0</div>
@@ -311,6 +318,11 @@
           <div class="admin-sub">Bookings tied to rep and lead metadata</div>
         </div>
         <div class="admin-card">
+          <div class="admin-k">Pay-Eligible Sales</div>
+          <div class="admin-v" id="fs-pay-eligible">0</div>
+          <div class="admin-sub">Service completed and payment received</div>
+        </div>
+        <div class="admin-card">
           <div class="admin-k">Overdue Follow-ups</div>
           <div class="admin-v" id="fs-overdue">0</div>
           <div class="admin-sub">Open items past scheduled time</div>
@@ -321,17 +333,26 @@
         <div class="admin-panel">
           <div class="section-title">Top Reps</div>
           <table class="admin-table">
-            <thead><tr><th>Rep</th><th>Doors</th><th>Interested</th><th>Bookings</th><th>Rate</th></tr></thead>
+            <thead><tr><th>Rep</th><th>Doors</th><th>Interested</th><th>Bookings</th><th>Pay-Eligible</th><th>Rate</th></tr></thead>
             <tbody id="tbl-field-reps"></tbody>
           </table>
         </div>
         <div class="admin-panel">
           <div class="section-title">Daily Field Trend</div>
           <table class="admin-table">
-            <thead><tr><th>Date</th><th>Doors</th><th>On-Door</th><th>Attributed</th></tr></thead>
+            <thead><tr><th>Date</th><th>Doors</th><th>On-Door</th><th>Attributed</th><th>Pay-Eligible</th></tr></thead>
             <tbody id="tbl-field-trend"></tbody>
           </table>
         </div>
+      </div>
+
+      <div class="admin-panel" style="margin-top:12px">
+        <div class="section-title">Booking Settlement Tracker</div>
+        <p class="mini-note" id="fs-bookings-status">Tracks each client, selected service, service completion, and payment state.</p>
+        <table class="admin-table">
+          <thead><tr><th>Date</th><th>Rep</th><th>Client</th><th>Service</th><th>Service Status</th><th>Payment Status</th><th>Paid $</th><th>Actions</th></tr></thead>
+          <tbody id="tbl-field-bookings"></tbody>
+        </table>
       </div>
 
       <div class="admin-panel" style="margin-top:12px">
@@ -343,6 +364,17 @@
           <button class="button" id="fs-create-rep-btn" type="button">Save Rep</button>
         </div>
         <p class="mini-note" id="fs-create-rep-status">Use this to create or rotate a rep PIN for the field console.</p>
+      </div>
+      <div class="admin-panel" style="margin-top:12px">
+        <div class="section-title">Leads Map</div>
+        <div style="display:grid;grid-template-columns:1fr 320px;gap:12px">
+          <div id="field-map"></div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="section-title" style="margin-bottom:6px">Leads</div>
+            <div id="leads-list"></div>
+          </div>
+        </div>
+        <p class="mini-note">Click a lead to view metadata: who set the lead and door event history.</p>
       </div>
     </section>
 
@@ -366,8 +398,10 @@
   const statusEl=document.getElementById('status');
   const createRepBtn=document.getElementById('fs-create-rep-btn');
   const createRepStatus=document.getElementById('fs-create-rep-status');
+  const fieldBookingsStatus=document.getElementById('fs-bookings-status');
   const tabButtons=Array.from(document.querySelectorAll('[data-tab-target]'));
   const tabPanels=Array.from(document.querySelectorAll('[data-tab-panel]'));
+  const fieldBookingLookup=new Map();
 
   const setText=(id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=String(val); };
   const setClass=(id,className)=>{ const el=document.getElementById(id); if(el) el.className=className; };
@@ -402,6 +436,19 @@
     tabPanels.forEach((panel)=>{
       panel.hidden=panel.dataset.tabPanel!==name;
     });
+    // If the Field Sales tab is shown, ensure the Leaflet map is initialized and resized
+    if(name === 'field'){
+      setTimeout(()=>{
+        try{
+          if(typeof fieldMap !== 'undefined' && fieldMap && typeof fieldMap.invalidateSize === 'function'){
+            fieldMap.invalidateSize(true);
+          } else {
+            // Try to initialize and render field map if it wasn't inited yet
+            try{ updateFieldMap(null); }catch(_e){}
+          }
+        }catch(_e){}
+      }, 220);
+    }
   }
 
   function setMenuOpen(open){
@@ -517,6 +564,33 @@
     return {data};
   }
 
+  async function patchJsonWithFallback(endpoints, token, body){
+    let res=null;
+    for(const ep of endpoints){
+      try{
+        const r=await fetch(ep,{
+          method:'PATCH',
+          headers:{'Content-Type':'application/json','x-admin-token':token},
+          body:JSON.stringify(body||{})
+        });
+        if(r.status===404) continue;
+        res=r;
+        break;
+      }catch(_e){}
+    }
+
+    if(!res) return {error:'Could not reach booking update endpoint.'};
+    if(res.status===401||res.status===403) return {authExpired:true};
+    if(!res.ok){
+      let text='';
+      try{text=await res.text();}catch(_e){}
+      return {error:`Update failed (${res.status}): ${String(text).slice(0,180)}`};
+    }
+
+    const data=await res.json().catch(()=>null);
+    return {data};
+  }
+
   function setCreateRepStatus(msg,isErr){
     if(!createRepStatus) return;
     createRepStatus.textContent=msg;
@@ -588,12 +662,24 @@
       `${API_BASE}/api/admin/field/summary?day=${encodeURIComponent(day)}&days=${encodeURIComponent(days)}`
     ];
 
-    const [analyticsRes, fieldRes]=await Promise.all([
+    const fieldBookingsEndpoints=[
+      `${API_BASE}/admin/field/bookings?day=${encodeURIComponent(day)}&days=${encodeURIComponent(days)}&limit=250`,
+      `${API_BASE}/api/admin/field/bookings?day=${encodeURIComponent(day)}&days=${encodeURIComponent(days)}&limit=250`
+    ];
+
+    const mapEndpoints=[
+      `${API_BASE}/admin/field/map-events?day=${encodeURIComponent(day)}&days=${encodeURIComponent(days)}&limit=1000`,
+      `${API_BASE}/api/admin/field/map-events?day=${encodeURIComponent(day)}&days=${encodeURIComponent(days)}&limit=1000`
+    ];
+
+    const [analyticsRes, fieldRes, bookingsRes, mapRes]=await Promise.all([
       fetchJsonWithFallback(endpoints, token),
-      fetchJsonWithFallback(fieldEndpoints, token)
+      fetchJsonWithFallback(fieldEndpoints, token),
+      fetchJsonWithFallback(fieldBookingsEndpoints, token),
+      fetchJsonWithFallback(mapEndpoints, token)
     ]);
 
-    if(analyticsRes.authExpired||fieldRes.authExpired){
+    if(analyticsRes.authExpired||fieldRes.authExpired||bookingsRes.authExpired||mapRes.authExpired){
       try{ sessionStorage.removeItem(TOKEN_KEY); }catch(_e){}
       redirectToSignIn('session-expired');
       return;
@@ -606,6 +692,9 @@
 
     render(analyticsRes.data, day, Number(days));
     renderFieldSales(fieldRes.data || null);
+    renderFieldBookings(bookingsRes.data || null, bookingsRes.error || '');
+    // Render authoritative map events for admin (no sample data fallback)
+    try{ updateFieldMap(mapRes.data || null); }catch(_e){ console.warn('Map render failed', _e); }
     setStatus(`Updated ${new Date().toLocaleString('en-US')}`,false);
   }
 
@@ -664,6 +753,7 @@
       setText('fs-interest-rate','0%');
       setText('fs-ondoor',0);
       setText('fs-attrib',0);
+      setText('fs-pay-eligible',0);
       setText('fs-overdue',0);
       renderFieldRepRows([]);
       renderFieldTrendRows([]);
@@ -676,6 +766,7 @@
     setText('fs-interest-rate',`${Number(s.interestRate||0).toFixed(1)}%`);
     setText('fs-ondoor',fmtNum(s.onDoorBooked||0));
     setText('fs-attrib',fmtNum(s.attributedBookings||0));
+    setText('fs-pay-eligible',fmtNum(s.payEligibleSales||0));
     setText('fs-overdue',fmtNum(s.overdueFollowups||0));
 
     renderFieldRepRows(Array.isArray(data.topReps)?data.topReps:[]);
@@ -686,7 +777,7 @@
     const tb=document.getElementById('tbl-field-reps');
     if(!tb) return;
     if(!rows.length){
-      tb.innerHTML='<tr><td colspan="5">No field rep data yet</td></tr>';
+      tb.innerHTML='<tr><td colspan="6">No field rep data yet</td></tr>';
       return;
     }
     tb.innerHTML=rows.map((r)=>`<tr>
@@ -694,6 +785,7 @@
       <td>${fmtNum(r.doors||0)}</td>
       <td>${fmtNum(r.interested||0)}</td>
       <td>${fmtNum(r.attributedBookings||0)}</td>
+      <td>${fmtNum(r.payEligibleSales||0)}</td>
       <td>${Number(r.interestRate||0).toFixed(1)}%</td>
     </tr>`).join('');
   }
@@ -702,7 +794,7 @@
     const tb=document.getElementById('tbl-field-trend');
     if(!tb) return;
     if(!rows.length){
-      tb.innerHTML='<tr><td colspan="4">No field trend data yet</td></tr>';
+      tb.innerHTML='<tr><td colspan="5">No field trend data yet</td></tr>';
       return;
     }
     tb.innerHTML=rows.map((r)=>`<tr>
@@ -710,7 +802,293 @@
       <td>${fmtNum(r.doors||0)}</td>
       <td>${fmtNum(r.onDoorBooked||0)}</td>
       <td>${fmtNum(r.attributedBookings||0)}</td>
+      <td>${fmtNum(r.payableSales||0)}</td>
     </tr>`).join('');
+  }
+
+  function setFieldBookingsStatus(msg,isErr){
+    if(!fieldBookingsStatus) return;
+    fieldBookingsStatus.textContent=msg;
+    fieldBookingsStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
+  }
+
+  function bookingServiceStatusOptions(selected){
+    const current=String(selected||'').trim().toLowerCase();
+    const options=[
+      ['scheduled','Scheduled'],
+      ['completed','Completed'],
+      ['no_show','No Show'],
+      ['cancelled','Cancelled']
+    ];
+    return options.map(([value,label])=>`<option value="${value}"${value===current?' selected':''}>${label}</option>`).join('');
+  }
+
+  function bookingPaymentStatusOptions(selected){
+    const current=String(selected||'').trim().toLowerCase();
+    const options=[
+      ['unpaid','Unpaid'],
+      ['paid','Paid'],
+      ['refunded','Refunded'],
+      ['disputed','Disputed']
+    ];
+    return options.map(([value,label])=>`<option value="${value}"${value===current?' selected':''}>${label}</option>`).join('');
+  }
+
+  function renderFieldBookings(data,errorMessage){
+    const tb=document.getElementById('tbl-field-bookings');
+    if(!tb) return;
+
+    fieldBookingLookup.clear();
+    if(errorMessage){
+      tb.innerHTML='<tr><td colspan="8">Could not load booking settlement data.</td></tr>';
+      setFieldBookingsStatus(errorMessage,true);
+      return;
+    }
+
+    const items=Array.isArray(data&&data.items)?data.items:[];
+    const summary=(data&&data.summary&&typeof data.summary==='object')?data.summary:{};
+    if(!items.length){
+      tb.innerHTML='<tr><td colspan="8">No bookings found in selected window.</td></tr>';
+      setFieldBookingsStatus('No bookings in this window yet.',false);
+      return;
+    }
+
+    items.forEach((item)=>fieldBookingLookup.set(String(item.id||''),item));
+    tb.innerHTML=items.map((item)=>{
+      const id=String(item.id||'');
+      const dateLabel=item.startAt?new Date(item.startAt).toLocaleString('en-US'):'-';
+      const client=[item.leadName||'Client', item.leadPhone||item.leadEmail||''].filter(Boolean).join(' · ');
+      const paidDollars=Number(item.paidAmountCents||0)/100;
+      return `<tr>
+        <td>${escapeHtml(dateLabel)}</td>
+        <td>${escapeHtml(item.repName||item.repId||'Rep')}</td>
+        <td>${escapeHtml(client)}</td>
+        <td>${escapeHtml(String(item.eventTypeSlug||'').replaceAll('-',' '))}</td>
+        <td><select class="sel fs-booking-service-status" data-booking-id="${escapeHtml(id)}">${bookingServiceStatusOptions(item.serviceStatus)}</select></td>
+        <td><select class="sel fs-booking-payment-status" data-booking-id="${escapeHtml(id)}">${bookingPaymentStatusOptions(item.paymentStatus)}</select></td>
+        <td><input class="inp fs-booking-paid-amount" data-booking-id="${escapeHtml(id)}" type="number" min="0" step="0.01" value="${Number.isFinite(paidDollars)?paidDollars.toFixed(2):'0.00'}"/></td>
+        <td><button class="button outline fs-booking-save" type="button" data-booking-id="${escapeHtml(id)}">Save</button></td>
+      </tr>`;
+    }).join('');
+
+    setFieldBookingsStatus(
+      `Loaded ${fmtNum(summary.total||items.length)} bookings. Completed: ${fmtNum(summary.completed||0)} · Paid: ${fmtNum(summary.paid||0)} · Pay-Eligible: ${fmtNum(summary.payEligible||0)}.`,
+      false
+    );
+  }
+
+  async function saveFieldBookingLifecycle(bookingId){
+    const id=String(bookingId||'').trim();
+    if(!id) return;
+
+    const token=getToken();
+    if(!token){
+      redirectToSignIn('auth-required');
+      return;
+    }
+
+    const serviceSel=document.querySelector(`.fs-booking-service-status[data-booking-id="${id}"]`);
+    const paymentSel=document.querySelector(`.fs-booking-payment-status[data-booking-id="${id}"]`);
+    const paidInput=document.querySelector(`.fs-booking-paid-amount[data-booking-id="${id}"]`);
+    const saveBtn=document.querySelector(`.fs-booking-save[data-booking-id="${id}"]`);
+    if(!serviceSel||!paymentSel||!paidInput||!saveBtn) return;
+
+    const paidRaw=Number(paidInput.value||0);
+    const paidAmountCents=Number.isFinite(paidRaw)&&paidRaw>0?Math.round(paidRaw*100):0;
+    const body={
+      serviceStatus:String(serviceSel.value||'scheduled'),
+      paymentStatus:String(paymentSel.value||'unpaid'),
+      paidAmountCents
+    };
+
+    saveBtn.disabled=true;
+    setFieldBookingsStatus('Saving booking lifecycle update...',false);
+    try{
+      const endpoints=[
+        `${API_BASE}/admin/field/bookings/${encodeURIComponent(id)}`,
+        `${API_BASE}/api/admin/field/bookings/${encodeURIComponent(id)}`
+      ];
+      const res=await patchJsonWithFallback(endpoints, token, body);
+      if(res.authExpired){
+        try{ sessionStorage.removeItem(TOKEN_KEY); }catch(_e){}
+        redirectToSignIn('session-expired');
+        return;
+      }
+      if(res.error){
+        setFieldBookingsStatus(res.error,true);
+        return;
+      }
+      setFieldBookingsStatus('Booking lifecycle updated.',false);
+      await fetchAnalytics();
+    }catch(err){
+      setFieldBookingsStatus(String(err&&err.message?err.message:'Update failed'),true);
+    } finally {
+      saveBtn.disabled=false;
+    }
+  }
+
+  // Field sales map integration
+  const FIELD_DEFAULT_CENTER = [37.6775, -113.0619];
+  const FIELD_DEFAULT_ZOOM = 12;
+  let fieldMap = null;
+  let fieldMarkerLayer = null;
+  let fieldMarkers = new Map();
+  let leadsIndex = {};
+  const repColorMap = {};
+  const repColorPalette = ['#4f46e5','#10b981','#f59e0b','#ef4444','#6366f1','#06b6d4','#a78bfa','#fb7185'];
+
+  function hashStringToInt(s){
+    let h = 0; if(!s) return 0; for(let i=0;i<s.length;i++){ h = ((h<<5) - h) + s.charCodeAt(i); h |= 0; } return Math.abs(h);
+  }
+
+  function getColorForRep(repId){
+    if(!repId) return '#0ea5df';
+    if(repColorMap[repId]) return repColorMap[repId];
+    const idx = hashStringToInt(String(repId)) % repColorPalette.length;
+    repColorMap[repId] = repColorPalette[idx];
+    return repColorMap[repId];
+  }
+
+  function findLeadRepId(lead){
+    return lead.repId || lead.rep_id || lead.created_by_rep_id || lead.created_by || lead.created_by_id || null;
+  }
+
+  function getLeadDisplayName(lead){
+    if(lead.name) return lead.name;
+    if(lead.first_name) return `${lead.first_name}${lead.last_name?(' '+lead.last_name):''}`;
+    if(lead.firstName) return `${lead.firstName}${lead.lastName?(' '+lead.lastName):''}`;
+    if(lead.phone) return lead.phone;
+    if(lead.email) return lead.email;
+    return 'Lead';
+  }
+
+  function initFieldMap(){
+    if(typeof L === 'undefined') return;
+    if(fieldMap) return;
+    try{
+      fieldMap = L.map('field-map', { scrollWheelZoom: true, attributionControl: false }).setView(FIELD_DEFAULT_CENTER, FIELD_DEFAULT_ZOOM);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(fieldMap);
+      fieldMarkerLayer = L.layerGroup().addTo(fieldMap);
+    }catch(_e){ console.warn('Leaflet init failed', _e); }
+  }
+
+  function clearFieldMarkers(){
+    if(fieldMarkerLayer) fieldMarkerLayer.clearLayers();
+    fieldMarkers = new Map();
+    leadsIndex = {};
+    const list = document.getElementById('leads-list');
+    if(list) list.innerHTML = '';
+  }
+
+  function addLeadMarker(lead, rep){
+    if(!fieldMap || !lead) return;
+    const lat = Number(lead.lat||lead.latitude||lead.lat);
+    const lng = Number(lead.lng||lead.longitude||lead.lon||lead.lng);
+    if(!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+    const key = String(lead.id || `${lat}-${lng}`);
+    const repId = rep && (rep.id||rep.rep_id) || findLeadRepId(lead);
+    const color = getColorForRep(repId);
+    const marker = L.circleMarker([lat,lng], { radius:7, fillColor:color, color:'#111', weight:1, opacity:1, fillOpacity:0.95 });
+    const leadName = escapeHtml(getLeadDisplayName(lead));
+    const knockedByDisplay = rep && (rep.display_name||rep.displayName||rep.name) ? escapeHtml(rep.display_name||rep.displayName||rep.name) : (repId?escapeHtml(repId):'Unknown');
+    const setterDisplay = escapeHtml(lead.leadCreatedByName || lead.leadCreatedBy || lead.created_by_rep_id || lead.created_by || 'Unknown');
+    let popupHtml = `<div style="min-width:180px"><strong>${leadName}</strong><div style="font-size:.85rem;color:var(--tx2);margin-top:6px">Set by: ${setterDisplay}</div><div style="font-size:.85rem;color:var(--tx2);margin-top:4px">Knocked by: ${knockedByDisplay}</div>`;
+    if(lead.notes || lead.note) popupHtml += `<div style="margin-top:6px">${escapeHtml(lead.notes||lead.note)}</div>`;
+    if(Array.isArray(lead.doorEvents) && lead.doorEvents.length){
+      popupHtml += `<div style="margin-top:8px;font-size:.8rem;color:var(--tx2)"><strong>Door events:</strong><ul style="padding-left:18px;margin:6px 0 0 0">` +
+        lead.doorEvents.map(de=>`<li>${escapeHtml(String(de.event||de.type||de.outcome||''))}${de.outcome?(' — '+escapeHtml(String(de.outcome))):''}</li>`).join('') + `</ul></div>`;
+    }
+    popupHtml += `</div>`;
+    marker.bindPopup(popupHtml);
+    marker.addTo(fieldMarkerLayer);
+    fieldMarkers.set(key, marker);
+    leadsIndex[key] = { lead, rep, marker };
+    return key;
+  }
+
+  function buildLeadsList(leads){
+    const wrap = document.getElementById('leads-list');
+    if(!wrap) return;
+    if(!leads||!leads.length){ wrap.innerHTML = '<div class="mini-note">No leads available</div>'; return; }
+    wrap.innerHTML = leads.map((lead, idx)=>{
+      const name = escapeHtml( (lead && (lead.name || lead.displayName)) ? (lead.name || lead.displayName) : getLeadDisplayName(lead) );
+      const addr = escapeHtml(lead.address_line1||lead.address||lead.city||'');
+      const id = String(lead.id || `${lead.lat||lead.latitude}-${lead.lng||lead.longitude}` || `lead-${idx}`);
+      return `<div class="lead-row" data-lead-id="${id}" role="button" tabindex="0"><div style="font-weight:800">${name}</div><div style="font-size:.85rem;color:var(--tx2)">${addr}</div></div>`;
+    }).join('');
+    wrap.querySelectorAll('.lead-row').forEach(el=>{
+      el.addEventListener('click',()=>{
+        const id = el.dataset.leadId;
+        const info = leadsIndex[id];
+        if(info && info.marker){
+          info.marker.openPopup();
+          try{ fieldMap.setView(info.marker.getLatLng(), Math.max(fieldMap.getZoom(), 15), { animate:true }); }catch(_e){}
+        }
+      });
+      el.addEventListener('keydown',(e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); el.click(); } });
+    });
+  }
+
+  async function updateFieldMap(fieldData){
+    try{
+      initFieldMap();
+      clearFieldMarkers();
+      const data = fieldData || null;
+      if(!data){
+        // No authoritative data available: leave map empty
+        return;
+      }
+
+      // Case A: admin map-events format (items)
+      if(Array.isArray(data.items)){
+        const items = data.items;
+        // Build markers per door event
+        items.forEach((it, idx)=>{
+          const leadLike = {
+            id: String(it.id || (`event-${idx}`)),
+            first_name: it.leadFirstName || it.leadFirstName || '',
+            last_name: it.leadLastName || it.leadLastName || '',
+            phone: it.leadPhone || it.leadPhone || '',
+            email: it.leadEmail || it.leadEmail || '',
+            address_line1: it.addressLine1 || it.addressLine1 || '',
+            city: it.city || it.city || '',
+            lat: it.lat,
+            lng: it.lng,
+            notes: it.outcomeDetail || it.outcomeDetail || '',
+            outcome: it.outcome,
+            leadCreatedBy: it.leadCreatedBy || null,
+            leadCreatedByName: it.leadCreatedByName || null,
+          };
+          const repObj = { id: it.repId || null, displayName: it.repName || '' };
+          addLeadMarker(leadLike, repObj);
+        });
+        buildLeadsList(items.map((it, idx)=>({ id: String(it.id||`event-${idx}`), name: (it.leadFirstName?`${it.leadFirstName}${it.leadLastName?(' '+it.leadLastName):''}`:it.leadPhone||it.leadEmail||'Lead'), address_line1: it.addressLine1 || it.city || '' })));
+      } else {
+        // Case B: legacy reps/leads payload
+        const repsById = {};
+        if(Array.isArray(data.reps)) data.reps.forEach(r=>{ repsById[r.id] = r; if(r.id && (r.display_name && !r.displayName)) { r.displayName = r.display_name; } });
+        const leads = Array.isArray(data.leads) ? data.leads : (Array.isArray(data.leadList) ? data.leadList : []);
+        leads.forEach((lead, idx)=>{
+          if(!lead.id) lead.id = `lead-${idx}`;
+          if(Array.isArray(data.door_events)){
+            lead.doorEvents = data.door_events.filter(de => String(de.lead_id) === String(lead.id) || String(de.leadId) === String(lead.id));
+          }
+          const repId = findLeadRepId(lead);
+          const repObj = repsById[repId] || null;
+          addLeadMarker(lead, repObj);
+        });
+        buildLeadsList(leads);
+      }
+      const pts = Array.from(fieldMarkers.values()).map(m=>m.getLatLng()).filter(Boolean);
+      if(pts.length){
+        const bounds = L.latLngBounds(pts);
+        fieldMap.fitBounds(bounds.pad(0.2), { maxZoom: 14 });
+        setTimeout(()=>{ try{ fieldMap.invalidateSize(true); }catch(_e){} }, 250);
+      } else {
+        // No markers: default to Cedar City at a sensible zoom
+        try{ fieldMap.setView(FIELD_DEFAULT_CENTER, FIELD_DEFAULT_ZOOM); fieldMap.invalidateSize(true); }catch(_e){}
+      }
+    }catch(_e){ console.warn('Field map error', _e); }
   }
 
   function riskLabel(metrics){
@@ -812,6 +1190,13 @@
   });
 
   refreshBtn.addEventListener('click',fetchAnalytics);
+  document.addEventListener('click',(ev)=>{
+    const btn=ev.target&&ev.target.closest?ev.target.closest('.fs-booking-save'):null;
+    if(!btn) return;
+    const bookingId=btn.getAttribute('data-booking-id')||'';
+    if(!bookingId) return;
+    saveFieldBookingLifecycle(bookingId);
+  });
   createRepBtn?.addEventListener('click',createRep);
   signoutBtn?.addEventListener('click',()=>{
     setMenuOpen(false);

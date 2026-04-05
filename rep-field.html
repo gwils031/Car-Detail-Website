@@ -9,39 +9,187 @@
   <link rel="stylesheet" href="/css/components.css"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
   <style>
-    .rep-shell{max-width:980px;margin:0 auto;padding:22px}
-    .rep-card{background:var(--srf);border:1px solid var(--bdr);border-radius:var(--r);padding:14px}
-    .rep-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .rep-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
-    .rep-kpi{background:var(--srf);border:1px solid var(--bdr);border-radius:10px;padding:10px}
-    .rep-k{font-size:.67rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
-    .rep-v{font-size:1.2rem;font-weight:800;color:var(--tx);margin-top:4px}
+    .rep-shell{max-width:1500px;margin:0 auto;padding:22px 24px 30px;display:grid;gap:14px}
+    .section-title{font-size:.86rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--tx);margin-bottom:8px}
+    .rep-card{background:linear-gradient(180deg,var(--srf) 0%,var(--srf2) 100%);border:1px solid var(--bdrmd);border-radius:14px;padding:16px 16px 14px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+    .rep-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+    .rep-map-layout{grid-template-columns:minmax(0,2.2fr) minmax(340px,1fr)}
+    .rep-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .rep-kpi{background:var(--srf);border:1px solid var(--bdr);border-radius:12px;padding:12px;min-height:80px;display:grid;align-content:start;gap:4px}
+    .rep-k{font-size:.64rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.09em;font-weight:800;line-height:1.2}
+    .rep-v{font-size:1.35rem;font-weight:800;color:var(--tx);line-height:1.15;font-variant-numeric:tabular-nums}
     .rep-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .rep-status{margin-top:8px;font-size:.83rem;color:var(--tx2)}
-    .rep-list{display:grid;gap:8px}
-    .rep-item{border:1px solid var(--bdr);border-radius:10px;background:var(--srf2);padding:10px}
-    .rep-item h4{margin:0 0 6px;font-size:.9rem}
-    .rep-item p{margin:0;font-size:.8rem;color:var(--tx2)}
+    .rep-status{margin-top:10px;font-size:.81rem;color:var(--tx2);line-height:1.45;background:var(--srf2);border:1px solid var(--bdr);border-radius:10px;padding:8px 10px}
+    .rep-list{display:grid;gap:10px}
+    .rep-item{border:1px solid var(--bdr);border-radius:11px;background:var(--srf2);padding:12px}
+    .rep-item h4{margin:0 0 6px;font-size:.91rem;line-height:1.3;color:var(--tx)}
+    .rep-item p{margin:0;font-size:.81rem;color:var(--tx2);line-height:1.45}
     .rep-hidden{display:none}
-    .rep-actions{display:flex;gap:8px;flex-wrap:wrap}
-    .rep-note{font-size:.8rem;color:var(--tx2);margin-top:6px}
-    .rep-map{height:320px;border:1px solid var(--bdr);border-radius:10px;overflow:hidden;background:#e5e7eb}
+    .rep-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .rep-note{font-size:.8rem;color:var(--tx2);margin-top:6px;line-height:1.45}
+      .rep-help-dropdown{margin:8px 0 10px;border:1px solid var(--bdr);border-radius:10px;background:rgba(255,255,255,.01)}
+    .rep-help-dropdown summary{list-style:none;cursor:pointer;padding:10px 12px;font-size:.82rem;font-weight:700;color:var(--tx);display:flex;align-items:center;justify-content:space-between}
+    .rep-help-dropdown summary::-webkit-details-marker{display:none}
+    .rep-help-dropdown summary::after{content:'+';font-size:1rem;font-weight:800;color:var(--tx2)}
+    .rep-help-dropdown[open] summary::after{content:'-'}
+    .rep-help-dropdown p{margin:0;padding:0 12px 10px;font-size:.8rem;color:var(--tx2)}
+      .rep-map-log-dropdown{margin-top:10px;border:1px solid var(--bdr);border-radius:10px;background:rgba(255,255,255,.01)}
+    .rep-map-log-dropdown summary{list-style:none;cursor:pointer;padding:10px 12px;font-size:.84rem;font-weight:800;color:var(--tx);display:flex;align-items:center;justify-content:space-between}
+    .rep-map-log-dropdown summary::-webkit-details-marker{display:none}
+    .rep-map-log-dropdown summary::after{content:'+';font-size:1rem;font-weight:800;color:var(--tx2)}
+    .rep-map-log-dropdown[open] summary::after{content:'-'}
+    .rep-map-log-body{padding:0 12px 12px}
+    .rep-photo-upload{display:grid;gap:8px;margin-top:10px}
+    .rep-photo-preview{min-height:78px;border:1px dashed var(--bdr);border-radius:10px;background:var(--srf);display:flex;align-items:center;justify-content:center;padding:8px;overflow:hidden}
+    .rep-photo-preview img{max-height:120px;max-width:100%;border-radius:8px;object-fit:cover}
+      .rep-map{position:relative;z-index:190;height:clamp(560px,72vh,920px);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;background:#e5e7eb;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+    .rep-map *,.leaflet-container,.leaflet-container *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+    .rep-map .leaflet-container{height:100%;width:100%;overflow:hidden!important;border-radius:12px;background:#e5e7eb}
+    .rep-map .leaflet-popup-pane{z-index:1890!important}
+    .rep-map .leaflet-control-container{z-index:1750}
+    .rep-map .leaflet-control-zoom{display:none!important}
+    .rep-dot-dialog{width:min(92vw,640px);max-width:100%;box-sizing:border-box;overflow:hidden;overflow-wrap:anywhere;color:#0f172a;line-height:1.4;color-scheme:light}
+    .leaflet-popup-content-wrapper{max-width:min(95vw,680px);max-height:min(74dvh,720px);overflow:hidden;background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);border:1px solid #dbe5f1;border-radius:18px;box-shadow:0 18px 40px rgba(15,23,42,.2)}
+    .leaflet-popup-content{width:min(92vw,640px)!important;max-width:100%!important;max-height:min(66dvh,620px);overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:calc(8px + env(safe-area-inset-bottom));margin:12px 14px!important;box-sizing:border-box}
+    .leaflet-popup-tip{background:#f8fafc;box-shadow:none}
+    .rep-dot-dialog *,.rep-popup-form *,.rep-popup-row *{box-sizing:border-box;max-width:100%;min-width:0}
+    .rep-dot-title{font-size:1rem;font-weight:800;letter-spacing:.01em;line-height:1.2}
+    .rep-dot-meta{margin-top:3px;font-size:.8rem;color:#475569;font-weight:600}
+    .rep-dot-address{margin-top:8px;font-size:.86rem;color:#0f172a;font-weight:600}
+    .rep-dot-sub{margin-top:6px;font-size:.79rem;color:#475569}
+    .rep-dot-detail{margin-top:8px;padding:8px 10px;border-radius:10px;border:1px solid #e2e8f0;background:#f8fafc;font-size:.8rem;color:#334155}
+    .rep-dot-dialog .rep-note{margin-top:0;color:#475569;font-size:.79rem}
     .rep-popup-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .rep-popup-btn{padding:6px 10px;border-radius:8px;border:1px solid #c9ced8;background:#ffffff;color:#1f2937;font-size:.78rem;font-weight:700;cursor:pointer}
-    .rep-popup-btn:hover{border-color:#111827}
-    .rep-map-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .rep-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--bdr);border-radius:999px;background:var(--srf2);font-size:.75rem;color:var(--tx2)}
-    .rep-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-    .rep-legend-item{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--bdr);border-radius:999px;background:var(--srf2);font-size:.74rem;color:var(--tx2)}
+    .rep-popup-btn{padding:7px 11px;border-radius:9px;border:1px solid #d5dde8;background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);color:#1f2937;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .14s ease}
+    .rep-popup-btn:hover{border-color:#64748b;transform:translateY(-1px)}
+    .rep-popup-btn:disabled{opacity:.58;cursor:wait;transform:none}
+    .rep-popup-btn[data-flow-action="save-event"]{background:linear-gradient(180deg,#1f2937 0%,#111827 100%);color:#f8fafc;border-color:#0f172a}
+    .rep-popup-btn[data-flow-action="save-event"]:hover{border-color:#111827;background:linear-gradient(180deg,#334155 0%,#1f2937 100%)}
+    .rep-popup-form{display:grid;gap:8px;margin-top:10px}
+    .rep-popup-form label{font-size:.78rem;font-weight:700;color:#334155;letter-spacing:.01em}
+    .rep-popup-form .inp,.rep-popup-form .sel,.rep-popup-form textarea{font-size:.82rem;padding:9px 10px;width:100%;max-width:100%;min-width:0;background:#ffffff;color:#0f172a;border:1px solid #cbd5e1;border-radius:10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+    .rep-popup-form .inp::placeholder,.rep-popup-form textarea::placeholder{color:#64748b}
+    .rep-popup-form .inp:focus,.rep-popup-form .sel:focus,.rep-popup-form textarea:focus{outline:none;border-color:#334155;box-shadow:0 0 0 3px rgba(51,65,85,.14)}
+    .rep-popup-form textarea{resize:vertical}
+    .rep-popup-form .rep-note{margin-top:0}
+    .rep-popup-choice{padding:8px 12px;border-radius:999px;border:1px solid #d5dde8;background:#fff;font-size:.78rem;font-weight:700;cursor:pointer;color:#1f2937;transition:all .14s ease}
+    .rep-popup-choice:hover{border-color:#475569;background:#f8fafc;transform:translateY(-1px)}
+    .rep-popup-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .rep-month-shell{display:grid;gap:8px;margin-top:4px}
+    .rep-month-head{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap}
+    .rep-month-title{font-size:.8rem;font-weight:800;color:#0f172a;letter-spacing:.01em}
+    .rep-month-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+    .rep-month-weekday{font-size:.68rem;font-weight:700;color:#64748b;text-align:center}
+    .rep-day-btn{display:grid;gap:2px;justify-items:center;align-content:center;min-height:50px;padding:6px 4px;border-radius:10px;border:1px solid #d5dde8;background:#fff;color:#1f2937;cursor:pointer}
+    .rep-day-btn strong{font-size:.78rem;line-height:1}
+    .rep-day-btn small{font-size:.64rem;color:#64748b;line-height:1}
+    .rep-day-btn:hover{border-color:#334155;background:#f8fafc}
+    .rep-day-btn.active{border-color:#0f172a;background:#1f2937;color:#f8fafc}
+    .rep-day-btn.active small{color:#e2e8f0}
+    .rep-day-btn:disabled{opacity:.4;cursor:not-allowed}
+    .rep-time-wrap{display:grid;gap:6px}
+    .rep-time-grid{display:flex;gap:6px;flex-wrap:wrap}
+    .rep-time-btn{font-size:.74rem;padding:5px 9px;border-radius:999px;border:1px solid #d5dde8;background:#fff;color:#1f2937;cursor:pointer}
+    .rep-time-btn:hover{border-color:#334155;background:#f8fafc}
+    .rep-time-btn.active{border-color:#0f172a;background:#0f172a;color:#f8fafc}
+    .rep-time-empty{font-size:.74rem;color:#64748b;padding:6px 0}
+    @media(max-width:640px){.rep-popup-row{grid-template-columns:1fr}}
+    .rep-map-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--bdr)}
+    .rep-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border:1px solid var(--bdr);border-radius:999px;background:var(--srf2);font-size:.75rem;color:var(--tx2)}
+    .rep-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .rep-legend-item{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border:1px solid var(--bdr);border-radius:999px;background:var(--srf2);font-size:.74rem;color:var(--tx2)}
     .rep-legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
-    .rep-slots{display:grid;gap:8px;margin-top:10px}
-    .rep-slot-item{border:1px solid var(--bdr);border-radius:10px;background:var(--srf2);padding:10px}
-    .rep-slot-date{font-size:.84rem;font-weight:700;color:var(--tx)}
+    .rep-slots{display:grid;gap:10px;margin-top:10px}
+    .rep-slot-item{border:1px solid var(--bdr);border-radius:11px;background:var(--srf2);padding:12px}
+    .rep-slot-date{font-size:.84rem;font-weight:800;color:var(--tx);line-height:1.3}
     .rep-slot-times{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
     .rep-slot-time{font-size:.74rem;padding:3px 8px;border-radius:999px;border:1px solid var(--bdr);background:var(--srf)}
+    .rep-sched-wrap{display:grid;gap:8px}
+    .rep-sched-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+    .rep-sched-title{font-size:.84rem;font-weight:800;color:var(--tx)}
+    .rep-sched-sub{font-size:.72rem;color:var(--tx3)}
+    .rep-sched-scroll{overflow:auto;padding-bottom:4px}
+    .rep-sched-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;min-width:700px}
+    .rep-sched-weekday{font-size:.62rem;font-weight:800;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;text-align:center;padding:2px 0}
+    .rep-sched-day{border:1px solid var(--bdr);border-radius:10px;background:var(--srf);padding:7px;min-height:98px;display:grid;align-content:start;gap:5px;cursor:pointer;transition:border-color .14s ease,box-shadow .14s ease,transform .14s ease;appearance:none;text-align:left;font:inherit;color:inherit}
+    .rep-sched-day:hover{border-color:#5b6b85;transform:translateY(-1px)}
+    .rep-sched-day:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(59,130,246,.24)}
+    .rep-sched-day.active{border-color:#0ea5e9;box-shadow:0 0 0 2px rgba(14,165,233,.2) inset}
+    .rep-sched-day.is-empty{opacity:.62;background:var(--srf2);border-style:dashed}
+    .rep-sched-day.is-low{border-color:rgba(245,158,11,.45)}
+    .rep-sched-day.is-medium{border-color:rgba(34,197,94,.45)}
+    .rep-sched-day.is-high{border-color:rgba(14,165,233,.45)}
+    .rep-sched-date-row{display:flex;justify-content:space-between;align-items:center;gap:6px}
+    .rep-sched-date{font-size:.82rem;font-weight:800;color:var(--tx);line-height:1}
+    .rep-sched-count{min-width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:900;border:1px solid var(--bdr);border-radius:999px;padding:0 6px;background:var(--srf2);color:var(--tx2);line-height:1}
+    .rep-sched-count.is-zero{opacity:.65}
+    .rep-sched-times{display:flex;flex-wrap:wrap;gap:5px}
+    .rep-sched-time{font-size:.64rem;padding:3px 6px;border-radius:999px;border:1px solid var(--bdr);background:var(--srf2);color:var(--tx2);line-height:1.15}
+    .rep-sched-more{font-size:.64rem;color:var(--tx3);font-weight:700;letter-spacing:.01em}
+    .rep-sched-empty{font-size:.7rem;color:var(--tx3);line-height:1}
+    .rep-sched-popup-backdrop{position:fixed;inset:0;z-index:4200;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(2,6,23,.42);backdrop-filter:blur(4px)}
+    .rep-sched-popup-backdrop.open{display:flex}
+    .rep-sched-popup{width:min(480px,calc(100vw - 24px));max-height:min(78vh,620px);overflow:auto;border:1px solid var(--bdr);border-radius:18px;background:linear-gradient(180deg,var(--srf) 0%,var(--srf2) 100%);padding:12px;box-shadow:0 20px 44px rgba(2,6,23,.32)}
+    .rep-sched-popup-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+    .rep-sched-popup-kicker{font-size:.72rem;color:var(--tx3);font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+    .rep-sched-popup-title{font-size:1rem;font-weight:900;color:var(--tx);line-height:1.2;margin-top:2px}
+    .rep-sched-popup-meta{font-size:.76rem;color:var(--tx2);margin-top:3px}
+    .rep-sched-popup-close{border:1px solid var(--bdr);background:var(--srf);color:var(--tx2);font-size:.76rem;font-weight:800;padding:6px 10px;border-radius:999px;cursor:pointer}
+    .rep-sched-popup-close:hover{border-color:#5b6b85;color:var(--tx)}
+    .rep-sched-popup-times{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+    .rep-sched-popup-time{font-size:.78rem;font-weight:700;padding:7px 10px;border-radius:999px;border:1px solid var(--bdr);background:var(--srf);color:var(--tx2);line-height:1.2}
+    .rep-sched-popup-empty{font-size:.78rem;color:var(--tx3)}
+    .rep-followup-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+    .rep-followup-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+    .rep-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;border:1px solid var(--bdr);background:var(--srf);font-size:.68rem;font-weight:800;letter-spacing:.02em;color:var(--tx2);line-height:1.2}
+    .rep-badge-status{text-transform:capitalize}
+    .rep-followup-lines{display:grid;gap:4px;margin-top:8px}
+    .rep-followup-line{font-size:.79rem;color:var(--tx2);line-height:1.4}
+    .rep-followup-line strong{color:var(--tx);font-weight:700}
+    .rep-followup-toolbar{position:sticky;top:10px;z-index:40;display:grid;gap:8px;margin:2px 0 10px;padding:10px;border:1px solid var(--bdr);border-radius:12px;background:rgba(15,23,42,.88);backdrop-filter:blur(8px)}
+    .rep-followup-stats{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .rep-followup-stat{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid var(--bdr);background:var(--srf);font-size:.68rem;font-weight:800;color:var(--tx2);line-height:1.2}
+    .rep-followup-tabs{display:flex;gap:6px;flex-wrap:wrap}
+    .rep-followup-tab{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--bdr);background:var(--srf);color:var(--tx2);padding:5px 10px;border-radius:999px;font-size:.7rem;font-weight:800;cursor:pointer;line-height:1.2}
+    .rep-followup-tab .count{font-size:.66rem;padding:2px 6px;border-radius:999px;background:var(--srf2);border:1px solid var(--bdr)}
+    .rep-followup-tab:hover{border-color:#5b6b85;color:var(--tx)}
+    .rep-followup-tab.active{border-color:#38bdf8;color:#e0f2fe;background:rgba(12,74,110,.36)}
+    .rep-followup-tab.active .count{border-color:#38bdf8;background:rgba(14,165,233,.24)}
+    .rep-followup-controls{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,.8fr) auto;gap:8px}
+    .rep-followup-controls .inp,.rep-followup-controls .sel{font-size:.78rem;padding:8px 10px;min-height:36px;border-radius:9px}
+    .rep-followup-clear{font-size:.74rem;font-weight:800;padding:8px 10px;border-radius:9px;border:1px solid var(--bdr);background:var(--srf);color:var(--tx2);cursor:pointer}
+    .rep-followup-clear:hover{border-color:#5b6b85;color:var(--tx)}
+    .rep-followup-group{border:1px solid var(--bdr);border-radius:11px;background:var(--srf2);overflow:hidden}
+    .rep-followup-group + .rep-followup-group{margin-top:10px}
+    .rep-followup-group summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;background:rgba(148,163,184,.08);font-size:.78rem;font-weight:800;color:var(--tx)}
+    .rep-followup-group summary::-webkit-details-marker{display:none}
+    .rep-followup-group summary::after{content:'+';font-size:.95rem;color:var(--tx3)}
+    .rep-followup-group[open] summary::after{content:'-'}
+    .rep-followup-group-list{padding:8px;display:grid;gap:8px}
+    .rep-followup-group-count{font-size:.68rem;color:var(--tx3);font-weight:700}
+    .rep-followup-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+    .rep-followup-action{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid var(--bdr);background:var(--srf);font-size:.72rem;font-weight:800;color:var(--tx2);text-decoration:none;line-height:1.2}
+    .rep-followup-action:hover{border-color:#5b6b85;color:var(--tx)}
+    .rep-followup-action.call,.rep-followup-action.text{border-color:#16a34a;color:#dcfce7;background:rgba(22,163,74,.34)}
+    .rep-followup-action.call:hover,.rep-followup-action.text:hover{border-color:#22c55e;color:#f0fdf4;background:rgba(22,163,74,.5)}
+    .rep-followup-action.book{border-color:var(--bdr);color:var(--tx3);background:transparent}
+    .rep-followup-action.book:hover{border-color:#64748b;color:var(--tx2)}
+    .rep-followup-filter-empty{font-size:.81rem;color:var(--tx2);line-height:1.45}
+    .rep-item.rep-due-critical{border-left:4px solid #ef4444}
+    .rep-item.rep-due-overdue{border-left:4px solid #f97316}
+    .rep-item.rep-due-urgent{border-left:4px solid #f59e0b}
+    .rep-item.rep-due-soon{border-left:4px solid #22c55e}
+    .rep-item.rep-due-upcoming{border-left:4px solid #0ea5e9}
+    .rep-item.rep-due-none{border-left:4px solid #64748b}
+    .rep-badge.rep-due-critical{color:#fecaca;border-color:#ef4444;background:rgba(127,29,29,.32)}
+    .rep-badge.rep-due-overdue{color:#fed7aa;border-color:#f97316;background:rgba(124,45,18,.32)}
+    .rep-badge.rep-due-urgent{color:#fde68a;border-color:#f59e0b;background:rgba(120,53,15,.32)}
+    .rep-badge.rep-due-soon{color:#bbf7d0;border-color:#22c55e;background:rgba(20,83,45,.32)}
+    .rep-badge.rep-due-upcoming{color:#bae6fd;border-color:#0ea5e9;background:rgba(12,74,110,.32)}
+    .rep-badge.rep-due-none{color:#cbd5e1;border-color:#64748b;background:rgba(30,41,59,.34)}
     .rep-modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:5000;padding:14px}
     .rep-modal-backdrop.open{display:flex}
-    .rep-modal{position:relative;z-index:5001;width:min(460px,100%);background:var(--srf);border:1px solid var(--bdr);border-radius:14px;padding:14px;box-shadow:0 16px 38px rgba(0,0,0,.24)}
+    .rep-modal{position:relative;z-index:5001;width:min(500px,100%);background:var(--srf);border:1px solid var(--bdr);border-radius:14px;padding:16px;box-shadow:0 16px 38px rgba(0,0,0,.24)}
     .rep-modal h3{margin:0 0 6px}
     .rep-modal p{margin:0;color:var(--tx2);font-size:.86rem}
     .rep-quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
@@ -50,14 +198,34 @@
     .rep-quick-btn:disabled{opacity:.55;cursor:not-allowed}
     .rep-quick-btn:hover{border-color:var(--red);color:var(--red)}
     .rep-modal-actions{display:flex;justify-content:space-between;gap:8px;margin-top:12px}
+      .rep-kpi-dropdown{margin-top:12px;border:1px solid var(--bdr);border-radius:10px;background:rgba(255,255,255,.01)}
+    .rep-kpi-dropdown summary{list-style:none;cursor:pointer;padding:10px 12px;font-size:.82rem;font-weight:700;color:var(--tx);display:flex;align-items:center;justify-content:space-between}
+    .rep-kpi-dropdown summary::-webkit-details-marker{display:none}
+    .rep-kpi-dropdown summary::after{content:'+';font-size:1rem;font-weight:800;color:var(--tx2)}
+    .rep-kpi-dropdown[open] summary::after{content:'-'}
+    .rep-kpi-wrap{padding:0 10px 10px}
+    .rep-success-toast{position:fixed;top:16px;right:16px;z-index:6200;display:grid;gap:2px;max-width:min(86vw,320px);padding:10px 12px;border-radius:12px;border:1px solid #166534;background:linear-gradient(180deg,#22c55e 0%,#16a34a 100%);color:#f0fdf4;font-size:.82rem;line-height:1.3;font-weight:800;box-shadow:0 14px 30px rgba(22,163,74,.3);opacity:0;transform:translateY(-8px) scale(.98);pointer-events:none;transition:opacity .18s ease,transform .18s ease}
+    .rep-success-toast.show{opacity:1;transform:translateY(0) scale(1)}
+    .rep-success-toast small{font-size:.74rem;font-weight:600;opacity:.92}
     @media(max-width:980px){
-      .rep-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+      .rep-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
       .rep-grid,.rep-row{grid-template-columns:1fr}
+      .rep-map-layout{grid-template-columns:1fr}
+      .rep-map{height:70vh}
     }
     @media(max-width:640px){
-      .rep-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
-      .rep-map{height:260px}
+      .rep-shell{padding:16px 14px 22px}
+      .rep-kpis{grid-template-columns:1fr 1fr}
+      .rep-card{padding:12px}
+      .rep-map{height:66vh}
       .rep-quick-grid{grid-template-columns:1fr}
+      .rep-followup-head{display:grid;gap:6px}
+      .rep-followup-badges{justify-content:flex-start}
+      .rep-followup-toolbar{top:6px;padding:8px}
+      .rep-followup-controls{grid-template-columns:1fr}
+      .rep-sched-popup-backdrop{align-items:flex-end;padding:10px}
+      .rep-sched-popup{width:100%;max-height:72vh;border-bottom-left-radius:12px;border-bottom-right-radius:12px}
+      .rep-success-toast{left:12px;right:12px;max-width:none}
     }
   </style>
 </head>
@@ -80,7 +248,7 @@
   <div class="rep-shell">
     <span class="eyebrow">Field Sales</span>
     <h1 class="h2" style="margin-top:6px">Rep Console</h1>
-    <p class="muted" style="font-size:.9rem">Log doors quickly, schedule follow-ups, and generate rep-attributed booking links.</p>
+    <p class="muted" style="font-size:.9rem">Quickly log outcomes, manage follow-ups, and open rep-attributed booking links.</p>
 
     <div class="rep-card" id="rep-login-card">
       <div class="rep-row">
@@ -113,19 +281,27 @@
         </div>
       </div>
 
-      <div class="rep-kpis" style="margin-top:12px">
-        <div class="rep-kpi"><div class="rep-k">Doors</div><div class="rep-v" id="k-doors">0</div></div>
-        <div class="rep-kpi"><div class="rep-k">Interested</div><div class="rep-v" id="k-interested">0</div></div>
-        <div class="rep-kpi"><div class="rep-k">On-Door Booked</div><div class="rep-v" id="k-ondoor">0</div></div>
-        <div class="rep-kpi"><div class="rep-k">Attributed Bookings</div><div class="rep-v" id="k-attrib">0</div></div>
-        <div class="rep-kpi"><div class="rep-k">Open Follow-ups</div><div class="rep-v" id="k-open">0</div></div>
-        <div class="rep-kpi"><div class="rep-k">Overdue Follow-ups</div><div class="rep-v" id="k-overdue">0</div></div>
-      </div>
+      <details class="rep-kpi-dropdown" open>
+        <summary>Rep Metrics</summary>
+        <div class="rep-kpi-wrap">
+          <div class="rep-kpis">
+            <div class="rep-kpi"><div class="rep-k">Doors</div><div class="rep-v" id="k-doors">0</div></div>
+            <div class="rep-kpi"><div class="rep-k">Interested</div><div class="rep-v" id="k-interested">0</div></div>
+            <div class="rep-kpi"><div class="rep-k">On-Door Booked</div><div class="rep-v" id="k-ondoor">0</div></div>
+            <div class="rep-kpi"><div class="rep-k">Attributed Bookings</div><div class="rep-v" id="k-attrib">0</div></div>
+            <div class="rep-kpi"><div class="rep-k">Open Follow-ups</div><div class="rep-v" id="k-open">0</div></div>
+            <div class="rep-kpi"><div class="rep-k">Overdue Follow-ups</div><div class="rep-v" id="k-overdue">0</div></div>
+          </div>
+        </div>
+      </details>
 
-      <div class="rep-grid" style="margin-top:12px">
+      <div class="rep-grid rep-map-layout" style="margin-top:12px">
         <div class="rep-card">
           <div class="section-title">Map Quick Log</div>
-          <p class="rep-note">Tap and hold on the map to place a pin, then choose outcome: Not Home, Not Interested, Call Back, or Sale Made.</p>
+          <details class="rep-help-dropdown">
+            <summary>Map Instructions</summary>
+            <p>Tap and hold on the map to place a pin, choose outcome in the white popup, then complete event details in that same popup card.</p>
+          </details>
           <div id="rep-map" class="rep-map" aria-label="Rep route map"></div>
           <div class="rep-map-meta">
             <div class="rep-chip" id="map-pin-label">No pin selected</div>
@@ -137,11 +313,93 @@
           <div class="rep-status" id="map-status">Map ready. Press and hold to drop a pin.</div>
           <div class="rep-note" id="map-history-status">Map activity not loaded yet.</div>
           <div class="rep-legend" id="map-legend"></div>
+          <details class="rep-map-log-dropdown" id="map-log-panel" hidden>
+            <summary>Door Event Logger</summary>
+            <div class="rep-map-log-body">
+              <div class="rep-row">
+                <div>
+                  <label for="de-outcome">Outcome</label>
+                  <select id="de-outcome" class="sel">
+                    <option value="no_answer">No Answer</option>
+                    <option value="not_interested">Not Interested</option>
+                    <option value="interested_callback">Interested / Callback</option>
+                    <option value="quote_requested">Quote Requested</option>
+                    <option value="booked_on_door">Booked On Door</option>
+                    <option value="bad_address">Bad Address</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="de-service">Service Interest</label>
+                  <select id="de-service" class="sel">
+                    <option value="">None</option>
+                    <option value="basic-detail">Basic Detail</option>
+                    <option value="standard-detail">Standard Detail</option>
+                    <option value="premium-detail">Premium Detail</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="rep-row" style="margin-top:10px">
+                <div>
+                  <label for="de-address">Address</label>
+                  <input id="de-address" class="inp" type="text" placeholder="123 Main St"/>
+                </div>
+                <div>
+                  <label for="de-city">City</label>
+                  <input id="de-city" class="inp" type="text" placeholder="Cedar City"/>
+                </div>
+              </div>
+              <input id="de-lat" type="hidden"/>
+              <input id="de-lng" type="hidden"/>
+              <div class="rep-note" id="de-coord-note">No pinned coordinates linked.</div>
+
+              <div class="rep-row" style="margin-top:10px">
+                <div>
+                  <label for="de-lead-name">Customer Name</label>
+                  <input id="de-lead-name" class="inp" type="text" placeholder="Jane Doe"/>
+                </div>
+                <div>
+                  <label for="de-lead-phone">Customer Phone</label>
+                  <input id="de-lead-phone" class="inp" type="tel" placeholder="(435) 555-0100"/>
+                </div>
+              </div>
+
+              <div style="margin-top:10px">
+                <label for="de-notes">Notes</label>
+                <textarea id="de-notes" class="inp" rows="3" placeholder="Agreed service details, condition notes, customer requests"></textarea>
+              </div>
+
+              <div class="rep-row" style="margin-top:10px">
+                <div>
+                  <label><input type="checkbox" id="de-followup"/> Needs Scheduling Follow-up</label>
+                </div>
+                <div>
+                  <label for="de-followup-date">Schedule / Follow-up Date</label>
+                  <input id="de-followup-date" class="inp" type="datetime-local"/>
+                </div>
+              </div>
+
+              <div class="rep-photo-upload">
+                <div>
+                  <label for="de-vehicle-photo">Vehicle Photo (agreed detail)</label>
+                  <input id="de-vehicle-photo" class="inp" type="file" accept="image/*" capture="environment"/>
+                </div>
+                <div class="rep-photo-preview" id="de-vehicle-photo-preview">
+                  <span class="rep-note" id="de-vehicle-photo-meta">No photo selected</span>
+                </div>
+              </div>
+
+              <div class="rep-actions" style="margin-top:10px">
+                <button class="button" id="de-save-btn" type="button">Save Door Event</button>
+              </div>
+              <div class="rep-status" id="de-status">Ready.</div>
+            </div>
+          </details>
         </div>
 
         <div class="rep-card">
           <div class="section-title">Live Schedule</div>
-          <p class="rep-note">Real-time availability from Cal.com so reps can confirm open slots before promising times.</p>
+          <p class="rep-note">Calendar view of live availability. Start with days that have openings, then pick a time.</p>
           <div class="rep-row">
             <div>
               <label for="sched-service">Service</label>
@@ -155,8 +413,9 @@
               <label for="sched-days">Window</label>
               <select id="sched-days" class="sel">
                 <option value="3">Next 3 Days</option>
-                <option value="7" selected>Next 7 Days</option>
+                <option value="7">Next 7 Days</option>
                 <option value="14">Next 14 Days</option>
+                <option value="30" selected>Next 30 Days (Month View)</option>
               </select>
             </div>
           </div>
@@ -174,83 +433,30 @@
         </div>
       </div>
 
-      <div class="rep-grid" style="margin-top:12px">
-        <div class="rep-card">
-          <div class="section-title">Log Door Event</div>
-          <div class="rep-row">
-            <div>
-              <label for="de-outcome">Outcome</label>
-              <select id="de-outcome" class="sel">
-                <option value="no_answer">No Answer</option>
-                <option value="not_interested">Not Interested</option>
-                <option value="interested_callback">Interested / Callback</option>
-                <option value="quote_requested">Quote Requested</option>
-                <option value="booked_on_door">Booked On Door</option>
-                <option value="bad_address">Bad Address</option>
-              </select>
-            </div>
-            <div>
-              <label for="de-service">Service Interest</label>
-              <select id="de-service" class="sel">
-                <option value="">None</option>
-                <option value="basic-detail">Basic Detail</option>
-                <option value="standard-detail">Standard Detail</option>
-                <option value="premium-detail">Premium Detail</option>
-              </select>
-            </div>
+      <div class="rep-card" style="margin-top:12px">
+        <div class="section-title">Follow-up Queue</div>
+        <div class="rep-followup-toolbar">
+          <div class="rep-followup-stats" id="rep-followup-stats"></div>
+          <div class="rep-followup-tabs" id="rep-followup-tabs">
+            <button type="button" class="rep-followup-tab active" data-filter="all">All <span class="count">0</span></button>
+            <button type="button" class="rep-followup-tab" data-filter="hot">Hot <span class="count">0</span></button>
+            <button type="button" class="rep-followup-tab" data-filter="overdue">Overdue <span class="count">0</span></button>
+            <button type="button" class="rep-followup-tab" data-filter="today">Today <span class="count">0</span></button>
+            <button type="button" class="rep-followup-tab" data-filter="soon">Soon <span class="count">0</span></button>
+            <button type="button" class="rep-followup-tab" data-filter="nodate">No Date <span class="count">0</span></button>
           </div>
-
-          <div class="rep-row" style="margin-top:10px">
-            <div>
-              <label for="de-address">Address</label>
-              <input id="de-address" class="inp" type="text" placeholder="123 Main St"/>
-            </div>
-            <div>
-              <label for="de-city">City</label>
-              <input id="de-city" class="inp" type="text" placeholder="Cedar City"/>
-            </div>
+          <div class="rep-followup-controls">
+            <input id="rep-followup-search" class="inp" type="search" placeholder="Search name, address, service, notes" aria-label="Search follow-up queue"/>
+            <select id="rep-followup-sort" class="sel" aria-label="Follow-up sort mode">
+              <option value="urgency" selected>Sort: Urgency</option>
+              <option value="due">Sort: Due Date</option>
+              <option value="name">Sort: Name</option>
+            </select>
+            <button id="rep-followup-clear" class="rep-followup-clear" type="button">Clear</button>
           </div>
-          <input id="de-lat" type="hidden"/>
-          <input id="de-lng" type="hidden"/>
-          <div class="rep-note" id="de-coord-note">No pinned coordinates linked.</div>
-
-          <div class="rep-row" style="margin-top:10px">
-            <div>
-              <label for="de-lead-name">Lead First Name</label>
-              <input id="de-lead-name" class="inp" type="text" placeholder="Jane"/>
-            </div>
-            <div>
-              <label for="de-lead-phone">Lead Phone</label>
-              <input id="de-lead-phone" class="inp" type="tel" placeholder="(435) 555-0100"/>
-            </div>
-          </div>
-
-          <div style="margin-top:10px">
-            <label for="de-notes">Notes</label>
-            <textarea id="de-notes" class="inp" rows="3" placeholder="Quick notes for follow-up"></textarea>
-          </div>
-
-          <div class="rep-row" style="margin-top:10px">
-            <div>
-              <label><input type="checkbox" id="de-followup"/> Needs Follow-up</label>
-            </div>
-            <div>
-              <label for="de-followup-date">Follow-up Date/Time</label>
-              <input id="de-followup-date" class="inp" type="datetime-local"/>
-            </div>
-          </div>
-
-          <div class="rep-actions" style="margin-top:10px">
-            <button class="button" id="de-save-btn" type="button">Save Door Event</button>
-          </div>
-          <div class="rep-status" id="de-status">Ready.</div>
         </div>
-
-        <div class="rep-card">
-          <div class="section-title">Follow-up Queue</div>
-          <div class="rep-list" id="rep-pipeline-list">
-            <div class="rep-item"><h4>No follow-ups yet</h4><p>Items you schedule will appear here.</p></div>
-          </div>
+        <div class="rep-list" id="rep-pipeline-list">
+          <div class="rep-item"><h4>No follow-ups yet</h4><p>Items you schedule will appear here.</p></div>
         </div>
       </div>
     </div>
@@ -259,16 +465,10 @@
 
 <div class="rep-modal-backdrop" id="map-modal" aria-hidden="true">
   <div class="rep-modal" role="dialog" aria-modal="true" aria-labelledby="map-modal-title">
-    <h3 id="map-modal-title">Quick Outcome</h3>
-    <p id="map-modal-address">Pinned location selected.</p>
-    <div class="rep-quick-grid">
-      <button class="rep-quick-btn" type="button" data-quick-outcome="not_home">Not Home</button>
-      <button class="rep-quick-btn" type="button" data-quick-outcome="not_interested">Not Interested</button>
-      <button class="rep-quick-btn" type="button" data-quick-outcome="call_back">Call Back</button>
-      <button class="rep-quick-btn" type="button" data-quick-outcome="sale_made">Sale Made</button>
-    </div>
+    <h3 id="map-modal-title">Booking Flow</h3>
+    <p id="map-modal-address">Complete booking for this sale.</p>
+    <iframe id="map-booking-frame" title="Booking Flow" style="display:none;width:100%;height:60vh;border:1px solid var(--bdr);border-radius:10px;background:#fff"></iframe>
     <div class="rep-modal-actions">
-      <button class="button outline" id="map-modal-full-form" type="button">Use Full Form</button>
       <button class="button outline" id="map-modal-close" type="button">Close</button>
     </div>
   </div>
@@ -287,12 +487,20 @@
   const MODAL_OPEN_DELAY_MS=350;
   const MODAL_TAP_GUARD_MS=450;
   const MAP_HISTORY_DAYS=30;
+  const API_TIMEOUT_MS=30000;
+  const SLOTS_TIMEOUT_MS=30000;
   const QUICK_OUTCOMES={
     not_home:{label:'Not Home',outcome:'no_answer',wantsFollowup:false,followupHours:0,note:'Quick map log: no one answered.'},
     not_interested:{label:'Not Interested',outcome:'not_interested',wantsFollowup:false,followupHours:0,note:'Quick map log: not interested.'},
     call_back:{label:'Call Back',outcome:'interested_callback',wantsFollowup:true,followupHours:4,note:'Quick map log: requested callback.'},
     sale_made:{label:'Sale Made',outcome:'booked_on_door',wantsFollowup:false,followupHours:0,note:'Quick map log: booked on door.'}
   };
+  const POPUP_OUTCOME_CHOICES=[
+    {label:'Interested',outcome:'interested_callback'},
+    {label:'Not Home',outcome:'no_answer'},
+    {label:'Not Interested',outcome:'not_interested'},
+    {label:'Sale Made',outcome:'booked_on_door'}
+  ];
   const OUTCOME_MAP_META={
     no_answer:{label:'Not Home',color:'#64748b'},
     not_interested:{label:'Not Interested',color:'#ef4444'},
@@ -311,6 +519,11 @@
   const loginStatus=document.getElementById('rep-login-status');
   const doorStatus=document.getElementById('de-status');
   const pipelineList=document.getElementById('rep-pipeline-list');
+  const pipelineStats=document.getElementById('rep-followup-stats');
+  const pipelineTabs=document.getElementById('rep-followup-tabs');
+  const pipelineSearch=document.getElementById('rep-followup-search');
+  const pipelineSort=document.getElementById('rep-followup-sort');
+  const pipelineClearBtn=document.getElementById('rep-followup-clear');
   const bookLink=document.getElementById('rep-book-link');
   const coordNote=document.getElementById('de-coord-note');
   const mapEl=document.getElementById('rep-map');
@@ -320,8 +533,13 @@
   const mapPinLabel=document.getElementById('map-pin-label');
   const mapMyLocationBtn=document.getElementById('map-my-location-btn');
   const mapClearBtn=document.getElementById('map-clear-btn');
+  const mapLogPanel=document.getElementById('map-log-panel');
+  const deVehiclePhotoInput=document.getElementById('de-vehicle-photo');
+  const deVehiclePhotoPreview=document.getElementById('de-vehicle-photo-preview');
   const mapModal=document.getElementById('map-modal');
+  const mapModalTitle=document.getElementById('map-modal-title');
   const mapModalAddress=document.getElementById('map-modal-address');
+  const mapBookingFrame=document.getElementById('map-booking-frame');
   const mapModalClose=document.getElementById('map-modal-close');
   const mapModalFullForm=document.getElementById('map-modal-full-form');
   const quickGrid=document.querySelector('.rep-quick-grid');
@@ -345,10 +563,44 @@
   let mapInitialized=false;
   let isMovePinMode=false;
   let latestPin=null;
+  let editingDoorEventId='';
+  let vehiclePhotoName='';
+  let vehiclePhotoPreviewUrl='';
+  let watchLocationErrorShown=false;
+  let activeWorkflow={
+    outcome:'',
+    reason:'',
+    name:'',
+    phone:'',
+    email:'',
+    service:'',
+    saleDate:'',
+    monthCursor:'',
+    monthSlotsByDate:{},
+    monthLoadedKey:'',
+    bookingSlots:[],
+    selectedSlot:'',
+    slotStatus:'',
+    bookingConfirmed:false,
+    bookedStartIso:'',
+    bookedLocalLabel:'',
+    bookedEmail:'',
+    bookedService:'',
+    bookedDate:'',
+    submitBusy:false,
+    submitStatus:'',
+    followup:true,
+    followupDueAt:'',
+    notes:''
+  };
   let latestPinSeq=0;
   let modalOpenDelayTimer=null;
   let modalTapGuardUntil=0;
   let modalTapGuardTimer=null;
+  let saleCongratsToastTimer=null;
+  let saleCongratsToastEl=null;
+  let pipelineItemsCache=[];
+  let pipelineFilterMode='all';
 
   function getToken(){
     try{return sessionStorage.getItem(TOKEN_KEY)||'';}catch(_e){return '';}
@@ -405,6 +657,98 @@
     mapHistoryStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
   }
 
+  function withTimeout(ms){
+    const timeoutMs=Math.max(1000,Number(ms)||API_TIMEOUT_MS);
+    if(typeof AbortController==='undefined'){
+      return { signal:undefined, cancel:()=>{} };
+    }
+    const controller=new AbortController();
+    const timer=window.setTimeout(()=>controller.abort(),timeoutMs);
+    return {
+      signal:controller.signal,
+      cancel:()=>window.clearTimeout(timer)
+    };
+  }
+
+  function refreshActivePopupIfOpen(){
+    if(!repMarker) return;
+    const wasOpen=typeof repMarker.isPopupOpen==='function' ? repMarker.isPopupOpen() : false;
+    syncRepMarkerPopup();
+    if(wasOpen) repMarker.openPopup();
+  }
+
+  function setWorkflowSubmitState(isBusy, message){
+    activeWorkflow.submitBusy=Boolean(isBusy);
+    activeWorkflow.submitStatus=String(message||'').trim();
+    refreshActivePopupIfOpen();
+  }
+
+  function clearWorkflowBookingConfirmation(){
+    activeWorkflow.bookingConfirmed=false;
+    activeWorkflow.bookedStartIso='';
+    activeWorkflow.bookedLocalLabel='';
+    activeWorkflow.bookedEmail='';
+    activeWorkflow.bookedService='';
+    activeWorkflow.bookedDate='';
+  }
+
+  function fallbackBookingEmailFromPhone(phoneValue){
+    const digits=String(phoneValue||'').replace(/\D/g,'').slice(-15);
+    if(digits.length<7) return '';
+    return `phone-${digits}@noemail.southernutahdetail.com`;
+  }
+
+  function bookingAttendeeEmail(rawEmail, rawPhone){
+    const email=String(rawEmail||'').trim().toLowerCase();
+    if(email) return email;
+    return fallbackBookingEmailFromPhone(rawPhone);
+  }
+
+  function markWorkflowBookingConfirmed(startIso, localLabel, attendeeEmail, serviceSlug, bookingDate){
+    activeWorkflow.bookingConfirmed=true;
+    activeWorkflow.bookedStartIso=String(startIso||'').trim();
+    activeWorkflow.bookedLocalLabel=String(localLabel||'').trim();
+    activeWorkflow.bookedEmail=String(attendeeEmail||'').trim().toLowerCase();
+    activeWorkflow.bookedService=String(serviceSlug||'').trim();
+    activeWorkflow.bookedDate=String(bookingDate||'').trim();
+  }
+
+  function hasMatchingConfirmedBooking(payload){
+    if(!activeWorkflow.bookingConfirmed) return false;
+    const serviceSlug=String(payload&&payload.serviceInterestSlug||'').trim();
+    const bookingDate=String(activeWorkflow.saleDate||'').trim();
+    const selectedSlot=String(activeWorkflow.selectedSlot||'').trim();
+    const attendeeEmail=bookingAttendeeEmail(
+      payload&&payload.lead&&payload.lead.email,
+      payload&&payload.lead&&payload.lead.phone
+    );
+    return Boolean(
+      selectedSlot &&
+      activeWorkflow.bookedStartIso===selectedSlot &&
+      activeWorkflow.bookedEmail===attendeeEmail &&
+      activeWorkflow.bookedService===serviceSlug &&
+      activeWorkflow.bookedDate===bookingDate
+    );
+  }
+
+  function showSaleCongratsToast(whenLabel){
+    const whenText=String(whenLabel||'').trim();
+    if(!saleCongratsToastEl){
+      saleCongratsToastEl=document.createElement('div');
+      saleCongratsToastEl.className='rep-success-toast';
+      saleCongratsToastEl.setAttribute('role','status');
+      saleCongratsToastEl.setAttribute('aria-live','polite');
+      document.body.appendChild(saleCongratsToastEl);
+    }
+    const detail=whenText?`Scheduled for ${whenText}`:'Scheduling confirmed';
+    saleCongratsToastEl.innerHTML=`Congrats! Booking confirmed.<small>${detail}</small>`;
+    saleCongratsToastEl.classList.add('show');
+    if(saleCongratsToastTimer) window.clearTimeout(saleCongratsToastTimer);
+    saleCongratsToastTimer=window.setTimeout(()=>{
+      if(saleCongratsToastEl) saleCongratsToastEl.classList.remove('show');
+    },2600);
+  }
+
   function stopLiveLocationWatch(){
     if(liveLocationWatchId===null) return;
     if(navigator.geolocation&&typeof navigator.geolocation.clearWatch==='function'){
@@ -437,16 +781,73 @@
     }
   }
 
+  function geolocationErrorMessage(err){
+    if(window.isSecureContext===false){
+      return 'Location requires HTTPS. Open the secure site and try again.';
+    }
+    const code=Number(err&&err.code||0);
+    if(code===1){
+      return 'Location permission denied. Enable Safari location access, then tap Use My Location again.';
+    }
+    if(code===2){
+      return 'Location unavailable. Check iPad Location Services and try again.';
+    }
+    if(code===3){
+      return 'Location request timed out. Move to an open area and retry.';
+    }
+    return 'Could not get current location. Please try again.';
+  }
+
+  function getCurrentPositionAsync(options){
+    return new Promise((resolve,reject)=>{
+      if(!navigator.geolocation||typeof navigator.geolocation.getCurrentPosition!=='function'){
+        reject(new Error('Geolocation not available'));
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(resolve,reject,options);
+    });
+  }
+
+  async function resolveCurrentLocation(){
+    if(window.isSecureContext===false){
+      throw new Error('Location requires HTTPS. Open the secure site and try again.');
+    }
+    try{
+      return await getCurrentPositionAsync({enableHighAccuracy:true,timeout:20000,maximumAge:0});
+    }catch(err){
+      const code=Number(err&&err.code||0);
+      if(code===1) throw err;
+      setMapStatus('Trying standard GPS mode...', false);
+      return await getCurrentPositionAsync({enableHighAccuracy:false,timeout:35000,maximumAge:60000});
+    }
+  }
+
+  function applyCurrentLocation(pos){
+    const lat=pos&&pos.coords?pos.coords.latitude:null;
+    const lng=pos&&pos.coords?pos.coords.longitude:null;
+    const accuracy=pos&&pos.coords?pos.coords.accuracy:null;
+    if(!Number.isFinite(lat)||!Number.isFinite(lng)){
+      throw new Error('Location data was invalid.');
+    }
+    renderLiveLocation(lat,lng,accuracy);
+    clearDoorEventEditState();
+    setPin(lat,lng,false);
+    if(repMap) repMap.setView([lat,lng],16);
+  }
+
   function startLiveLocationWatch(){
     if(!repMap||!navigator.geolocation||liveLocationWatchId!==null) return;
+    watchLocationErrorShown=false;
     liveLocationWatchId=navigator.geolocation.watchPosition((pos)=>{
       const lat=pos&&pos.coords?pos.coords.latitude:null;
       const lng=pos&&pos.coords?pos.coords.longitude:null;
       const accuracy=pos&&pos.coords?pos.coords.accuracy:null;
       if(!Number.isFinite(lat)||!Number.isFinite(lng)) return;
       renderLiveLocation(lat,lng,accuracy);
-    },()=>{
-      // Keep silent when unavailable; map remains usable without location permission.
+    },(err)=>{
+      if(watchLocationErrorShown) return;
+      watchLocationErrorShown=true;
+      setMapStatus(`${geolocationErrorMessage(err)} Tap Use My Location to retry.`, true);
     },{
       enableHighAccuracy:true,
       maximumAge:15000,
@@ -462,6 +863,91 @@
   function setVal(id, value){
     const el=document.getElementById(id);
     if(el&&typeof el.value==='string') el.value=value||'';
+  }
+
+  function stripVehiclePhotoTag(text){
+    return String(text||'').replace(/\s*\[Vehicle photo:[^\]]+\]\s*/gi,' ').replace(/\s{2,}/g,' ').trim();
+  }
+
+  function withVehiclePhotoTag(text){
+    const base=stripVehiclePhotoTag(text);
+    if(!vehiclePhotoName) return base;
+    return `${base}${base?' ':''}[Vehicle photo: ${vehiclePhotoName}]`.trim();
+  }
+
+  function extractVehiclePhotoName(text){
+    const m=String(text||'').match(/\[Vehicle photo:\s*([^\]]+)\]/i);
+    return m&&m[1]?String(m[1]).trim().slice(0,120):'';
+  }
+
+  function updateVehiclePhotoPreview(){
+    if(!deVehiclePhotoPreview) return;
+    if(vehiclePhotoPreviewUrl){
+      deVehiclePhotoPreview.innerHTML=`<img src="${esc(vehiclePhotoPreviewUrl)}" alt="Vehicle photo preview"/>`;
+      return;
+    }
+    const text=vehiclePhotoName?`Photo on record: ${vehiclePhotoName}`:'No photo selected';
+    deVehiclePhotoPreview.innerHTML=`<span class="rep-note" id="de-vehicle-photo-meta">${esc(text)}</span>`;
+  }
+
+  function popupPhotoInputHtml(){
+    const photoLabel=vehiclePhotoName?`Photo attached: ${vehiclePhotoName}`:'No photo selected';
+    return `<div>
+      <label for="wf-photo">Vehicle Photo</label>
+      <input id="wf-photo" class="inp" type="file" accept="image/*" capture="environment"/>
+      <div class="rep-note">${esc(photoLabel)}</div>
+    </div>`;
+  }
+
+  function clearVehiclePhotoSelection(clearInput){
+    vehiclePhotoName='';
+    vehiclePhotoPreviewUrl='';
+    if(clearInput&&deVehiclePhotoInput&&typeof deVehiclePhotoInput.value==='string') deVehiclePhotoInput.value='';
+    updateVehiclePhotoPreview();
+  }
+
+  function readFileAsDataUrl(file){
+    return new Promise((resolve,reject)=>{
+      const reader=new FileReader();
+      reader.onload=()=>resolve(String(reader.result||''));
+      reader.onerror=()=>reject(new Error('Could not read image file.'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function handleVehiclePhotoChange(){
+    const file=deVehiclePhotoInput&&deVehiclePhotoInput.files&&deVehiclePhotoInput.files[0]?deVehiclePhotoInput.files[0]:null;
+    return await selectVehiclePhotoFile(file,true);
+  }
+
+  async function selectVehiclePhotoFile(file, clearInputOnFail){
+    if(!file){
+      clearVehiclePhotoSelection(false);
+      return;
+    }
+    if(!String(file.type||'').toLowerCase().startsWith('image/')){
+      setDoorStatus('Please choose an image file for vehicle photo.', true);
+      clearVehiclePhotoSelection(Boolean(clearInputOnFail));
+      return;
+    }
+    try{
+      vehiclePhotoName=String(file.name||'vehicle-photo').slice(0,120);
+      vehiclePhotoPreviewUrl=await readFileAsDataUrl(file);
+      updateVehiclePhotoPreview();
+      setDoorStatus(`Photo attached: ${vehiclePhotoName}`, false);
+    }catch(err){
+      clearVehiclePhotoSelection(Boolean(clearInputOnFail));
+      setDoorStatus(String(err&&err.message?err.message:'Could not load selected image.'), true);
+    }
+  }
+
+  async function handlePopupPhotoChange(inputEl){
+    const file=inputEl&&inputEl.files&&inputEl.files[0]?inputEl.files[0]:null;
+    await selectVehiclePhotoFile(file,false);
+    if(repMarker){
+      syncRepMarkerPopup();
+      repMarker.openPopup();
+    }
   }
 
   function esc(str){
@@ -484,10 +970,55 @@
     return dt.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
   }
 
+  function currentMonthValue(){
+    return todayLocalDateValue().slice(0,7);
+  }
+
+  function monthBounds(monthValue){
+    const raw=String(monthValue||'').trim();
+    const match=raw.match(/^(\d{4})-(\d{2})$/);
+    if(!match) return null;
+    const year=Number(match[1]);
+    const monthIndex=Number(match[2])-1;
+    if(!Number.isInteger(year)||!Number.isInteger(monthIndex)||monthIndex<0||monthIndex>11) return null;
+    const startDate=new Date(Date.UTC(year,monthIndex,1));
+    const endDate=new Date(Date.UTC(year,monthIndex+1,0));
+    const start=`${year}-${String(monthIndex+1).padStart(2,'0')}-01`;
+    const end=`${endDate.getUTCFullYear()}-${String(endDate.getUTCMonth()+1).padStart(2,'0')}-${String(endDate.getUTCDate()).padStart(2,'0')}`;
+    return {
+      year,
+      monthIndex,
+      start,
+      end,
+      daysInMonth:endDate.getUTCDate(),
+      startsOn:startDate.getUTCDay(),
+    };
+  }
+
+  function shiftMonthValue(monthValue, delta){
+    const bounds=monthBounds(monthValue)||monthBounds(currentMonthValue());
+    if(!bounds) return currentMonthValue();
+    const shifted=new Date(Date.UTC(bounds.year,bounds.monthIndex+Number(delta||0),1));
+    return `${shifted.getUTCFullYear()}-${String(shifted.getUTCMonth()+1).padStart(2,'0')}`;
+  }
+
+  function monthTitle(monthValue){
+    const bounds=monthBounds(monthValue);
+    if(!bounds) return 'Month';
+    const dt=new Date(Date.UTC(bounds.year,bounds.monthIndex,1));
+    return dt.toLocaleDateString('en-US',{month:'long',year:'numeric',timeZone:'UTC'});
+  }
+
   function formatSlotTime(iso){
     const dt=new Date(iso);
     if(Number.isNaN(dt.getTime())) return '';
     return dt.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+  }
+
+  function formatSlotLabel(iso){
+    const dt=new Date(iso);
+    if(Number.isNaN(dt.getTime())) return String(iso||'');
+    return dt.toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
   }
 
   function updateCoordinateNote(){
@@ -530,18 +1061,442 @@
       `data-dot-lat="${esc(String(p.lat||''))}"`,
       `data-dot-lng="${esc(String(p.lng||''))}"`,
       `data-dot-marker-id="${esc(String(p.markerId||''))}"`,
+      `data-dot-event-id="${esc(String(p.eventId||''))}"`,
       `data-dot-address="${esc(encodePopupData(p.addressLine1||''))}"`,
       `data-dot-city="${esc(encodePopupData(p.city||''))}"`,
       `data-dot-state="${esc(encodePopupData(p.state||''))}"`,
       `data-dot-postal="${esc(encodePopupData(p.postalCode||''))}"`,
       `data-dot-outcome="${esc(encodePopupData(p.outcome||''))}"`,
       `data-dot-detail="${esc(encodePopupData(p.outcomeDetail||''))}"`,
+      `data-dot-service="${esc(encodePopupData(p.serviceInterestSlug||''))}"`,
+      `data-dot-lead-name="${esc(encodePopupData(p.leadFirstName||''))}"`,
+      `data-dot-lead-phone="${esc(encodePopupData(p.leadPhone||''))}"`,
+      `data-dot-lead-email="${esc(encodePopupData(p.leadEmail||''))}"`,
+      `data-dot-followup="${p.wantsFollowup?'1':'0'}"`,
+      `data-dot-followup-due="${esc(encodePopupData(p.followupDueAt||''))}"`,
     ].join(' ');
     return `<div class="rep-popup-actions">
       <button class="rep-popup-btn" type="button" data-dot-action="move" ${baseAttrs}>Move</button>
       <button class="rep-popup-btn" type="button" data-dot-action="edit" ${baseAttrs}>Edit</button>
       <button class="rep-popup-btn" type="button" data-dot-action="delete" ${baseAttrs}>Delete</button>
     </div>`;
+  }
+
+  function nextFollowupLocalValue(hoursFromNow){
+    const due=new Date(Date.now()+Math.max(1,Number(hoursFromNow||4))*60*60*1000);
+    return new Date(due.getTime()-due.getTimezoneOffset()*60*1000).toISOString().slice(0,16);
+  }
+
+  function todayLocalDateValue(){
+    const now=new Date();
+    const local=new Date(now.getTime()-now.getTimezoneOffset()*60*1000);
+    return local.toISOString().slice(0,10);
+  }
+
+  function resetActiveWorkflow(outcome){
+    const normalized=String(outcome||'').trim();
+    activeWorkflow={
+      outcome:normalized,
+      reason:'',
+      name:val('de-lead-name').trim(),
+      phone:val('de-lead-phone').trim(),
+      email:'',
+      service:(val('de-service')||'').trim(),
+      saleDate:todayLocalDateValue(),
+      monthCursor:currentMonthValue(),
+      monthSlotsByDate:{},
+      monthLoadedKey:'',
+      bookingSlots:[],
+      selectedSlot:'',
+      slotStatus:'',
+      bookingConfirmed:false,
+      bookedStartIso:'',
+      bookedLocalLabel:'',
+      bookedEmail:'',
+      bookedService:'',
+      bookedDate:'',
+      submitBusy:false,
+      submitStatus:'',
+      followup:normalized==='interested_callback',
+      followupDueAt:normalized==='interested_callback'?nextFollowupLocalValue(4):'',
+      notes:''
+    };
+  }
+
+  function setActiveWorkflowFromEvent(data){
+    const outcome=String(data&&data.outcome||'').trim();
+    const detail=stripVehiclePhotoTag(data&&data.outcomeDetail||'');
+    const service=String(data&&data.serviceInterestSlug||'').trim();
+    const wantsFollowup=Boolean(data&&data.wantsFollowup);
+    const followupDueAt=toLocalDateTimeInputValue(data&&data.followupDueAt||'');
+    activeWorkflow={
+      outcome,
+      reason:outcome==='not_interested'?detail:'',
+      name:String(data&&data.leadFirstName||val('de-lead-name')||'').trim(),
+      phone:String(data&&data.leadPhone||val('de-lead-phone')||'').trim(),
+      email:String(data&&data.leadEmail||'').trim(),
+      service,
+      saleDate:todayLocalDateValue(),
+      monthCursor:currentMonthValue(),
+      monthSlotsByDate:{},
+      monthLoadedKey:'',
+      bookingSlots:[],
+      selectedSlot:'',
+      slotStatus:'',
+      bookingConfirmed:false,
+      bookedStartIso:'',
+      bookedLocalLabel:'',
+      bookedEmail:'',
+      bookedService:'',
+      bookedDate:'',
+      submitBusy:false,
+      submitStatus:'',
+      followup:wantsFollowup||outcome==='interested_callback',
+      followupDueAt:followupDueAt||(outcome==='interested_callback'?nextFollowupLocalValue(4):''),
+      notes:outcome==='not_interested'?'':detail
+    };
+  }
+
+  function activeDotActionAttrs(){
+    if(!latestPin) return '';
+    const outcome=activeWorkflow.outcome||val('de-outcome');
+    const detail=activeWorkflow.outcome==='not_interested'?activeWorkflow.reason:activeWorkflow.notes;
+    return [
+      `data-dot-source="active"`,
+      `data-dot-lat="${esc(String(latestPin.lat||''))}"`,
+      `data-dot-lng="${esc(String(latestPin.lng||''))}"`,
+      `data-dot-address="${esc(encodePopupData(latestPin.addressLine1||''))}"`,
+      `data-dot-city="${esc(encodePopupData(latestPin.city||''))}"`,
+      `data-dot-state="${esc(encodePopupData(latestPin.state||''))}"`,
+      `data-dot-postal="${esc(encodePopupData(latestPin.postalCode||''))}"`,
+      `data-dot-outcome="${esc(encodePopupData(outcome||''))}"`,
+      `data-dot-detail="${esc(encodePopupData(detail||''))}"`,
+      `data-dot-service="${esc(encodePopupData(activeWorkflow.service||''))}"`,
+      `data-dot-followup="${activeWorkflow.followup?'1':'0'}"`,
+      `data-dot-followup-due="${esc(encodePopupData(activeWorkflow.followupDueAt||''))}"`,
+    ].join(' ');
+  }
+
+  function popupServiceOptions(selected){
+    const current=String(selected||'');
+    const options=[
+      {value:'',label:'None'},
+      {value:'basic-detail',label:'Basic Detail'},
+      {value:'standard-detail',label:'Standard Detail'},
+      {value:'premium-detail',label:'Premium Detail'},
+    ];
+    return options.map((opt)=>`<option value="${esc(opt.value)}"${opt.value===current?' selected':''}>${esc(opt.label)}</option>`).join('');
+  }
+
+  function popupMonthCalendarHtml(){
+    const monthValue=String(activeWorkflow.monthCursor||currentMonthValue()).trim()||currentMonthValue();
+    const bounds=monthBounds(monthValue);
+    if(!bounds){
+      return '<div class="rep-time-empty">Calendar unavailable.</div>';
+    }
+
+    const weekdayHeaders=['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+      .map((label)=>`<div class="rep-month-weekday">${label}</div>`)
+      .join('');
+
+    const cells=[];
+    for(let i=0;i<bounds.startsOn;i+=1){
+      cells.push('<span></span>');
+    }
+
+    const slotsByDate=(activeWorkflow.monthSlotsByDate&&typeof activeWorkflow.monthSlotsByDate==='object')
+      ? activeWorkflow.monthSlotsByDate
+      : {};
+    const busyAttr=activeWorkflow.submitBusy?' disabled':'';
+    for(let day=1;day<=bounds.daysInMonth;day+=1){
+      const dateStr=`${monthValue}-${String(day).padStart(2,'0')}`;
+      const slots=Array.isArray(slotsByDate[dateStr])?slotsByDate[dateStr]:[];
+      const isActive=String(activeWorkflow.saleDate||'').trim()===dateStr;
+      const cls=isActive?'rep-day-btn active':'rep-day-btn';
+      const countLabel=slots.length>0?`${slots.length} open`:'No times';
+      cells.push(`<button class="${cls}" type="button" data-flow-action="pick-day" data-flow-day="${esc(dateStr)}"${slots.length?busyAttr:' disabled'}><strong>${day}</strong><small>${esc(countLabel)}</small></button>`);
+    }
+
+    return `<div class="rep-month-shell">
+      <div class="rep-month-head">
+        <button class="rep-popup-btn" type="button" data-flow-action="month-prev"${busyAttr}>Prev</button>
+        <div class="rep-month-title">${esc(monthTitle(monthValue))}</div>
+        <button class="rep-popup-btn" type="button" data-flow-action="month-next"${busyAttr}>Next</button>
+      </div>
+      <div class="rep-month-grid">${weekdayHeaders}</div>
+      <div class="rep-month-grid">${cells.join('')}</div>
+    </div>`;
+  }
+
+  function popupMonthTimesHtml(){
+    const selectedDate=String(activeWorkflow.saleDate||'').trim();
+    if(!selectedDate){
+      return '<div class="rep-time-empty">Pick a date with open times.</div>';
+    }
+    const slotsByDate=(activeWorkflow.monthSlotsByDate&&typeof activeWorkflow.monthSlotsByDate==='object')
+      ? activeWorkflow.monthSlotsByDate
+      : {};
+    const slots=Array.isArray(slotsByDate[selectedDate])?slotsByDate[selectedDate]:[];
+    if(!slots.length){
+      return `<div class="rep-time-empty">No open times for ${esc(formatDateLabel(selectedDate))}. Choose another date.</div>`;
+    }
+
+    const busyAttr=activeWorkflow.submitBusy?' disabled':'';
+    const selectedSlot=String(activeWorkflow.selectedSlot||'').trim();
+    const buttons=slots.map((iso)=>{
+      const value=String(iso||'').trim();
+      const cls=value===selectedSlot?'rep-time-btn active':'rep-time-btn';
+      return `<button class="${cls}" type="button" data-flow-action="pick-time" data-flow-day="${esc(selectedDate)}" data-flow-slot="${esc(value)}"${busyAttr}>${esc(formatSlotTime(value)||value)}</button>`;
+    }).join('');
+    return `<div class="rep-time-wrap"><div class="rep-note">Times for ${esc(formatDateLabel(selectedDate))}:</div><div class="rep-time-grid">${buttons}</div></div>`;
+  }
+
+  async function loadSaleSlotsForWorkflow(forceReload){
+    if(activeWorkflow.submitBusy) return;
+    syncWorkflowFromPopupInputs();
+    clearWorkflowBookingConfirmation();
+    const serviceSlug=String(activeWorkflow.service||'').trim();
+    if(!serviceSlug){
+      activeWorkflow.slotStatus='Choose a service first.';
+      refreshActivePopupIfOpen();
+      return;
+    }
+
+    const monthValue=String(activeWorkflow.monthCursor||String(activeWorkflow.saleDate||'').slice(0,7)||currentMonthValue()).trim()||currentMonthValue();
+    const bounds=monthBounds(monthValue);
+    if(!bounds){
+      activeWorkflow.slotStatus='Invalid month selected.';
+      refreshActivePopupIfOpen();
+      return;
+    }
+    activeWorkflow.monthCursor=monthValue;
+
+    const cacheKey=`${serviceSlug}|${monthValue}`;
+    if(!forceReload && activeWorkflow.monthLoadedKey===cacheKey){
+      const chosenDate=String(activeWorkflow.saleDate||'').trim();
+      const cachedSlots=chosenDate && activeWorkflow.monthSlotsByDate && Array.isArray(activeWorkflow.monthSlotsByDate[chosenDate])
+        ? activeWorkflow.monthSlotsByDate[chosenDate]
+        : [];
+      activeWorkflow.bookingSlots=Array.isArray(cachedSlots)?cachedSlots:[];
+      refreshActivePopupIfOpen();
+      return;
+    }
+
+    activeWorkflow.slotStatus='Loading monthly availability...';
+    setWorkflowSubmitState(true,'Loading available dates and times...');
+    try{
+      const slotsByDate=await fetchSlotsForRange(serviceSlug,bounds.start,bounds.end);
+      activeWorkflow.monthSlotsByDate=slotsByDate;
+      activeWorkflow.monthLoadedKey=cacheKey;
+      const availableDates=Object.keys(slotsByDate)
+        .filter((date)=>Array.isArray(slotsByDate[date])&&slotsByDate[date].length>0)
+        .sort();
+
+      if(!availableDates.length){
+        activeWorkflow.saleDate='';
+        activeWorkflow.selectedSlot='';
+        activeWorkflow.bookingSlots=[];
+        activeWorkflow.slotStatus=`No open times in ${monthTitle(monthValue)}. Try next month.`;
+      }else{
+        const existingDate=String(activeWorkflow.saleDate||'').trim();
+        activeWorkflow.saleDate=availableDates.includes(existingDate)?existingDate:availableDates[0];
+        activeWorkflow.bookingSlots=Array.isArray(slotsByDate[activeWorkflow.saleDate])?slotsByDate[activeWorkflow.saleDate]:[];
+        if(!activeWorkflow.bookingSlots.includes(activeWorkflow.selectedSlot)){
+          activeWorkflow.selectedSlot='';
+        }
+        activeWorkflow.slotStatus=`${availableDates.length} day${availableDates.length===1?'':'s'} available in ${monthTitle(monthValue)}. Pick a day, then a time.`;
+      }
+    }catch(err){
+      activeWorkflow.monthSlotsByDate={};
+      activeWorkflow.monthLoadedKey='';
+      activeWorkflow.bookingSlots=[];
+      activeWorkflow.selectedSlot='';
+      activeWorkflow.slotStatus=String(err&&err.message?err.message:'Could not load monthly availability.');
+    } finally {
+      setWorkflowSubmitState(false,'');
+    }
+  }
+
+  function popupOutcomeChooserHtml(){
+    const buttons=POPUP_OUTCOME_CHOICES.map((choice)=>`<button class="rep-popup-choice" type="button" data-flow-action="choose-outcome" data-flow-outcome="${esc(choice.outcome)}">${esc(choice.label)}</button>`).join('');
+    return `<div class="rep-popup-form">
+      <div class="rep-note">Quickly choose an outcome for this dot:</div>
+      <div class="rep-popup-actions">${buttons}</div>
+      <div class="rep-popup-actions">
+        <button class="rep-popup-btn" type="button" data-dot-action="move" ${activeDotActionAttrs()}>Move</button>
+        <button class="rep-popup-btn" type="button" data-dot-action="delete" ${activeDotActionAttrs()}>Delete</button>
+      </div>
+    </div>`;
+  }
+
+  function popupWorkflowFieldsHtml(){
+    const outcome=activeWorkflow.outcome;
+    if(!outcome) return popupOutcomeChooserHtml();
+
+    if(outcome==='not_interested'){
+      return `<div class="rep-popup-form">
+        <label for="wf-reason">Why not interested?</label>
+        <textarea id="wf-reason" class="inp" rows="3" placeholder="Customer concern, timing, budget, etc.">${esc(activeWorkflow.reason||'')}</textarea>
+        ${popupPhotoInputHtml()}
+      </div>`;
+    }
+
+    if(outcome==='interested_callback'){
+      return `<div class="rep-popup-form">
+        <div class="rep-popup-row">
+          <div>
+            <label for="wf-name">Contact Name</label>
+            <input id="wf-name" class="inp" type="text" value="${esc(activeWorkflow.name||'')}" placeholder="Jane Doe"/>
+          </div>
+          <div>
+            <label for="wf-phone">Phone</label>
+            <input id="wf-phone" class="inp" type="tel" value="${esc(activeWorkflow.phone||'')}" placeholder="(435) 555-0100"/>
+          </div>
+        </div>
+        <div class="rep-popup-row">
+          <div>
+            <label for="wf-service">Service</label>
+            <select id="wf-service" class="sel">${popupServiceOptions(activeWorkflow.service)}</select>
+          </div>
+          <div>
+            <label for="wf-followup-date">Follow-up</label>
+            <input id="wf-followup-date" class="inp" type="datetime-local" value="${esc(activeWorkflow.followupDueAt||'')}"/>
+          </div>
+        </div>
+        <label for="wf-notes">Notes</label>
+        <textarea id="wf-notes" class="inp" rows="2" placeholder="Requested details and schedule preferences">${esc(activeWorkflow.notes||'')}</textarea>
+        ${popupPhotoInputHtml()}
+      </div>`;
+    }
+
+    if(outcome==='booked_on_door'){
+      const busyAttr=activeWorkflow.submitBusy?' disabled':'';
+      const bookingStateNote=activeWorkflow.bookingConfirmed
+        ? `<div class="rep-note">Booking confirmed for ${esc(activeWorkflow.bookedLocalLabel||formatSlotTime(activeWorkflow.bookedStartIso)||'selected slot')}. Tap save to finish logging this sale.</div>`
+        : '';
+      return `<div class="rep-popup-form">
+        <div class="rep-note">Required: customer name, plus phone or email. Select service, then date, then time.</div>
+        <div class="rep-popup-row">
+          <div>
+            <label for="wf-name">Customer Name</label>
+            <input id="wf-name" class="inp" type="text" value="${esc(activeWorkflow.name||'')}" placeholder="Jane Doe"/>
+          </div>
+          <div>
+            <label for="wf-service">Service</label>
+            <select id="wf-service" class="sel">${popupServiceOptions(activeWorkflow.service)}</select>
+          </div>
+        </div>
+        <div class="rep-popup-row">
+          <div>
+            <label for="wf-phone">Phone (required if no email)</label>
+            <input id="wf-phone" class="inp" type="tel" value="${esc(activeWorkflow.phone||'')}" placeholder="(435) 555-0100"/>
+          </div>
+          <div>
+            <label for="wf-email">Email (optional if phone provided)</label>
+            <input id="wf-email" class="inp" type="email" value="${esc(activeWorkflow.email||'')}" placeholder="customer@email.com"/>
+          </div>
+        </div>
+        <div class="rep-popup-actions">
+          <button class="rep-popup-btn" type="button" data-flow-action="load-slots"${busyAttr}>Refresh Month Availability</button>
+        </div>
+        ${popupMonthCalendarHtml()}
+        ${popupMonthTimesHtml()}
+        <div class="rep-note">${esc(activeWorkflow.slotStatus||'Tap Refresh Month Availability to load open dates and times.')}</div>
+        ${bookingStateNote}
+        <label for="wf-notes">Sale Notes</label>
+        <textarea id="wf-notes" class="inp" rows="2" placeholder="What package was sold and key details">${esc(activeWorkflow.notes||'')}</textarea>
+        <div class="rep-note">Fast flow: choose service, pick date, pick time, then save and auto-book.</div>
+        ${popupPhotoInputHtml()}
+      </div>`;
+    }
+
+    return `<div class="rep-popup-form">
+      <label for="wf-notes">Notes</label>
+      <textarea id="wf-notes" class="inp" rows="2" placeholder="Optional notes">${esc(activeWorkflow.notes||'')}</textarea>
+      ${popupPhotoInputHtml()}
+    </div>`;
+  }
+
+  function popupWorkflowFooterHtml(){
+    const baseSaveLabel=activeWorkflow.outcome==='booked_on_door'
+      ? (editingDoorEventId?'Update Sale & Auto-Book':'Save Sale & Auto-Book')
+      : (editingDoorEventId?'Update Event':'Save Event');
+    const saveLabel=activeWorkflow.submitBusy?'Working...':baseSaveLabel;
+    if(!activeWorkflow.outcome){
+      return '';
+    }
+    const busyAttr=activeWorkflow.submitBusy?' disabled':'';
+    const statusNote=activeWorkflow.submitStatus?`<div class="rep-note">${esc(activeWorkflow.submitStatus)}</div>`:'';
+    return `${statusNote}<div class="rep-popup-actions">
+      <button class="rep-popup-btn" type="button" data-flow-action="clear-outcome"${busyAttr}>Back</button>
+      <button class="rep-popup-btn" type="button" data-flow-action="save-event"${busyAttr}>${esc(saveLabel)}</button>
+      <button class="rep-popup-btn" type="button" data-dot-action="move" ${activeDotActionAttrs()}${busyAttr}>Move</button>
+      <button class="rep-popup-btn" type="button" data-dot-action="delete" ${activeDotActionAttrs()}${busyAttr}>Delete</button>
+    </div>`;
+  }
+
+  function syncWorkflowFromPopupInputs(){
+    const getText=(id)=>{
+      const el=document.getElementById(id);
+      return el&&typeof el.value==='string'?el.value.trim():'';
+    };
+    const outcome=String(activeWorkflow.outcome||'').trim();
+    if(outcome==='not_interested'){
+      activeWorkflow.reason=getText('wf-reason');
+      return;
+    }
+    const prevName=String(activeWorkflow.name||'').trim();
+    const prevPhone=String(activeWorkflow.phone||'').trim();
+    const prevEmail=String(activeWorkflow.email||'').trim().toLowerCase();
+    const prevService=String(activeWorkflow.service||'').trim();
+    const prevSaleDate=String(activeWorkflow.saleDate||'').trim();
+    const prevSelectedSlot=String(activeWorkflow.selectedSlot||'').trim();
+
+    activeWorkflow.name=getText('wf-name');
+    activeWorkflow.phone=getText('wf-phone');
+    activeWorkflow.email=getText('wf-email');
+    activeWorkflow.service=getText('wf-service');
+    const saleDateInput=getText('wf-sale-date');
+    if(saleDateInput) activeWorkflow.saleDate=saleDateInput;
+    const selectedSlotInput=getText('wf-slot');
+    if(selectedSlotInput) activeWorkflow.selectedSlot=selectedSlotInput;
+    activeWorkflow.notes=getText('wf-notes');
+    if(outcome==='interested_callback'){
+      activeWorkflow.followup=true;
+      activeWorkflow.followupDueAt=getText('wf-followup-date');
+    } else {
+      activeWorkflow.followup=false;
+      activeWorkflow.followupDueAt='';
+    }
+
+    if(outcome==='booked_on_door'){
+      const selectedDate=String(activeWorkflow.saleDate||'').trim();
+      const slotsByDate=(activeWorkflow.monthSlotsByDate&&typeof activeWorkflow.monthSlotsByDate==='object')
+        ? activeWorkflow.monthSlotsByDate
+        : {};
+      const daySlots=selectedDate&&Array.isArray(slotsByDate[selectedDate]) ? slotsByDate[selectedDate] : [];
+      activeWorkflow.bookingSlots=Array.isArray(daySlots)?daySlots:[];
+      if(!activeWorkflow.bookingSlots.includes(activeWorkflow.selectedSlot)){
+        activeWorkflow.selectedSlot='';
+      }
+    }
+
+    const nextName=String(activeWorkflow.name||'').trim();
+    const nextPhone=String(activeWorkflow.phone||'').trim();
+    const nextEmail=String(activeWorkflow.email||'').trim().toLowerCase();
+    const nextService=String(activeWorkflow.service||'').trim();
+    const nextSaleDate=String(activeWorkflow.saleDate||'').trim();
+    const nextSelectedSlot=String(activeWorkflow.selectedSlot||'').trim();
+    if(
+      prevName!==nextName ||
+      prevPhone!==nextPhone ||
+      prevEmail!==nextEmail ||
+      prevService!==nextService ||
+      prevSaleDate!==nextSaleDate ||
+      prevSelectedSlot!==nextSelectedSlot
+    ){
+      clearWorkflowBookingConfirmation();
+    }
   }
 
   function renderMapLegend(byOutcome, total){
@@ -564,15 +1519,22 @@
     const when=item.happenedAt?new Date(item.happenedAt).toLocaleString('en-US'):'Unknown time';
     const addr=popupAddress(item)||'No address';
     const detail=item.outcomeDetail?esc(item.outcomeDetail):'';
+    const contact=[item.leadFirstName||'', item.leadPhone||''].filter(Boolean).join(' · ');
+    const followupText=item.followupDueAt?new Date(item.followupDueAt).toLocaleString('en-US'):'';
+    const serviceLabel=item.serviceInterestSlug?esc(item.serviceInterestSlug.replaceAll('-',' ')):'';
     const markerId=String(item.id||'');
-    return `<div style="min-width:220px">
-      <div style="font-weight:800;color:${meta.color}">${esc(meta.label)}</div>
-      <div style="font-size:.82rem;color:#d1d5db">${esc(when)}</div>
-      <div style="margin-top:6px;font-size:.84rem">${esc(addr)}</div>
-      ${detail?`<div style="margin-top:6px;font-size:.8rem;color:#9ca3af">${detail}</div>`:''}
+    return `<div class="rep-dot-dialog">
+      <div class="rep-dot-title" style="color:${meta.color}">${esc(meta.label)}</div>
+      <div class="rep-dot-meta">${esc(when)}</div>
+      <div class="rep-dot-address">${esc(addr)}</div>
+      ${contact?`<div class="rep-dot-sub">${esc(contact)}</div>`:''}
+      ${serviceLabel?`<div class="rep-dot-sub">Service: ${serviceLabel}</div>`:''}
+      ${followupText?`<div class="rep-dot-sub">Follow-up: ${esc(followupText)}</div>`:''}
+      ${detail?`<div class="rep-dot-detail">${detail}</div>`:''}
       ${popupActionButtons({
         source:'history',
         markerId,
+        eventId:markerId,
         lat:item.lat,
         lng:item.lng,
         addressLine1:item.addressLine1,
@@ -581,6 +1543,12 @@
         postalCode:item.postalCode,
         outcome:item.outcome,
         outcomeDetail:item.outcomeDetail,
+        serviceInterestSlug:item.serviceInterestSlug,
+        leadFirstName:item.leadFirstName,
+        leadPhone:item.leadPhone,
+        leadEmail:item.leadEmail,
+        wantsFollowup:Boolean(item.wantsFollowup),
+        followupDueAt:item.followupDueAt,
       })}
     </div>`;
   }
@@ -588,21 +1556,31 @@
   function activeMarkerPopupHtml(){
     if(!latestPin) return '<div>No pin selected</div>';
     const addr=popupAddress(latestPin)||`${formatCoord(latestPin.lat)}, ${formatCoord(latestPin.lng)}`;
-    return `<div style="min-width:220px">
-      <div style="font-weight:800;color:#1f2937">Selected Dot</div>
-      <div style="font-size:.82rem;color:#6b7280">${esc(addr)}</div>
-      ${popupActionButtons({
-        source:'active',
-        lat:latestPin.lat,
-        lng:latestPin.lng,
-        addressLine1:latestPin.addressLine1,
-        city:latestPin.city,
-        state:latestPin.state,
-        postalCode:latestPin.postalCode,
-        outcome:val('de-outcome'),
-        outcomeDetail:val('de-notes'),
-      })}
+    const title=editingDoorEventId?'Edit Door Event':'New Door Event';
+    return `<div class="rep-dot-dialog">
+      <div class="rep-dot-title">${esc(title)}</div>
+      <div class="rep-dot-meta">${esc(addr)}</div>
+      ${popupWorkflowFieldsHtml()}
+      ${popupWorkflowFooterHtml()}
     </div>`;
+  }
+
+  function setDoorEventEditState(eventId){
+    editingDoorEventId=String(eventId||'').trim();
+    if(saveDoorBtn) saveDoorBtn.textContent=editingDoorEventId?'Update Door Event':'Save Door Event';
+    if(!editingDoorEventId) resetActiveWorkflow('');
+    if(repMarker&&latestPin) syncRepMarkerPopup();
+  }
+
+  function clearDoorEventEditState(){
+    setDoorEventEditState('');
+  }
+
+  function toLocalDateTimeInputValue(iso){
+    if(!iso) return '';
+    const dt=new Date(String(iso));
+    if(Number.isNaN(dt.getTime())) return '';
+    return new Date(dt.getTime()-dt.getTimezoneOffset()*60*1000).toISOString().slice(0,16);
   }
 
   function syncRepMarkerPopup(){
@@ -664,11 +1642,21 @@
     const token=getToken();
     const headers={'Content-Type':'application/json'};
     if(token) headers['x-rep-session']=token;
-    const res=await fetch(API_BASE+path, {
-      method,
-      headers,
-      body: body ? JSON.stringify(body) : undefined
-    });
+    const timeout=withTimeout(API_TIMEOUT_MS);
+    let res;
+    try{
+      res=await fetch(API_BASE+path, {
+        method,
+        headers,
+        signal:timeout.signal,
+        body: body ? JSON.stringify(body) : undefined
+      });
+    }catch(err){
+      if(err&&err.name==='AbortError') throw new Error('Request timed out. Please try again.');
+      throw err;
+    } finally {
+      timeout.cancel();
+    }
 
     if(res.status===401){
       clearRepSession();
@@ -755,22 +1743,277 @@
     document.getElementById('k-overdue').textContent=String(Number(s.overdueFollowups||0));
   }
 
+  function pickField(obj, keys){
+    const source=obj&&typeof obj==='object'?obj:{};
+    for(const key of keys){
+      const value=source[key];
+      if(value!==undefined && value!==null && String(value).trim()) return String(value).trim();
+    }
+    return '';
+  }
+
+  function toValidDate(value){
+    const text=String(value||'').trim();
+    if(!text) return null;
+    const dt=new Date(text);
+    return Number.isNaN(dt.getTime())?null:dt;
+  }
+
+  function formatRelativeDue(target){
+    if(!(target instanceof Date)) return '';
+    const diffMs=target.getTime()-Date.now();
+    const abs=Math.abs(diffMs);
+    const suffix=diffMs<0?'ago':'from now';
+    if(abs<60*60*1000){
+      const mins=Math.max(1,Math.round(abs/(60*1000)));
+      return `${mins} min ${suffix}`;
+    }
+    if(abs<24*60*60*1000){
+      const hrs=Math.max(1,Math.round(abs/(60*60*1000)));
+      return `${hrs} hr${hrs===1?'':'s'} ${suffix}`;
+    }
+    const days=Math.max(1,Math.round(abs/(24*60*60*1000)));
+    return `${days} day${days===1?'':'s'} ${suffix}`;
+  }
+
+  function dueMeta(value){
+    const when=toValidDate(value);
+    if(!when){
+      return {
+        className:'rep-due-none',
+        label:'No Date',
+        hint:'No follow-up date set',
+        sortRank:5,
+        sortValue:Number.POSITIVE_INFINITY,
+        localLabel:'No date set',
+      };
+    }
+
+    const diff=when.getTime()-Date.now();
+    const abs=Math.abs(diff);
+    let className='rep-due-upcoming';
+    let label='Upcoming';
+    let sortRank=4;
+    if(diff<0 && abs>48*60*60*1000){
+      className='rep-due-critical';
+      label='Critical';
+      sortRank=0;
+    }else if(diff<0){
+      className='rep-due-overdue';
+      label='Overdue';
+      sortRank=1;
+    }else if(diff<=24*60*60*1000){
+      className='rep-due-urgent';
+      label='Due Today';
+      sortRank=2;
+    }else if(diff<=72*60*60*1000){
+      className='rep-due-soon';
+      label='Due Soon';
+      sortRank=3;
+    }
+
+    return {
+      className,
+      label,
+      hint:formatRelativeDue(when),
+      sortRank,
+      sortValue:when.getTime(),
+      localLabel:when.toLocaleString('en-US'),
+    };
+  }
+
+  function serviceLabel(value){
+    const raw=String(value||'').trim();
+    if(!raw) return '';
+    return raw
+      .replaceAll('-', ' ')
+      .replace(/\b\w/g, (m)=>m.toUpperCase());
+  }
+
+  function statusLabel(value){
+    const raw=String(value||'').trim();
+    if(!raw) return 'Open';
+    return raw.replaceAll('_',' ').replace(/\b\w/g,(m)=>m.toUpperCase());
+  }
+
+  function normalizePhoneForHref(value){
+    return String(value||'').replace(/[^\d+]/g,'').trim();
+  }
+
+  function bookingHrefFromRow(row){
+    const rep=getRep()||{};
+    const params=new URLSearchParams();
+    params.set('src','field_sales');
+    if(rep.id) params.set('rep_id',String(rep.id));
+    if(row&&row.svcSlug) params.set('service_slug',row.svcSlug);
+    if(row&&row.name&&row.name!=='Lead') params.set('name',row.name);
+    if(row&&row.phone) params.set('phone',row.phone);
+    if(row&&row.email) params.set('email',row.email);
+    return `/booking.html?${params.toString()}`;
+  }
+
+  function renderPipelineStats(rows, visibleCount){
+    if(!pipelineStats) return;
+    const counts={critical:0,overdue:0,urgent:0,soon:0,upcoming:0,nodate:0};
+    (rows||[]).forEach((row)=>{
+      const cls=String(row&&row.due&&row.due.className||'');
+      if(cls==='rep-due-critical') counts.critical++;
+      else if(cls==='rep-due-overdue') counts.overdue++;
+      else if(cls==='rep-due-urgent') counts.urgent++;
+      else if(cls==='rep-due-soon') counts.soon++;
+      else if(cls==='rep-due-upcoming') counts.upcoming++;
+      else counts.nodate++;
+    });
+
+    pipelineStats.innerHTML=[
+      `<span class="rep-followup-stat">Showing ${visibleCount}/${rows.length}</span>`,
+      `<span class="rep-followup-stat">Critical ${counts.critical}</span>`,
+      `<span class="rep-followup-stat">Overdue ${counts.overdue}</span>`,
+      `<span class="rep-followup-stat">Today ${counts.urgent}</span>`,
+      `<span class="rep-followup-stat">Soon ${counts.soon}</span>`,
+      `<span class="rep-followup-stat">No Date ${counts.nodate}</span>`
+    ].join('');
+  }
+
+  function renderPipelineTabs(rows){
+    if(!pipelineTabs) return;
+    const counts={all:rows.length,hot:0,overdue:0,today:0,soon:0,nodate:0};
+    rows.forEach((row)=>{
+      const rank=Number(row&&row.due&&row.due.sortRank);
+      const cls=String(row&&row.due&&row.due.className||'');
+      if(rank<=2) counts.hot++;
+      if(rank<=1) counts.overdue++;
+      if(rank===2) counts.today++;
+      if(rank===3) counts.soon++;
+      if(cls==='rep-due-none') counts.nodate++;
+    });
+
+    pipelineTabs.querySelectorAll('.rep-followup-tab').forEach((btn)=>{
+      const key=String(btn.getAttribute('data-filter')||'all');
+      const value=Number(counts[key]||0);
+      const countEl=btn.querySelector('.count');
+      if(countEl) countEl.textContent=String(value);
+      btn.classList.toggle('active', key===pipelineFilterMode);
+    });
+  }
+
+  function renderPipelineCard(row){
+    const contact=[row.phone,row.email].filter(Boolean).join(' · ') || 'No contact info';
+    const phoneHref=normalizePhoneForHref(row.phone);
+    const smsHref=phoneHref?`sms:${phoneHref}`:'';
+    const callHref=phoneHref?`tel:${phoneHref}`:'';
+    const emailHref=row.email?`mailto:${row.email}`:'';
+    const bookingHref=bookingHrefFromRow(row);
+    const actions=[];
+    if(callHref) actions.push(`<a class="rep-followup-action call" href="${esc(callHref)}">Call</a>`);
+    if(smsHref) actions.push(`<a class="rep-followup-action text" href="${esc(smsHref)}">Text</a>`);
+    if(emailHref) actions.push(`<a class="rep-followup-action" href="${esc(emailHref)}">Email</a>`);
+    actions.push(`<a class="rep-followup-action book" href="${esc(bookingHref)}" target="_blank" rel="noopener">Book</a>`);
+
+    return `<div class="rep-item ${row.due.className}">
+      <div class="rep-followup-head">
+        <h4>${esc(row.name)}</h4>
+        <div class="rep-followup-badges">
+          <span class="rep-badge rep-badge-status">${esc(row.status)}</span>
+          <span class="rep-badge ${row.due.className}">${esc(row.due.label)}</span>
+        </div>
+      </div>
+      <div class="rep-followup-lines">
+        <div class="rep-followup-line"><strong>Due:</strong> ${esc(row.due.localLabel)}${row.due.hint?` · ${esc(row.due.hint)}`:''}</div>
+        <div class="rep-followup-line"><strong>Contact:</strong> ${esc(contact)}</div>
+        <div class="rep-followup-line"><strong>Address:</strong> ${esc(row.addr)}</div>
+        <div class="rep-followup-line"><strong>Service:</strong> ${esc(row.svc||'Not selected')}</div>
+        ${row.notes?`<div class="rep-followup-line"><strong>Notes:</strong> ${esc(row.notes)}</div>`:''}
+      </div>
+      <div class="rep-followup-actions">${actions.join('')}</div>
+    </div>`;
+  }
+
   function renderPipeline(items){
+    pipelineItemsCache=Array.isArray(items)?items.slice():[];
     if(!items||!items.length){
+      if(pipelineStats) pipelineStats.innerHTML='';
+      renderPipelineTabs([]);
       pipelineList.innerHTML='<div class="rep-item"><h4>No open follow-ups</h4><p>Great work. Keep logging door outcomes.</p></div>';
       return;
     }
 
-    pipelineList.innerHTML=items.slice(0,12).map((it)=>{
-      const nm=[it.firstName||'',it.lastName||''].join(' ').trim()||'Lead';
-      const when=it.scheduledFor?new Date(it.scheduledFor).toLocaleString('en-US'):'No date set';
-      const addr=[it.addressLine1||'',it.city||'',it.state||''].filter(Boolean).join(', ')||'No address';
-      return `<div class="rep-item">
-        <h4>${esc(nm)} · ${esc(it.status||'open')}</h4>
-        <p>${esc(addr)}</p>
-        <p>${esc(when)}</p>
-      </div>`;
-    }).join('');
+    const rows=(items||[]).map((it)=>{
+      const nm=[it.firstName||'',it.lastName||''].join(' ').trim() || pickField(it,['name','leadName']) || 'Lead';
+      const dueIso=pickField(it,['scheduledFor','followupDueAt','dueAt']);
+      const due=dueMeta(dueIso);
+      const status=statusLabel(pickField(it,['status']) || 'open');
+      const phone=pickField(it,['phone','leadPhone','contactPhone']);
+      const email=pickField(it,['email','leadEmail','contactEmail']);
+      const svcSlug=pickField(it,['serviceInterestSlug','serviceSlug','service']);
+      const svc=serviceLabel(svcSlug);
+      const addr=[it.addressLine1||'',it.city||'',it.state||'',it.postalCode||''].filter(Boolean).join(', ') || 'No address';
+      const notes=pickField(it,['notes','outcomeDetail']);
+      const searchable=[nm,status,phone,email,svc,addr,notes,due.localLabel,due.hint].join(' ').toLowerCase();
+      return {it,name:nm,due,status,phone,email,svcSlug,svc,addr,notes,searchable};
+    });
+
+    const query=String(pipelineSearch&&pipelineSearch.value||'').trim().toLowerCase();
+    const filter=String(pipelineFilterMode||'all');
+    const sortMode=String(pipelineSort&&pipelineSort.value||'urgency');
+
+    renderPipelineTabs(rows);
+
+    const filtered=rows.filter((row)=>{
+      if(query && !row.searchable.includes(query)) return false;
+      if(filter==='hot') return row.due.sortRank<=2;
+      if(filter==='overdue') return row.due.sortRank<=1;
+      if(filter==='today') return row.due.sortRank===2;
+      if(filter==='soon') return row.due.sortRank===3;
+      if(filter==='nodate') return row.due.className==='rep-due-none';
+      return true;
+    });
+
+    const ordered=filtered.sort((a,b)=>{
+      if(sortMode==='name') return a.name.localeCompare(b.name);
+      if(sortMode==='due'){
+        if(a.due.sortValue!==b.due.sortValue) return a.due.sortValue-b.due.sortValue;
+        return a.name.localeCompare(b.name);
+      }
+      if(a.due.sortRank!==b.due.sortRank) return a.due.sortRank-b.due.sortRank;
+      if(a.due.sortValue!==b.due.sortValue) return a.due.sortValue-b.due.sortValue;
+      return a.name.localeCompare(b.name);
+    });
+
+    renderPipelineStats(rows, ordered.length);
+
+    if(!ordered.length){
+      pipelineList.innerHTML='<div class="rep-item"><h4>No matches for current filter</h4><p class="rep-followup-filter-empty">Try clearing search or changing urgency filter.</p><div class="rep-followup-actions"><button type="button" class="rep-followup-clear" id="rep-followup-inline-clear">Clear Filters</button></div></div>';
+      const inlineClear=document.getElementById('rep-followup-inline-clear');
+      inlineClear&&inlineClear.addEventListener('click',()=>{
+        if(pipelineSearch) pipelineSearch.value='';
+        if(pipelineSort) pipelineSort.value='urgency';
+        pipelineFilterMode='all';
+        renderPipeline(pipelineItemsCache);
+      });
+      return;
+    }
+
+    const groupDefs=[
+      {className:'rep-due-critical',label:'Critical',open:true},
+      {className:'rep-due-overdue',label:'Overdue',open:true},
+      {className:'rep-due-urgent',label:'Due Today',open:true},
+      {className:'rep-due-soon',label:'Due Soon',open:true},
+      {className:'rep-due-upcoming',label:'Upcoming',open:false},
+      {className:'rep-due-none',label:'No Date',open:false}
+    ];
+
+    const sections=groupDefs.map((group)=>{
+      const rowsInGroup=ordered.filter((row)=>row.due.className===group.className);
+      if(!rowsInGroup.length) return '';
+      const openAttr=(group.open||filter!=='all')?' open':'';
+      return `<details class="rep-followup-group"${openAttr}>
+        <summary>${group.label}<span class="rep-followup-group-count">${rowsInGroup.length}</span></summary>
+        <div class="rep-followup-group-list">${rowsInGroup.map((row)=>renderPipelineCard(row)).join('')}</div>
+      </details>`;
+    }).filter(Boolean);
+
+    pipelineList.innerHTML=sections.join('');
   }
 
   async function refreshData(){
@@ -817,11 +2060,26 @@
     beginModalTapGuard();
   }
 
+  function openBookingOverlay(url){
+    if(!mapModal) return;
+    if(mapModalTitle) mapModalTitle.textContent='Booking Flow';
+    if(mapModalAddress) mapModalAddress.textContent='Complete booking details for this sale.';
+    if(mapBookingFrame){
+      mapBookingFrame.style.display='block';
+      mapBookingFrame.src=String(url||'/booking.html');
+    }
+    openMapModal();
+  }
+
   function closeMapModal(){
     if(!mapModal) return;
     cancelPendingModalOpen();
     mapModal.classList.remove('open');
     mapModal.setAttribute('aria-hidden','true');
+    if(mapBookingFrame){
+      mapBookingFrame.style.display='none';
+      mapBookingFrame.src='';
+    }
     if(modalTapGuardTimer){
       clearTimeout(modalTapGuardTimer);
       modalTapGuardTimer=null;
@@ -840,12 +2098,30 @@
     mapModalAddress.textContent=latestPin.label || `${formatCoord(latestPin.lat)}, ${formatCoord(latestPin.lng)}`;
   }
 
+  function openMapLogger(options){
+    if(!mapLogPanel) return;
+    mapLogPanel.open=true;
+    const cfg=options||{};
+    const shouldScroll=cfg.scroll!==false;
+    const focusId=typeof cfg.focusId==='string'&&cfg.focusId ? cfg.focusId : '';
+    if(shouldScroll && typeof mapLogPanel.scrollIntoView==='function'){
+      mapLogPanel.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    if(focusId){
+      const field=document.getElementById(focusId);
+      if(field && typeof field.focus==='function'){
+        setTimeout(()=>{ field.focus(); }, 120);
+      }
+    }
+  }
+
   function openDotEditForm(){
     if(!latestPin){
       setMapStatus('Drop a dot first, then tap Edit.', true);
       return;
     }
     closeMapModal();
+    openMapLogger({scroll:true,focusId:'de-address'});
     const addressInput=document.getElementById('de-address');
     const cityInput=document.getElementById('de-city');
     if(latestPin.addressLine1&&!val('de-address')) setVal('de-address',latestPin.addressLine1);
@@ -876,8 +2152,28 @@
 
     if(data.addressLine1) setVal('de-address',data.addressLine1);
     if(data.city) setVal('de-city',data.city);
-    if(data.outcome && OUTCOME_MAP_META[data.outcome]) setVal('de-outcome',data.outcome);
-    if(data.outcomeDetail && !val('de-notes')) setVal('de-notes',data.outcomeDetail);
+    if(data.outcome && OUTCOME_MAP_META[data.outcome]){
+      setVal('de-outcome',data.outcome);
+      setActiveWorkflowFromEvent(data);
+    }else{
+      resetActiveWorkflow('');
+    }
+    clearVehiclePhotoSelection(true);
+    if(typeof data.outcomeDetail==='string'){
+      setVal('de-notes',stripVehiclePhotoTag(data.outcomeDetail));
+      const existingPhoto=extractVehiclePhotoName(data.outcomeDetail);
+      if(existingPhoto){
+        vehiclePhotoName=existingPhoto;
+        vehiclePhotoPreviewUrl='';
+        updateVehiclePhotoPreview();
+      }
+    }
+    if(typeof data.serviceInterestSlug==='string') setVal('de-service',data.serviceInterestSlug);
+    const followupCheckbox=document.getElementById('de-followup');
+    if(followupCheckbox && typeof data.wantsFollowup==='boolean') followupCheckbox.checked=data.wantsFollowup;
+    if(typeof data.followupDueAt==='string'){
+      setVal('de-followup-date',toLocalDateTimeInputValue(data.followupDueAt));
+    }
 
     if(mapPinLabel){
       const label=latestPin.label||`Pin ${formatCoord(latestPin.lat)}, ${formatCoord(latestPin.lng)}`;
@@ -888,7 +2184,125 @@
     return true;
   }
 
-  function handleMapPopupActionClick(evt){
+  async function deleteDoorEvent(eventId){
+    if(!eventId){
+      setMapStatus('Missing event id for delete.', true);
+      return;
+    }
+    setMapStatus('Deleting door event...', false);
+    saveDoorBtn.disabled=true;
+    try{
+      await api(`/field/door-events/${encodeURIComponent(eventId)}`,'DELETE');
+      if(editingDoorEventId===eventId){
+        clearDoorEventEditState();
+        clearPin();
+      }else if(repMap){
+        repMap.closePopup();
+      }
+      setDoorStatus('Door event deleted.', false);
+      await Promise.all([
+        refreshData(),
+        refreshSchedule(),
+        refreshMapHistory().catch(()=>null)
+      ]);
+      setMapStatus('Door event removed and synced.', false);
+    }catch(err){
+      setMapStatus(String(err&&err.message?err.message:'Could not delete door event.'), true);
+    } finally {
+      saveDoorBtn.disabled=false;
+    }
+  }
+
+  async function handleMapPopupActionClick(evt){
+    const flowBtn=evt.target&&typeof evt.target.closest==='function'
+      ? evt.target.closest('[data-flow-action]')
+      : null;
+    if(flowBtn){
+      evt.preventDefault();
+      evt.stopPropagation();
+      const flowAction=String(flowBtn.getAttribute('data-flow-action')||'').trim().toLowerCase();
+      if(flowAction==='choose-outcome'){
+        const outcome=String(flowBtn.getAttribute('data-flow-outcome')||'').trim();
+        resetActiveWorkflow(outcome);
+        if(repMarker){
+          syncRepMarkerPopup();
+          repMarker.openPopup();
+        }
+        if(outcome==='booked_on_door'){
+          loadSaleSlotsForWorkflow(true).catch(()=>null);
+        }
+        return;
+      }
+      if(flowAction==='clear-outcome'){
+        resetActiveWorkflow('');
+        if(repMarker){
+          syncRepMarkerPopup();
+          repMarker.openPopup();
+        }
+        return;
+      }
+      if(flowAction==='load-slots'){
+        await loadSaleSlotsForWorkflow(true);
+        return;
+      }
+      if(flowAction==='month-prev' || flowAction==='month-next'){
+        syncWorkflowFromPopupInputs();
+        clearWorkflowBookingConfirmation();
+        const delta=flowAction==='month-prev'?-1:1;
+        activeWorkflow.monthCursor=shiftMonthValue(activeWorkflow.monthCursor||currentMonthValue(),delta);
+        activeWorkflow.saleDate='';
+        activeWorkflow.selectedSlot='';
+        activeWorkflow.bookingSlots=[];
+        await loadSaleSlotsForWorkflow(true);
+        return;
+      }
+      if(flowAction==='pick-day'){
+        syncWorkflowFromPopupInputs();
+        const pickedDay=String(flowBtn.getAttribute('data-flow-day')||'').trim();
+        const slotsByDate=(activeWorkflow.monthSlotsByDate&&typeof activeWorkflow.monthSlotsByDate==='object')
+          ? activeWorkflow.monthSlotsByDate
+          : {};
+        const daySlots=Array.isArray(slotsByDate[pickedDay])?slotsByDate[pickedDay]:[];
+        activeWorkflow.monthCursor=pickedDay.slice(0,7);
+        activeWorkflow.saleDate=pickedDay;
+        activeWorkflow.bookingSlots=daySlots;
+        activeWorkflow.selectedSlot='';
+        clearWorkflowBookingConfirmation();
+        activeWorkflow.slotStatus=daySlots.length
+          ? `Selected ${formatDateLabel(pickedDay)}. Pick a time to finish.`
+          : `No open times for ${formatDateLabel(pickedDay)}.`;
+        refreshActivePopupIfOpen();
+        return;
+      }
+      if(flowAction==='pick-time'){
+        syncWorkflowFromPopupInputs();
+        const pickedDay=String(flowBtn.getAttribute('data-flow-day')||'').trim();
+        const pickedSlot=String(flowBtn.getAttribute('data-flow-slot')||'').trim();
+        if(!pickedDay || !pickedSlot) return;
+        const slotsByDate=(activeWorkflow.monthSlotsByDate&&typeof activeWorkflow.monthSlotsByDate==='object')
+          ? activeWorkflow.monthSlotsByDate
+          : {};
+        const daySlots=Array.isArray(slotsByDate[pickedDay])?slotsByDate[pickedDay]:[];
+        if(!daySlots.includes(pickedSlot)){
+          activeWorkflow.slotStatus='That time is no longer available. Refresh month availability.';
+          refreshActivePopupIfOpen();
+          return;
+        }
+        activeWorkflow.monthCursor=pickedDay.slice(0,7);
+        activeWorkflow.saleDate=pickedDay;
+        activeWorkflow.bookingSlots=daySlots;
+        activeWorkflow.selectedSlot=pickedSlot;
+        clearWorkflowBookingConfirmation();
+        activeWorkflow.slotStatus=`Time selected: ${formatSlotLabel(pickedSlot)}.`;
+        refreshActivePopupIfOpen();
+        return;
+      }
+      if(flowAction==='save-event'){
+        await savePopupWorkflowEvent();
+        return;
+      }
+    }
+
     const btn=evt.target&&typeof evt.target.closest==='function'
       ? evt.target.closest('[data-dot-action]')
       : null;
@@ -900,6 +2314,7 @@
     const action=String(btn.getAttribute('data-dot-action')||'').trim().toLowerCase();
     const source=String(btn.getAttribute('data-dot-source')||'').trim().toLowerCase();
     const markerId=String(btn.getAttribute('data-dot-marker-id')||'').trim();
+    const eventId=String(btn.getAttribute('data-dot-event-id')||markerId).trim();
     const payload={
       lat:Number(btn.getAttribute('data-dot-lat')),
       lng:Number(btn.getAttribute('data-dot-lng')),
@@ -909,17 +2324,22 @@
       postalCode:decodePopupData(btn.getAttribute('data-dot-postal')),
       outcome:decodePopupData(btn.getAttribute('data-dot-outcome')),
       outcomeDetail:decodePopupData(btn.getAttribute('data-dot-detail')),
+      serviceInterestSlug:decodePopupData(btn.getAttribute('data-dot-service')),
+      leadFirstName:decodePopupData(btn.getAttribute('data-dot-lead-name')),
+      leadPhone:decodePopupData(btn.getAttribute('data-dot-lead-phone')),
+      leadEmail:decodePopupData(btn.getAttribute('data-dot-lead-email')),
+      wantsFollowup:String(btn.getAttribute('data-dot-followup')||'').trim()==='1',
+      followupDueAt:decodePopupData(btn.getAttribute('data-dot-followup-due')),
     };
 
     if(action==='delete'){
-      if(source==='history' && markerId && mapHistoryMarkersById.has(markerId)){
-        const marker=mapHistoryMarkersById.get(markerId);
-        if(marker&&mapHistoryLayer) mapHistoryLayer.removeLayer(marker);
-        mapHistoryMarkersById.delete(markerId);
-        if(repMap) repMap.closePopup();
-        setMapStatus('Event dot removed from current map view only.', false);
+      if(source==='history' && eventId){
+        const confirmed=window.confirm('Delete this door event from backend data?');
+        if(!confirmed) return;
+        await deleteDoorEvent(eventId);
         return;
       }
+      clearDoorEventEditState();
       clearPin();
       if(repMap) repMap.closePopup();
       return;
@@ -931,22 +2351,38 @@
       return;
     }
 
+    if(source==='history' && eventId){
+      setDoorEventEditState(eventId);
+    }else if(source!=='history'){
+      clearDoorEventEditState();
+    }
+
     if(action==='move'){
       setMovePinMode(true);
       if(repMap) repMap.closePopup();
-      setMapStatus('Move mode on. Tap once on the map to reposition the dot.', false);
+      setMapStatus(source==='history'
+        ? 'Move mode on. Tap map to reposition, then click Update Door Event.'
+        : 'Move mode on. Tap once on the map to reposition the dot.', false);
       return;
     }
 
     if(action==='edit'){
       if(repMap) repMap.closePopup();
-      openDotEditForm();
+      setActiveWorkflowFromEvent(payload);
+      if(repMarker){
+        syncRepMarkerPopup();
+        repMarker.openPopup();
+      }
+      setMapStatus('Editing this event in popup.', false);
     }
   }
 
   function clearPin(){
     cancelPendingModalOpen();
     setMovePinMode(false);
+    clearDoorEventEditState();
+    resetActiveWorkflow('');
+    clearVehiclePhotoSelection(true);
     latestPin=null;
     latestPinSeq=0;
     setVal('de-lat','');
@@ -993,7 +2429,6 @@
     const clippedLat=Math.max(-90,Math.min(90,Number(lat)));
     const clippedLng=Math.max(-180,Math.min(180,Number(lng)));
     latestPinSeq+=1;
-    const currentPinSeq=latestPinSeq;
     latestPin={
       lat:Number(clippedLat.toFixed(6)),
       lng:Number(clippedLng.toFixed(6)),
@@ -1005,6 +2440,7 @@
     };
     setVal('de-lat',String(latestPin.lat));
     setVal('de-lng',String(latestPin.lng));
+    if(!editingDoorEventId) resetActiveWorkflow('');
     updateCoordinateNote();
     if(repMap){
       if(repMarker){
@@ -1016,16 +2452,10 @@
       repMap.panTo([latestPin.lat,latestPin.lng]);
     }
     syncRepMarkerPopup();
+    if(repMarker) repMarker.openPopup();
     if(mapPinLabel) mapPinLabel.textContent=`Pin ${formatCoord(latestPin.lat)}, ${formatCoord(latestPin.lng)}`;
-    setMapStatus(openModalFlag ? 'Pin dropped. Opening quick outcome...' : 'Pin dropped. Choose an outcome.', false);
+    setMapStatus('Pin dropped. Choose outcome in the popup card.', false);
     updateMapModalAddress();
-    if(openModalFlag){
-      modalOpenDelayTimer=setTimeout(()=>{
-        modalOpenDelayTimer=null;
-        if(currentPinSeq!==latestPinSeq) return;
-        openMapModal();
-      }, MODAL_OPEN_DELAY_MS);
-    }
     reverseGeocodeLatestPin().catch(()=>null);
   }
 
@@ -1081,6 +2511,253 @@
     }
   }
 
+  function buildPopupWorkflowPayload(){
+    if(!latestPin) return null;
+    syncWorkflowFromPopupInputs();
+    const outcome=String(activeWorkflow.outcome||'').trim();
+    if(!outcome||!OUTCOME_MAP_META[outcome]) return null;
+
+    let detail='';
+    if(outcome==='not_interested'){
+      detail=String(activeWorkflow.reason||'').trim();
+    }else{
+      detail=String(activeWorkflow.notes||'').trim();
+    }
+    if(outcome==='booked_on_door' && activeWorkflow.saleDate){
+      detail=[detail,`Target booking date: ${activeWorkflow.saleDate}`].filter(Boolean).join(' | ');
+    }
+    detail=withVehiclePhotoTag(detail);
+
+    let followupDueAt='';
+    if(activeWorkflow.followup && activeWorkflow.followupDueAt){
+      const parsed=new Date(activeWorkflow.followupDueAt);
+      if(!Number.isNaN(parsed.getTime())) followupDueAt=parsed.toISOString();
+    }
+
+    return {
+      outcome,
+      serviceInterestSlug:String(activeWorkflow.service||'').trim(),
+      addressLine1:String(latestPin.addressLine1||val('de-address')||'').trim(),
+      city:String(latestPin.city||val('de-city')||'').trim(),
+      state:String(latestPin.state||'').trim(),
+      postalCode:String(latestPin.postalCode||'').trim(),
+      wantsFollowup:Boolean(activeWorkflow.followup),
+      followupDueAt,
+      outcomeDetail:detail,
+      vehiclePhotoName,
+      lead:{
+        firstName:String(activeWorkflow.name||'').trim(),
+        phone:String(activeWorkflow.phone||'').trim(),
+        email:String(activeWorkflow.email||'').trim(),
+        notes:detail
+      },
+      lat:Number(latestPin.lat),
+      lng:Number(latestPin.lng)
+    };
+  }
+
+  async function autoBookSaleMade(payload, doorEventResult){
+    const serviceSlug=String(payload&&payload.serviceInterestSlug||'').trim();
+    const bookingDate=String(activeWorkflow.saleDate||'').trim();
+    const selectedSlot=String(activeWorkflow.selectedSlot||'').trim();
+    const attendeeName=String(payload&&payload.lead&&payload.lead.firstName||'').trim();
+    const attendeePhone=String(payload&&payload.lead&&payload.lead.phone||'').trim();
+    const attendeeEmail=bookingAttendeeEmail(
+      payload&&payload.lead&&payload.lead.email,
+      attendeePhone
+    );
+
+    if(!serviceSlug){
+      throw new Error('Choose a service before auto-booking.');
+    }
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(bookingDate)){
+      throw new Error('Choose a valid booking date before auto-booking.');
+    }
+    if(!attendeeName){
+      throw new Error('Customer name is required to auto-book.');
+    }
+    if(!attendeePhone && !String(payload&&payload.lead&&payload.lead.email||'').trim()){
+      throw new Error('Phone or email is required to auto-book.');
+    }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(attendeeEmail)){
+      throw new Error('Could not generate a valid booking email. Add a customer email or phone.');
+    }
+
+    if(!selectedSlot){
+      throw new Error('Select a time before booking. Refresh month availability if needed.');
+    }
+
+    const startIso=selectedSlot;
+    if(!startIso){
+      throw new Error('No valid slot returned for booking.');
+    }
+
+    const latestDaySlots=await fetchSlotsForDate(serviceSlug,bookingDate);
+    if(!latestDaySlots.includes(startIso)){
+      throw new Error('Selected time was just taken. Choose another available time.');
+    }
+
+    const rep=getRep()||{};
+    const tz=(Intl&&Intl.DateTimeFormat&&Intl.DateTimeFormat().resolvedOptions&&Intl.DateTimeFormat().resolvedOptions().timeZone)||'America/Denver';
+    const bookingMetadata={
+      src:'field_sales',
+      rep_id:String(rep.id||''),
+      booking_key:`${serviceSlug}|${startIso}|${attendeeEmail}`.slice(0,120)
+    };
+    const leadId=String(doorEventResult&&doorEventResult.leadId||'').trim();
+    const doorEventId=String(doorEventResult&&doorEventResult.doorEventId||'').trim();
+    if(leadId) bookingMetadata.lead_id=leadId;
+    if(doorEventId) bookingMetadata.door_event_id=doorEventId;
+    if(attendeePhone) bookingMetadata.lead_phone=attendeePhone;
+    if(!String(payload&&payload.lead&&payload.lead.email||'').trim()) bookingMetadata.email_source='phone_fallback';
+
+    const bookingPayload={
+      eventTypeSlug:serviceSlug,
+      start:startIso,
+      attendee:{
+        name:attendeeName,
+        email:attendeeEmail,
+        timeZone:tz,
+        language:'en'
+      },
+      metadata:bookingMetadata
+    };
+
+    const location=[payload.addressLine1||'',payload.city||'',payload.state||'',payload.postalCode||''].filter(Boolean).join(', ');
+    if(location) bookingPayload.location=location;
+
+    const bookingResult=await api('/bookings','POST',bookingPayload);
+    return { bookingResult, startIso };
+  }
+
+  async function savePopupWorkflowEvent(){
+    if(activeWorkflow.submitBusy){
+      setMapStatus('Already processing this request...', false);
+      return;
+    }
+    const payload=buildPopupWorkflowPayload();
+    if(!payload){
+      setMapStatus('Choose an outcome first.', true);
+      return;
+    }
+    if(payload.outcome==='not_interested' && !payload.outcomeDetail){
+      setMapStatus('Please add why they were not interested.', true);
+      return;
+    }
+    if(payload.outcome==='interested_callback' && !payload.lead.firstName){
+      setMapStatus('Add contact name for interested follow-up.', true);
+      return;
+    }
+    if(payload.outcome==='booked_on_door'){
+      if(!payload.lead.firstName){
+        setMapStatus('Customer name is required for sale made.', true);
+        return;
+      }
+      if(!payload.lead.phone && !payload.lead.email){
+        setMapStatus('Add at least a phone or email to auto-book sale made.', true);
+        return;
+      }
+      if(!payload.serviceInterestSlug){
+        setMapStatus('Choose a service before saving sale made.', true);
+        return;
+      }
+      if(!activeWorkflow.saleDate){
+        setMapStatus('Choose an available date before saving sale made.', true);
+        return;
+      }
+      if(!activeWorkflow.selectedSlot){
+        setMapStatus('Choose a time before saving sale made.', true);
+        return;
+      }
+      const saleDaySlots=(activeWorkflow.monthSlotsByDate&&Array.isArray(activeWorkflow.monthSlotsByDate[activeWorkflow.saleDate]))
+        ? activeWorkflow.monthSlotsByDate[activeWorkflow.saleDate]
+        : [];
+      activeWorkflow.bookingSlots=saleDaySlots;
+      if(!hasMatchingConfirmedBooking(payload) && !saleDaySlots.length){
+        setMapStatus('No availability found for that date. Refresh availability and pick another date.', true);
+        return;
+      }
+      if(!hasMatchingConfirmedBooking(payload) && !saleDaySlots.includes(activeWorkflow.selectedSlot)){
+        setMapStatus('Selected time is outdated. Refresh month availability and choose another time.', true);
+        return;
+      }
+    }
+
+    setWorkflowSubmitState(true,payload.outcome==='booked_on_door'?'Saving sale and confirming booking...':'Saving event...');
+    try{
+      if(payload.outcome==='booked_on_door'){
+        try{
+          let bookedLocal=String(activeWorkflow.bookedLocalLabel||'').trim();
+          if(hasMatchingConfirmedBooking(payload)){
+            setWorkflowSubmitState(true,'Booking already confirmed. Saving sale log...');
+            if(!bookedLocal){
+              const dt=new Date(activeWorkflow.selectedSlot);
+              bookedLocal=Number.isNaN(dt.getTime())?activeWorkflow.selectedSlot:dt.toLocaleString('en-US');
+              markWorkflowBookingConfirmed(
+                activeWorkflow.selectedSlot,
+                bookedLocal,
+                bookingAttendeeEmail(payload.lead.email,payload.lead.phone),
+                payload.serviceInterestSlug,
+                activeWorkflow.saleDate
+              );
+            }
+          }else{
+            setWorkflowSubmitState(true,'Confirming booking with scheduler...');
+            const booked=await autoBookSaleMade(payload,null);
+            bookedLocal=new Date(booked.startIso).toLocaleString('en-US');
+            markWorkflowBookingConfirmed(
+              booked.startIso,
+              bookedLocal,
+              bookingAttendeeEmail(payload.lead.email,payload.lead.phone),
+              payload.serviceInterestSlug,
+              activeWorkflow.saleDate
+            );
+          }
+
+          const saleDetail=[stripVehiclePhotoTag(payload.outcomeDetail),`Auto-booked: ${bookedLocal}`].filter(Boolean).join(' | ');
+          payload.outcomeDetail=withVehiclePhotoTag(saleDetail);
+          if(payload.lead&&typeof payload.lead==='object') payload.lead.notes=payload.outcomeDetail;
+        }catch(err){
+          clearWorkflowBookingConfirmation();
+          const reason=String(err&&err.message?err.message:'Booking failed');
+          setDoorStatus(`Auto-booking failed. Sale not saved: ${reason}`, true);
+          setMapStatus(`Auto-booking failed: ${reason}. Sale was not saved.`, true);
+          refreshActivePopupIfOpen();
+          return;
+        }
+      }
+
+      setMapStatus(payload.outcome==='booked_on_door'?'Booking confirmed. Saving sale event...':'Saving event...', false);
+      const res=await submitDoorPayload(payload,editingDoorEventId?'Door event updated.':'Door event saved.');
+      if(!res){
+        if(payload.outcome==='booked_on_door' && hasMatchingConfirmedBooking(payload)){
+          setMapStatus('Booking is confirmed. Sale log save failed; tap Update Sale & Auto-Book to retry save only.', true);
+          setDoorStatus('Booking confirmed, but sale log did not save yet. Tap again to retry save.', true);
+          refreshActivePopupIfOpen();
+          return;
+        }
+        setMapStatus('Could not save door event. Check the message and retry.', true);
+        return;
+      }
+
+      if(payload.outcome==='booked_on_door'){
+        const bookedLocal=String(activeWorkflow.bookedLocalLabel||'').trim();
+        setDoorStatus(`Sale saved and booked for ${bookedLocal||'selected slot'}.`, false);
+        setMapStatus(`Sale and booking confirmed for ${bookedLocal||'selected slot'}.`, false);
+        showSaleCongratsToast(bookedLocal);
+      }
+
+      clearDoorEventEditState();
+      resetActiveWorkflow('');
+      clearVehiclePhotoSelection(true);
+      if(repMap) repMap.closePopup();
+
+      await refreshMapHistory().catch(()=>null);
+    } finally {
+      setWorkflowSubmitState(false,'');
+    }
+  }
+
   function buildDoorPayload(overrides){
     const merged=overrides||{};
     const outcomeRaw=String(merged.outcome!==undefined?merged.outcome:val('de-outcome')).trim();
@@ -1092,6 +2769,8 @@
     }
     const lat=Number(val('de-lat'));
     const lng=Number(val('de-lng'));
+    const outcomeDetailRaw=String(merged.outcomeDetail!==undefined?merged.outcomeDetail:val('de-notes')).trim();
+    const outcomeDetail=withVehiclePhotoTag(outcomeDetailRaw);
 
     const payload={
       outcome:outcomeRaw,
@@ -1102,11 +2781,12 @@
       postalCode:String(merged.postalCode!==undefined?merged.postalCode:(latestPin&&latestPin.postalCode)||'').trim(),
       wantsFollowup:merged.wantsFollowup!==undefined?Boolean(merged.wantsFollowup):Boolean(document.getElementById('de-followup').checked),
       followupDueAt,
-      outcomeDetail:String(merged.outcomeDetail!==undefined?merged.outcomeDetail:val('de-notes')).trim(),
+      outcomeDetail,
+      vehiclePhotoName,
       lead:merged.lead!==undefined?merged.lead:{
         firstName:val('de-lead-name').trim(),
         phone:val('de-lead-phone').trim(),
-        notes:val('de-notes').trim()
+        notes:outcomeDetail
       }
     };
 
@@ -1121,24 +2801,33 @@
   async function submitDoorPayload(payload, okMessage){
     if(!payload||!payload.outcome){
       setDoorStatus('Outcome is required.', true);
-      return;
+      return null;
     }
 
     saveDoorBtn.disabled=true;
     setDoorStatus('Saving...', false);
     try{
-      const res=await api('/field/door-events','POST',payload);
-      if(res&&res.bookingUrl){
+      const isUpdate=Boolean(editingDoorEventId);
+      const endpoint=isUpdate
+        ? `/field/door-events/${encodeURIComponent(editingDoorEventId)}`
+        : '/field/door-events';
+      const method=isUpdate?'PATCH':'POST';
+      const res=await api(endpoint,method,payload);
+      if(!isUpdate&&res&&res.bookingUrl){
         setBookingLink(res.bookingUrl);
       }
+      if(isUpdate) clearDoorEventEditState();
+      clearVehiclePhotoSelection(true);
       setDoorStatus(okMessage||'Door event saved.', false);
       await Promise.all([
         refreshData(),
         refreshSchedule(),
         refreshMapHistory().catch(()=>null)
       ]);
+      return res;
     }catch(err){
       setDoorStatus(String(err&&err.message?err.message:'Save failed'), true);
+      return null;
     } finally {
       saveDoorBtn.disabled=false;
     }
@@ -1146,7 +2835,7 @@
 
   async function saveDoorEvent(){
     const payload=buildDoorPayload({});
-    await submitDoorPayload(payload,'Door event saved.');
+    await submitDoorPayload(payload,editingDoorEventId?'Door event updated.':'Door event saved.');
   }
 
   async function quickLogFromMap(choiceKey){
@@ -1176,6 +2865,7 @@
       }
     });
 
+    clearDoorEventEditState();
     closeMapModal();
     await submitDoorPayload(payload,`${preset.label} saved.`);
 
@@ -1185,45 +2875,201 @@
     }
   }
 
-  async function fetchSlotsForDate(serviceSlug, dateStr){
-    const query=`eventTypeSlug=${encodeURIComponent(serviceSlug)}&start=${encodeURIComponent(dateStr)}&end=${encodeURIComponent(dateStr)}`;
-    let res=await fetch(`${API_BASE}/slots?${query}`,{headers:{'Content-Type':'application/json'}});
+  function normalizeSlotsByDate(slotPayload){
+    const raw=(slotPayload&&slotPayload.data&&typeof slotPayload.data==='object') ? slotPayload.data : {};
+    const result={};
+    Object.keys(raw).forEach((dateKey)=>{
+      const row=Array.isArray(raw[dateKey])?raw[dateKey]:[];
+      const slots=row.map((slot)=>{
+        if(slot&&typeof slot==='object') return String(slot.start||slot.time||'').trim();
+        return String(slot||'').trim();
+      }).filter(Boolean);
+      result[dateKey]=Array.from(new Set(slots)).sort();
+    });
+    return result;
+  }
+
+  async function fetchSlotsForRange(serviceSlug, startDate, endDate){
+    const query=`eventTypeSlug=${encodeURIComponent(serviceSlug)}&start=${encodeURIComponent(startDate)}&end=${encodeURIComponent(endDate)}`;
+    const timeout=withTimeout(SLOTS_TIMEOUT_MS);
+    let res;
+    try{
+      res=await fetch(`${API_BASE}/slots?${query}`,{headers:{'Content-Type':'application/json'},signal:timeout.signal});
+    }catch(err){
+      if(err&&err.name==='AbortError') throw new Error('Slots request timed out. Please retry.');
+      throw err;
+    } finally {
+      timeout.cancel();
+    }
     if(!res.ok){
-      res=await fetch(`${API_BASE}/api/slots?${query}`,{headers:{'Content-Type':'application/json'}});
+      const fallbackTimeout=withTimeout(SLOTS_TIMEOUT_MS);
+      try{
+        res=await fetch(`${API_BASE}/api/slots?${query}`,{headers:{'Content-Type':'application/json'},signal:fallbackTimeout.signal});
+      }catch(err){
+        if(err&&err.name==='AbortError') throw new Error('Slots request timed out. Please retry.');
+        throw err;
+      } finally {
+        fallbackTimeout.cancel();
+      }
     }
     if(!res.ok){
       throw new Error(`Schedule request failed (${res.status})`);
     }
     const data=await res.json().catch(()=>null);
-    const daySlots=(data&&data.data&&Array.isArray(data.data[dateStr]))?data.data[dateStr]:[];
-    return daySlots.map((slot)=>{
-      if(slot&&typeof slot==='object') return String(slot.start||slot.time||'');
-      return String(slot||'');
-    }).filter(Boolean);
+    return normalizeSlotsByDate(data||{});
+  }
+
+  async function fetchSlotsForDate(serviceSlug, dateStr){
+    const byDate=await fetchSlotsForRange(serviceSlug,dateStr,dateStr);
+    const daySlots=Array.isArray(byDate[dateStr])?byDate[dateStr]:[];
+    return daySlots;
   }
 
   function renderSchedule(items){
     if(!schedList) return;
-    const withSlots=(items||[]).filter((row)=>row.slots&&row.slots.length>0);
-    if(!withSlots.length){
+    const rows=(items||[])
+      .map((row)=>({
+        date:String(row&&row.date||'').trim(),
+        slots:Array.isArray(row&&row.slots)?row.slots.filter(Boolean):[]
+      }))
+      .filter((row)=>/^\d{4}-\d{2}-\d{2}$/.test(row.date))
+      .sort((a,b)=>a.date.localeCompare(b.date));
+
+    const withSlots=rows.filter((row)=>row.slots.length>0);
+    if(!rows.length||!withSlots.length){
       schedList.innerHTML='<div class="rep-slot-item"><div class="rep-slot-date">No open slots in selected window</div><div class="rep-note">Try a wider window or another service.</div></div>';
       return;
     }
 
-    schedList.innerHTML=withSlots.map((row)=>{
-      const times=row.slots.slice(0,8).map((iso)=>`<span class="rep-slot-time">${esc(formatSlotTime(iso))}</span>`).join('');
-      const overflow=row.slots.length>8?`<span class="rep-slot-time">+${row.slots.length-8} more</span>`:'';
-      return `<div class="rep-slot-item">
-        <div class="rep-slot-date">${esc(formatDateLabel(row.date))} (${row.slots.length} open)</div>
-        <div class="rep-slot-times">${times}${overflow}</div>
-      </div>`;
-    }).join('');
+    const byDate=new Map(rows.map((row)=>[row.date,row.slots]));
+    const firstDate=new Date(`${rows[0].date}T12:00:00`);
+    const lastDate=new Date(`${rows[rows.length-1].date}T12:00:00`);
+    const totalSlots=rows.reduce((sum,row)=>sum+row.slots.length,0);
+    const firstOpenDate=(withSlots[0]&&withSlots[0].date)||rows[0].date;
+
+    const weekdays=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const weekdayHead=weekdays.map((wd)=>`<div class="rep-sched-weekday">${wd}</div>`).join('');
+
+    const cells=[];
+    for(let i=0;i<firstDate.getDay();i++){
+      cells.push('<div class="rep-sched-day is-empty" aria-hidden="true"></div>');
+    }
+
+    const todayYmd=toYmd(new Date());
+    const cursor=new Date(firstDate);
+    while(cursor<=lastDate){
+      const dateStr=toYmd(cursor);
+      const slots=byDate.get(dateStr)||[];
+      const count=slots.length;
+      const levelClass=count===0?'is-empty':count<=2?'is-low':count<=5?'is-medium':'is-high';
+      const countClass=`rep-sched-count${count===0?' is-zero':''}`;
+      const times=count
+        ? slots.slice(0,2).map((iso)=>`<span class="rep-sched-time">${esc(formatSlotTime(iso))}</span>`).join('')
+        : '<span class="rep-sched-empty">-</span>';
+      const more=count>2?`<span class="rep-sched-more">+${count-2} more</span>`:'';
+      const dayTitle=dateStr===todayYmd?`Today - ${cursor.toLocaleDateString('en-US',{month:'short',day:'numeric'})}`:cursor.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+
+      const isActive=dateStr===firstOpenDate?' active':'';
+      cells.push(`<button type="button" class="rep-sched-day ${levelClass}${isActive}" data-date="${esc(dateStr)}" title="${esc(dayTitle)}">
+        <div class="rep-sched-date-row">
+          <div class="rep-sched-date">${cursor.getDate()}</div>
+          <div class="${countClass}" title="${esc(dayTitle)}: ${count} open slot${count===1?'':'s'}">${count}</div>
+        </div>
+        <div class="rep-sched-times">${times}</div>
+        ${more}
+      </button>`);
+
+      cursor.setDate(cursor.getDate()+1);
+    }
+
+    const rangeLabel=`${firstDate.toLocaleDateString('en-US',{month:'short',day:'numeric'})} - ${lastDate.toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
+    schedList.innerHTML=`<div class="rep-sched-wrap">
+      <div class="rep-sched-head">
+        <div class="rep-sched-title">Month View (${esc(rangeLabel)})</div>
+        <div class="rep-sched-sub">${totalSlots} slots across ${withSlots.length} open days</div>
+      </div>
+      <div class="rep-sched-scroll">
+        <div class="rep-sched-grid">${weekdayHead}${cells.join('')}</div>
+      </div>
+    </div>`;
+
+    const grid=schedList.querySelector('.rep-sched-grid');
+    if(!grid) return;
+
+    const popupMarkup=`<div class="rep-sched-popup-backdrop" id="rep-sched-popup" aria-hidden="true">
+      <div class="rep-sched-popup" role="dialog" aria-modal="true" aria-labelledby="rep-sched-popup-title">
+        <div class="rep-sched-popup-head">
+          <div>
+            <div class="rep-sched-popup-kicker" id="rep-sched-popup-kicker">Day</div>
+            <div class="rep-sched-popup-title" id="rep-sched-popup-title">Date</div>
+            <div class="rep-sched-popup-meta" id="rep-sched-popup-meta">0 available times</div>
+          </div>
+          <button type="button" class="rep-sched-popup-close" id="rep-sched-popup-close-btn" data-close-sched-popup>Close</button>
+        </div>
+        <div class="rep-sched-popup-times" id="rep-sched-popup-times"></div>
+      </div>
+    </div>`;
+    schedList.insertAdjacentHTML('beforeend',popupMarkup);
+
+    const popup=schedList.querySelector('#rep-sched-popup');
+    const popupKicker=schedList.querySelector('#rep-sched-popup-kicker');
+    const popupTitle=schedList.querySelector('#rep-sched-popup-title');
+    const popupMeta=schedList.querySelector('#rep-sched-popup-meta');
+    const popupTimes=schedList.querySelector('#rep-sched-popup-times');
+    const popupCloseBtn=schedList.querySelector('#rep-sched-popup-close-btn');
+    if(!popup||!popupKicker||!popupTitle||!popupMeta||!popupTimes||!popupCloseBtn) return;
+
+    const closePopup=()=>{
+      popup.classList.remove('open');
+      popup.setAttribute('aria-hidden','true');
+    };
+
+    const openPopupForDate=(dateStr)=>{
+      const slots=Array.isArray(byDate.get(dateStr))?byDate.get(dateStr):[];
+      const dateObj=new Date(`${dateStr}T12:00:00`);
+      const weekday=dateObj.toLocaleDateString('en-US',{weekday:'long'});
+      const label=dateObj.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+      popupKicker.textContent=weekday;
+      popupTitle.textContent=label;
+      popupMeta.textContent=`${slots.length} available time${slots.length===1?'':'s'}`;
+      if(!slots.length){
+        popupTimes.innerHTML='<div class="rep-sched-popup-empty">No available times for this day.</div>';
+        popup.classList.add('open');
+        popup.setAttribute('aria-hidden','false');
+        popupCloseBtn.focus();
+        return;
+      }
+      popupTimes.innerHTML=slots.map((iso)=>`<span class="rep-sched-popup-time">${esc(formatSlotTime(iso))}</span>`).join('');
+      popup.classList.add('open');
+      popup.setAttribute('aria-hidden','false');
+      popupCloseBtn.focus();
+    };
+
+    grid.addEventListener('click',(evt)=>{
+      const dayBtn=evt.target&&evt.target.closest?evt.target.closest('.rep-sched-day[data-date]'):null;
+      if(!dayBtn) return;
+      const dateStr=String(dayBtn.getAttribute('data-date')||'').trim();
+      if(!dateStr) return;
+      grid.querySelectorAll('.rep-sched-day.active').forEach((el)=>el.classList.remove('active'));
+      dayBtn.classList.add('active');
+      openPopupForDate(dateStr);
+    });
+
+    popup.addEventListener('click',(evt)=>{
+      const target=evt.target;
+      if(target===popup || (target&&target.closest&&target.closest('[data-close-sched-popup]'))){
+        closePopup();
+      }
+    });
+    popup.addEventListener('keydown',(evt)=>{
+      if(evt.key==='Escape') closePopup();
+    });
   }
 
   async function refreshSchedule(){
     if(!schedService||!schedDays) return;
     const serviceSlug=(schedService.value||'').trim();
-    const days=Math.max(1,Math.min(14,Number(schedDays.value||7)));
+    const days=Math.max(1,Math.min(31,Number(schedDays.value||30)));
     if(!serviceSlug){
       setScheduleStatus('Choose a service first.', true);
       return;
@@ -1256,12 +3102,31 @@
       return;
     }
 
-    repMap=L.map(mapEl,{zoomControl:true}).setView([37.6775,-113.0619],13);
+    repMap=L.map(mapEl,{zoomControl:false}).setView([37.6775,-113.0619],13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(repMap);
     mapHistoryLayer=L.layerGroup().addTo(repMap);
     mapInitialized=true;
     if(mapEl && !mapEl.dataset.popupActionBound){
       mapEl.addEventListener('click', handleMapPopupActionClick);
+      mapEl.addEventListener('change',(evt)=>{
+        const target=evt&&evt.target;
+        if(target&&target.id==='wf-photo'){
+          handlePopupPhotoChange(target).catch(()=>null);
+          return;
+        }
+        if(target&&target.id==='wf-service'&&String(activeWorkflow.outcome||'').trim()==='booked_on_door'){
+          syncWorkflowFromPopupInputs();
+          clearWorkflowBookingConfirmation();
+          activeWorkflow.monthLoadedKey='';
+          activeWorkflow.monthSlotsByDate={};
+          activeWorkflow.saleDate='';
+          activeWorkflow.selectedSlot='';
+          activeWorkflow.bookingSlots=[];
+          activeWorkflow.slotStatus='Service changed. Loading fresh availability...';
+          refreshActivePopupIfOpen();
+          loadSaleSlotsForWorkflow(true).catch(()=>null);
+        }
+      });
       mapEl.dataset.popupActionBound='1';
     }
 
@@ -1269,10 +3134,12 @@
       const latlng=evt&&evt.latlng;
       if(!latlng) return;
       if(isMovePinMode) return;
+      if(evt&&evt.originalEvent&&typeof evt.originalEvent.preventDefault==='function') evt.originalEvent.preventDefault();
       if(mapHoldTimer) clearTimeout(mapHoldTimer);
       mapHoldTimer=setTimeout(()=>{
         mapHoldTimer=null;
-        setPin(latlng.lat,latlng.lng,true);
+        clearDoorEventEditState();
+        setPin(latlng.lat,latlng.lng,false);
       },MAP_HOLD_MS);
     };
 
@@ -1296,23 +3163,33 @@
       setPin(ll.lat,ll.lng,false);
       setMapStatus('Dot moved. You can save the door event now.', false);
     });
-    repMap.on('contextmenu',(evt)=>setPin(evt.latlng.lat,evt.latlng.lng,true));
+    repMap.on('contextmenu',(evt)=>{
+      if(evt&&evt.originalEvent&&typeof evt.originalEvent.preventDefault==='function') evt.originalEvent.preventDefault();
+      clearDoorEventEditState();
+      setPin(evt.latlng.lat,evt.latlng.lng,false);
+    });
+
+    if(mapEl && !mapEl.dataset.touchGuardBound){
+      const preventDefault=(e)=>{ if(e&&typeof e.preventDefault==='function') e.preventDefault(); };
+      mapEl.addEventListener('contextmenu',preventDefault);
+      mapEl.addEventListener('selectstart',preventDefault);
+      mapEl.dataset.touchGuardBound='1';
+    }
 
     mapMyLocationBtn&&mapMyLocationBtn.addEventListener('click',()=>{
       if(!navigator.geolocation){
         setMapStatus('Geolocation is not available on this browser.', true);
         return;
       }
-      navigator.geolocation.getCurrentPosition((pos)=>{
-        const lat=pos&&pos.coords?pos.coords.latitude:null;
-        const lng=pos&&pos.coords?pos.coords.longitude:null;
-        const accuracy=pos&&pos.coords?pos.coords.accuracy:null;
-        if(Number.isFinite(lat)&&Number.isFinite(lng)){
-          renderLiveLocation(lat,lng,accuracy);
-          setPin(lat,lng,false);
-          if(repMap) repMap.setView([lat,lng],16);
-        }
-      },()=>setMapStatus('Could not get current location.', true),{enableHighAccuracy:true,timeout:10000});
+      setMapStatus('Getting current location...', false);
+      resolveCurrentLocation()
+        .then((pos)=>{
+          applyCurrentLocation(pos);
+          setMapStatus('Current location updated.', false);
+        })
+        .catch((err)=>{
+          setMapStatus(geolocationErrorMessage(err), true);
+        });
     });
 
     mapClearBtn&&mapClearBtn.addEventListener('click',clearPin);
@@ -1330,10 +3207,25 @@
     ]).catch(()=>null);
   });
   saveDoorBtn.addEventListener('click',saveDoorEvent);
+  deVehiclePhotoInput&&deVehiclePhotoInput.addEventListener('change',()=>{ handleVehiclePhotoChange().catch(()=>null); });
 
   schedRefreshBtn&&schedRefreshBtn.addEventListener('click',()=>{ refreshSchedule().catch(()=>null); });
   schedService&&schedService.addEventListener('change',()=>{ refreshSchedule().catch(()=>null); });
   schedDays&&schedDays.addEventListener('change',()=>{ refreshSchedule().catch(()=>null); });
+  pipelineSearch&&pipelineSearch.addEventListener('input',()=>{ renderPipeline(pipelineItemsCache); });
+  pipelineSort&&pipelineSort.addEventListener('change',()=>{ renderPipeline(pipelineItemsCache); });
+  pipelineTabs&&pipelineTabs.addEventListener('click',(evt)=>{
+    const btn=evt&&evt.target&&evt.target.closest?evt.target.closest('.rep-followup-tab[data-filter]'):null;
+    if(!btn) return;
+    pipelineFilterMode=String(btn.getAttribute('data-filter')||'all');
+    renderPipeline(pipelineItemsCache);
+  });
+  pipelineClearBtn&&pipelineClearBtn.addEventListener('click',()=>{
+    if(pipelineSearch) pipelineSearch.value='';
+    if(pipelineSort) pipelineSort.value='urgency';
+    pipelineFilterMode='all';
+    renderPipeline(pipelineItemsCache);
+  });
 
   mapModalClose&&mapModalClose.addEventListener('click',closeMapModal);
   mapModalFullForm&&mapModalFullForm.addEventListener('click',()=>{
@@ -1354,6 +3246,7 @@
     });
   });
 
+  updateVehiclePhotoPreview();
   updateCoordinateNote();
 
   const token=getToken();

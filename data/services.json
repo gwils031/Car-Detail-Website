@@ -2,45 +2,63 @@
   "packages": [
     {
       "name": "Basic Detail",
+      "slug": "basic-detail",
       "price": 129,
+      "duration": "1.5 hours",
       "description": "Essential exterior and light interior cleaning.",
-      "features": ["Exterior wash", "Door jam clean", "Light interior detail", "Interior glass clean"],
+      "features": [
+        "Exterior wash",
+        "Door jam clean",
+        "Light interior detail",
+        "Interior glass clean"
+      ],
       "addons": [
-        { "name": "Pet Hair Removal", "price": 30 },
-        { "name": "Odor Removal", "price": 40 },
-        { "name": "Wax", "price": 50 },
-        { "name": "Full Interior Detail", "price": 60 }
+        {
+          "name": "Pet Hair Removal",
+          "price": 30
+        },
+        {
+          "name": "Odor Removal",
+          "price": 40
+        }
       ]
     },
     {
       "name": "Standard Detail",
+      "slug": "standard-detail",
       "price": 179,
-      "description": "Everything in Basic Detail plus interior vacuum and thorough interior cleaning.",
-      "features": ["Everything in Basic Detail PLUS", "Interior vacuum", "Interior detail"],
+      "duration": "2.5 hours",
+      "description": "Everything in Basic plus full interior vacuum and a deeper cabin clean.",
+      "popular": true,
+      "features": [
+        "Everything in Basic Detail",
+        "Full interior vacuum",
+        "Thorough interior deep clean"
+      ],
       "addons": [
-        { "name": "Pet Hair Removal", "price": 30 },
-        { "name": "Odor Removal", "price": 40 },
-        { "name": "Leather Seat Conditioning", "price": 50 }
+        {
+          "name": "Pet Hair Removal",
+          "price": 30
+        },
+        {
+          "name": "Odor Removal",
+          "price": 40
+        }
       ]
     },
     {
       "name": "Premium Detail",
+      "slug": "premium-detail",
       "price": 249,
-      "description": "Complete detailing with all premium services included.",
-      "features": ["Everything in Standard Detail PLUS", "Pet hair removal", "Odor removal", "Leather seat conditioning"],
-      "addons": [
-        { "name": "Ceramic Coating (1 year)", "price": 199 },
-        { "name": "Headlight Restoration", "price": 60 }
-      ]
-    },
-    {
-      "name": "Custom",
-      "price": null,
-      "description": "Tailored detailing for boats, RVs, trailers, fleets, and specialty vehicles.",
-      "features": [],
-      "addons": [],
-      "ctaLabel": "Contact Us",
-      "ctaHref": "/contact.html"
+      "duration": "3-4 hours",
+      "description": "Complete detailing with premium interior restoration extras included.",
+      "features": [
+        "Everything in Standard Detail",
+        "Pet hair removal",
+        "Odor removal",
+        "Leather seat conditioning"
+      ],
+      "addons": []
     }
   ]
 }

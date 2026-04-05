@@ -12,21 +12,21 @@
 .cd-service footer .button { width: 100%; }
 .cd-service .cd-features {
   display: grid; gap: 10px;
-  color: var(--cd-muted);
+  color: var(--text-2); /* mapped to root */
   line-height: 1.6;
 }
 .cd-service .cd-addons {
   display: grid; gap: 10px;
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid var(--cd-border);
-  color: var(--cd-muted);
+  border-top: 1px solid var(--border);
+  color: var(--text-2);
 }
 
 /* Review Item */
 .cd-review { display: grid; gap: 12px; }
 .cd-stars {
-  color: var(--cd-primary);
+  color: var(--red);
   font-size: 1.2rem;
   letter-spacing: 2px;
 }
@@ -36,47 +36,42 @@
 @media (min-width: 640px) { .cd-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 1024px) { .cd-gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .cd-gallery img {
-  border-radius: var(--cd-radius);
+  border-radius: var(--r-sm);
   cursor: zoom-in;
-  transition: all var(--cd-transition);
-  border: 1px solid var(--cd-border);
+  transition: all 0.3s;
+  border: 1px solid var(--border);
 }
 .cd-gallery img:hover {
   transform: scale(1.03);
-  box-shadow: var(--cd-shadow-lg), var(--cd-glow);
+  box-shadow: var(--shadow-lg), var(--glow);
 }
 
-/* FAQ */
-.cd-faq { }
-
-/* Footer */
+/* Footer & Social (Touch Target Fixes) */
 .cd-social { display: flex; gap: 16px; }
 .cd-social a {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 40px; height: 40px;
+  width: 44px; height: 44px; /* Increased for mobile touch */
   border-radius: 999px;
-  background: var(--cd-surface);
-  border: 1px solid var(--cd-border);
-  color: var(--cd-text);
-  transition: all var(--cd-transition);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  transition: all 0.2s;
 }
 .cd-social a:hover {
-  background: var(--cd-primary);
+  background: var(--red);
   color: #fff;
   transform: translateY(-2px);
-  box-shadow: var(--cd-glow);
+  box-shadow: var(--glow);
 }
 
-/* CTA prominence */
+/* CTA prominence (Mobile Stacking Fix) */
 .cd-cta { display: flex; gap: 16px; flex-wrap: wrap; }
 .cd-cta .button { min-width: 180px; }
+@media (max-width: 480px) {
+  .cd-cta { flex-direction: column; width: 100%; }
+  .cd-cta .button { width: 100%; min-width: unset; }
+}
 
-/* Screen-reader utility */
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-
-/* Mobile nav animation hint */
-
-/* Animations */
 .anim-fade-up { opacity: 0; transform: translateY(12px); animation: fadeUp .7s ease forwards; }
 @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
-

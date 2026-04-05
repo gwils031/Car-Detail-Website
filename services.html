@@ -1,56 +1,327 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Services • Southern Utah Detailing</title>
-    <meta name="description" content="Explore detailing packages: Basic Detail ($129), Standard Detail ($179), Premium Detail ($249), and custom options." />
-    <meta property="og:title" content="Services • Southern Utah Detailing" />
-    <meta property="og:description" content="Explore detailing packages: Basic Detail ($129), Standard Detail ($179), Premium Detail ($249), and custom options." />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://images.unsplash.com/photo-1511910952555-193e877c9d4a?q=80&w=1200&auto=format&fit=crop" />
-  <link rel="stylesheet" href="/css/style.css" />
-  <link rel="stylesheet" href="/css/components.css" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Detailing Packages &amp; Pricing · Southern Utah Detailing Cedar City UT</title>
+  <meta name="description" content="Basic Detail $129, Standard Detail $179, Premium Detail $249. Mobile car detailing serving Cedar City and nearby communities."/>
+  <meta property="og:title" content="Detailing Packages · Southern Utah Detailing"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <link rel="stylesheet" href="/css/components.css"/>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"ItemList","name":"Detailing Packages","itemListElement":[{"@type":"ListItem","position":1,"item":{"@type":"Service","name":"Basic Detail","description":"Exterior wash, door jam clean, light interior detail, interior glass clean","offers":{"@type":"Offer","price":"129","priceCurrency":"USD"}}},{"@type":"ListItem","position":2,"item":{"@type":"Service","name":"Standard Detail","description":"Everything in Basic plus interior vacuum and thorough interior cleaning","offers":{"@type":"Offer","price":"179","priceCurrency":"USD"}}},{"@type":"ListItem","position":3,"item":{"@type":"Service","name":"Premium Detail","description":"Everything in Standard plus pet hair removal, odor removal, leather seat conditioning","offers":{"@type":"Offer","price":"249","priceCurrency":"USD"}}}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"Mobile Car Detailing Service Area","provider":{"@type":"LocalBusiness","name":"Southern Utah Detailing","telephone":"+14359994052","url":"https://www.southernutahdetail.com"},"serviceType":"Mobile car detailing","areaServed":[{"@type":"City","name":"Cedar City"},{"@type":"City","name":"Cedar Highlands"},{"@type":"City","name":"Hamiltons Fort"},{"@type":"City","name":"Parowan"},{"@type":"City","name":"Kanarraville"},{"@type":"City","name":"Enoch"},{"@type":"City","name":"Summit"},{"@type":"City","name":"Brian Head"},{"@type":"City","name":"Paragonah"}],"availableChannel":{"@type":"ServiceChannel","servicePhone":{"@type":"ContactPoint","telephone":"+14359994052","contactType":"customer service"}}}</script>
 </head>
 <body>
-  <header class="header">
-    <div class="container nav cd-navbar">
-      <button class="nav-toggle" aria-label="Toggle menu">☰</button>
-      <a href="/index.html" class="nav-brand cd-logo">Southern Utah Detailing</a>
-      <nav class="nav-menu" aria-label="Primary">
-        <a href="/services.html" aria-current="page">Services</a>
-        <a href="/booking.html">Booking</a>
-        <a href="/contact.html">Contact</a>
-      </nav>
-      <div class="nav-actions">
-        <img src="/images/Logo.PNG" alt="Southern Utah Detailing Logo" class="nav-logo" />
-        <a class="button" href="/booking.html">Book Now</a>
+
+<a class="float-cta button lg" id="float-cta" href="/booking.html" data-track="float_book_now">Book Now →</a>
+
+<header class="header" id="site-header">
+  <div class="container nav">
+    <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">☰</button>
+    <a href="/index.html" class="nav-brand">
+      <img src="/images/Logo.PNG" alt="So.U.Detail logo" class="nav-logo"/>
+      Southern Utah Detailing
+    </a>
+    <div class="nav-spacer"></div>
+    <nav class="nav-menu" aria-label="Primary">
+      <a href="/index.html">Home</a>
+      <a href="/services.html" aria-current="page">Services</a>
+      <a href="/booking.html">Booking</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+    <div class="nav-actions"><a class="button" href="/booking.html" data-track="nav_book_now">Book Now</a></div>
+  </div>
+</header>
+
+<!-- Page hero -->
+<section style="padding:72px 0 48px;background:var(--bg-up);border-bottom:1px solid var(--bdr)">
+  <div class="container" data-reveal>
+    <span class="eyebrow">Packages &amp; Pricing</span>
+    <h1 class="h1" style="margin-bottom:10px">Detailing Services &amp; Pricing</h1>
+    <p class="muted" style="max-width:620px">Choose the package that fits your vehicle and budget. Need help deciding? Use our 15-second Package Finder popup and book instantly from your recommendation.</p>
+    <div class="hero-cta" style="margin-top:20px">
+      <button class="button lg" type="button" id="open-package-finder" data-track="open_package_finder_hero">Find My Package in 15 Seconds</button>
+      <a class="button outline lg" href="#all-packages" data-track="view_packages_anchor">View Packages</a>
+    </div>
+    <p class="muted" style="font-size:.82rem;margin-top:10px">No payment due until service is complete.</p>
+  </div>
+</section>
+
+<!-- ─── Packages: Goals 2, 3 baked into JS ───────────────────────── -->
+<section class="section" id="all-packages">
+  <div class="container">
+    <div class="center" data-reveal style="margin-bottom:24px">
+      <span class="eyebrow">Our Services</span>
+      <h2 class="h2">Mobile Detailing Packages</h2>
+      <p class="muted" style="max-width:620px;margin:10px auto 0;font-size:.9rem">Clear pricing. Professional process. Every package is delivered at your location with premium tools and products.</p>
+      <div style="margin-top:14px">
+        <button class="button outline" type="button" id="open-package-finder-inline" data-track="open_package_finder_inline">Need help choosing? Open Package Finder</button>
       </div>
     </div>
-  </header>
+    <div id="services-list" class="grid cols-3"></div>
+  </div>
+</section>
 
-  <section class="section">
-    <div class="container">
-      <h1 class="h1">Detailing Packages</h1>
-      <p class="muted">Choose the perfect package and add-ons for your vehicle.</p>
-      <div id="services-list" class="grid cols-3 mt-16"></div>
+<!-- ─── Specialty Vehicles (Quote) ──────────────────────────────── -->
+<section class="section sm" style="background:var(--bg-up);border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr)">
+  <div class="container" data-reveal>
+    <div class="qv-shell">
+      <div class="center" style="margin-bottom:18px">
+        <span class="eyebrow">Specialty Services</span>
+        <h2 class="h2" style="font-size:clamp(1.45rem,2.9vw,2rem)">Boats, RVs, Semitrucks &amp; Commercial Vehicles</h2>
+        <p class="muted" style="max-width:700px;margin:10px auto 0;font-size:.9rem">We also detail large and specialty vehicles on a quote-by-quote basis. Pricing depends on size, condition, access, and scope of work.</p>
+      </div>
+      <div class="qv-grid">
+        <article class="qv-card"><div class="qv-tag">Boats</div><p>Interior and exterior wash, oxidation cleanup, and seasonal detailing plans.</p></article>
+        <article class="qv-card"><div class="qv-tag">RVs</div><p>Full cabin detail, exterior cleaning, roof-aware process, and long-duration appointments.</p></article>
+        <article class="qv-card"><div class="qv-tag">Semitrucks</div><p>Cab detail, glass restoration, and heavy-duty surface cleanup for working rigs.</p></article>
+        <article class="qv-card"><div class="qv-tag">Commercial Fleets</div><p>Custom recurring service plans for vans, pickups, and business vehicles.</p></article>
+      </div>
+      <p class="qv-foot">Request a custom quote: <a href="tel:+14359994052" data-track="specialty_quote_call">(435) 999-4052</a> or <a href="/contact.html" data-track="specialty_quote_contact">send us your vehicle details</a>.</p>
     </div>
-  </section>
+  </div>
+</section>
 
-  <footer class="footer">
-    <div class="container footer-grid">
+<!-- ─── Goal 7: Service Area ─────────────────────────────────────── -->
+<section class="section sm area-sec" style="background:var(--bg-up);border-top:1px solid var(--bdr)">
+  <div class="container" data-reveal>
+    <div class="area-shell">
+      <div class="center" style="margin-bottom:26px">
+        <span class="eyebrow">Where We Serve</span>
+        <h2 class="h2 area-title">Mobile Car Detailing Service Area in Cedar City, UT</h2>
+        <p class="muted area-sub">Southern Utah Detailing is based in Cedar City, Utah and provides mobile auto detailing in Cedar City and nearby communities throughout the area.</p>
+      </div>
+
+      <div class="area-meta" aria-label="Service coverage details">
+        <article class="area-note">
+          <div class="area-note-k">Primary Area</div>
+          <div class="area-note-v">Cedar City, Utah</div>
+        </article>
+        <article class="area-note">
+          <div class="area-note-k">Nearby Requests</div>
+          <div class="area-note-v">Available by travel schedule</div>
+        </article>
+        <article class="area-note">
+          <div class="area-note-k">Outside This List?</div>
+          <div class="area-note-v"><a href="tel:+14359994052">Call (435) 999-4052 to confirm coverage</a></div>
+        </article>
+      </div>
+
+      <h3 class="area-list-title">Cities and communities we currently serve</h3>
+      <ul class="area-grid area-list" aria-label="Cedar City detailing service area">
+        <li class="area-pill">Cedar City</li>
+        <li class="area-pill">Cedar Highlands</li>
+        <li class="area-pill">Hamiltons Fort</li>
+        <li class="area-pill">Parowan</li>
+        <li class="area-pill">Kanarraville</li>
+        <li class="area-pill">Enoch</li>
+        <li class="area-pill">Summit</li>
+        <li class="area-pill">Brian Head</li>
+        <li class="area-pill">Paragonah</li>
+      </ul>
+
+      <p class="area-foot">Looking for car detailing near Cedar City? <a href="/booking.html">Book your mobile detail online</a> or <a href="/contact.html">contact us</a> and we will confirm your service location.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section sm">
+  <div class="container" data-reveal>
+    <div class="cta-strip">
+      <span class="eyebrow" style="margin-bottom:10px">Ready to Book?</span>
+      <h2 class="h2" style="margin-bottom:10px">Get the detail your car deserves.</h2>
+      <p class="muted" style="max-width:360px;margin:0 auto 24px;font-size:.875rem">Same-week availability. We come to you. 100% satisfaction guaranteed.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a class="button lg" href="/booking.html" data-track="services_cta_book_online">Book Online Now</a>
+        <a class="button outline lg" href="tel:+14359994052" data-track="services_cta_call">Call (435) 999-4052</a>
+      </div>
+      <p class="muted" style="font-size:.8rem;margin-top:10px">No payment due until service is complete.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Package Finder Modal -->
+<div class="finder-modal" id="finder-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="finder-title">
+  <div class="finder-dialog">
+    <button class="finder-close" id="finder-close" type="button" aria-label="Close package finder">×</button>
+    <div class="center" style="margin-bottom:16px">
+      <span class="eyebrow">Package Finder</span>
+      <h2 class="h2" id="finder-title" style="font-size:clamp(1.45rem,2.7vw,2rem)">Answer 3 Quick Questions</h2>
+      <p class="muted" style="max-width:560px;margin:10px auto 0;font-size:.9rem">Get a personalized recommendation, then jump straight to booking with your package preselected.</p>
+    </div>
+    <div class="rec">
+      <div class="rec-head">
+        <div class="rq-bar" id="rq-bar">
+          <div class="rq-bar-seg" id="rq-seg-1"></div>
+          <div class="rq-bar-seg" id="rq-seg-2"></div>
+          <div class="rq-bar-seg" id="rq-seg-3"></div>
+        </div>
+        <div class="rq-lbl" id="rq-lbl">Question 1 of 3</div>
+      </div>
+      <div class="rec-body">
+        <div class="rq-step active" id="rq-1">
+          <div class="rq-q">Do pets ride in your car regularly?</div>
+          <div class="rq-opts">
+            <button class="rq-opt" onclick="rqA(1,'yes')">Yes — dogs, cats, or other pets</button>
+            <button class="rq-opt" onclick="rqA(1,'no')">No pets in my car</button>
+          </div>
+        </div>
+        <div class="rq-step" id="rq-2">
+          <div class="rq-q">Do you have leather seats?</div>
+          <div class="rq-opts">
+            <button class="rq-opt" onclick="rqA(2,'yes')">Yes, leather interior</button>
+            <button class="rq-opt" onclick="rqA(2,'no')">No, cloth or vinyl seats</button>
+          </div>
+        </div>
+        <div class="rq-step" id="rq-3">
+          <div class="rq-q">When was your car last professionally detailed?</div>
+          <div class="rq-opts">
+            <button class="rq-opt" onclick="rqA(3,'recent')">Within the last 3 months</button>
+            <button class="rq-opt" onclick="rqA(3,'old')">3–12 months ago</button>
+            <button class="rq-opt" onclick="rqA(3,'never')">Over a year ago / never</button>
+          </div>
+        </div>
+        <div class="rq-step" id="rq-result">
+          <div class="rq-res">
+            <div class="rq-res-badge">We recommend</div>
+            <div class="rq-res-name" id="rq-name">—</div>
+            <div class="rq-res-price" id="rq-price">—</div>
+            <div class="rq-res-why" id="rq-why">—</div>
+            <ul class="rq-res-points" id="rq-points"></ul>
+            <div class="rq-res-note">Same-week availability. No payment due until service is complete.</div>
+            <div class="rq-res-acts">
+              <a class="button block" id="rq-book" href="/booking.html">Book This Package</a>
+            </div>
+            <button class="rq-restart" onclick="rqReset()">Start over</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="ft-grid">
       <div>
-        <div class="h3">Southern Utah Detailing</div>
-        <p class="muted">Premium mobile detailing service in Southern Utah — we come to you.</p>
+        <div class="ft-brand">Southern Utah Detailing</div>
+        <p class="ft-body">Mobile detailing — we come to you.</p>
       </div>
       <div>
-        <div class="h3">Contact</div>
-        <p><a href="tel:+14359994052">+1 (435) 999-4052</a><br/><a href="mailto:SouthernUtahDetail@gmail.com">SouthernUtahDetail@gmail.com</a></p>
+        <div class="ft-head">Pages</div>
+        <div class="ft-links">
+          <a href="/index.html">Home</a><a href="/services.html">Services</a>
+          <a href="/booking.html">Book Now</a><a href="/contact.html">Contact</a>
+        </div>
+      </div>
+      <div>
+        <div class="ft-head">Contact</div>
+        <div class="ft-links">
+          <a href="tel:+14359994052">(435) 999-4052</a>
+          <a href="mailto:SouthernUtahDetail@gmail.com">SouthernUtahDetail@gmail.com</a>
+        </div>
       </div>
     </div>
-    <div class="container legal">© <span class="js-year"></span> Southern Utah Detailing. All rights reserved.</div>
-  </footer>
+    <div class="ft-legal"><span>© <span class="js-year"></span> Southern Utah Detailing LLC.</span></div>
+  </div>
+</footer>
 
-  <script src="/js/main.js" defer></script>
+<script src="/js/analytics.js" defer></script>
+<script src="/js/main.js" defer></script>
+<script>
+/* ── Recommender ─────────────────────────────────────────────────── */
+const finderModal=document.getElementById('finder-modal');
+const openFinderButtons=[
+  document.getElementById('open-package-finder'),
+  document.getElementById('open-package-finder-inline')
+].filter(Boolean);
+const closeFinderButton=document.getElementById('finder-close');
+
+function openFinderModal(){
+  if(!finderModal) return;
+  finderModal.classList.add('open');
+  finderModal.setAttribute('aria-hidden','false');
+  document.body.classList.add('finder-open');
+  rqReset();
+}
+
+function closeFinderModal(){
+  if(!finderModal) return;
+  finderModal.classList.remove('open');
+  finderModal.setAttribute('aria-hidden','true');
+  document.body.classList.remove('finder-open');
+}
+
+openFinderButtons.forEach(btn=>btn.addEventListener('click',openFinderModal));
+if(closeFinderButton) closeFinderButton.addEventListener('click',closeFinderModal);
+if(finderModal){
+  finderModal.addEventListener('click',e=>{ if(e.target===finderModal) closeFinderModal(); });
+}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeFinderModal(); });
+
+const rqAns={};
+function rqA(q,v){
+  rqAns[q]=v;
+  document.getElementById('rq-seg-'+q).classList.add('done');
+  if(q<3){
+    document.getElementById('rq-'+q).classList.remove('active');
+    document.getElementById('rq-'+(q+1)).classList.add('active');
+    document.getElementById('rq-lbl').textContent='Question '+(q+1)+' of 3';
+  } else {
+    document.getElementById('rq-3').classList.remove('active');
+    document.getElementById('rq-result').classList.add('active');
+    document.getElementById('rq-lbl').textContent='Your recommendation';
+    const pets=rqAns[1]==='yes', leather=rqAns[2]==='yes', old=rqAns[3]!=='recent';
+    let pkg,price,slug,why,points;
+    if(pets||leather){
+      pkg='Premium Detail';price='$249';slug='premium';
+      const r=[];
+      if(pets) r.push('pet hair removal and odor treatment');
+      if(leather) r.push('leather seat conditioning');
+      if(old) r.push('a thorough deep clean after extended time');
+      why='Your car needs '+r.join(', ')+' — all included in Premium at no extra cost.';
+      points=[
+        'Includes specialized treatment for heavy-use interiors',
+        'Most complete interior and exterior reset in one appointment',
+        'Ideal for vehicles with pets, odors, or neglected surfaces'
+      ];
+    } else if(old){
+      pkg='Standard Detail';price='$179';slug='standard';
+      why="It's been a while since your last detail. Standard's full vacuum and thorough interior clean is exactly what a well-maintained car needs after extended use — and it's only $50 more than Basic.";
+      points=[
+        'Best value for regular drivers who want a true reset',
+        'Deep interior clean without paying for premium extras',
+        'Most customers choose this package for monthly upkeep'
+      ];
+    } else {
+      pkg='Basic Detail';price='$129';slug='basic';
+      why='Your car is well-maintained with no special needs. Basic covers the essentials perfectly — exterior wash, door jams, light interior, and glass.';
+      points=[
+        'Fast refresh for well-maintained vehicles',
+        'Covers essentials while keeping price efficient',
+        'Great entry package for first-time mobile detailing'
+      ];
+    }
+    document.getElementById('rq-name').textContent=pkg;
+    document.getElementById('rq-price').textContent=price;
+    document.getElementById('rq-why').textContent=why;
+    const list=document.getElementById('rq-points');
+    if(list) list.innerHTML=points.map(p=>`<li>${p}</li>`).join('');
+    const btn=document.getElementById('rq-book');
+    btn.href='/booking.html?pkg='+slug;
+    btn.textContent='Book '+pkg+' — '+price;
+  }
+}
+function rqReset(){
+  Object.keys(rqAns).forEach(k=>delete rqAns[k]);
+  document.querySelectorAll('.rq-step').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.rq-bar-seg').forEach(s=>s.classList.remove('done'));
+  document.getElementById('rq-1').classList.add('active');
+  document.getElementById('rq-lbl').textContent='Question 1 of 3';
+}
+</script>
 </body>
 </html>

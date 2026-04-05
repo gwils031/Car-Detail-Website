@@ -1,130 +1,108 @@
-// Service Selector
-// Handles service card selection for booking form
-
+/**
+ * service-selector.js — Goals 2 + 3
+ * Renders service cards, handles selection, shows upgrade nudge for Basic,
+ * shows/hides add-on checkboxes, updates sidebar summary, auto-selects from URL.
+ */
 class ServiceSelector {
-  constructor() {
-    this.serviceGrid = document.getElementById('service-grid');
-    this.hiddenInput = document.getElementById('selected-service');
-    this.selectedCard = null;
-    
-    // Service data - matching Cal.com event types
-    this.services = [
-      {
-        name: 'Basic Detail',
-        slug: 'basic-detail',
-        price: 129,
-        duration: '1.5 hours',
-        description: 'Essential exterior and light interior cleaning.'
-      },
-      {
-        name: 'Standard Detail',
-        slug: 'standard-detail',
-        price: 179,
-        duration: '2.5 hours',
-        description: 'Everything in Basic Detail plus interior vacuum and thorough interior cleaning.'
-      },
-      {
-        name: 'Premium Detail',
-        slug: 'premium-detail',
-        price: 249,
-        duration: '3-4 hours',
-        description: 'Complete detailing with all premium services included.'
-      }
+  constructor(){
+    this.grid=document.getElementById('svc-grid');
+    this.hidden=document.getElementById('sel-service');
+    this.active=null;
+    this.pkgs=[
+      {name:'Basic Detail',    slug:'basic-detail',    price:129, dur:'1.5 hours',  desc:'Essential exterior and light interior cleaning.', popular:false},
+      {name:'Standard Detail', slug:'standard-detail',  price:179, dur:'2.5 hours',  desc:'Everything in Basic plus full vacuum and thorough deep clean.', popular:true},
+      {name:'Premium Detail',  slug:'premium-detail',   price:249, dur:'3–4 hours',  desc:'Everything in Standard plus pet hair removal, odor removal, and leather conditioning.', popular:false}
     ];
-    
-    this.init();
+    if(this.grid) this.render();
+    // Auto-select after render
+    setTimeout(()=>{
+      const slug=window.__autoSlug;
+      if(slug) this.pickBySlug(slug);
+    },150);
   }
-  
-  init() {
-    this.renderServiceCards();
-  }
-  
-  renderServiceCards() {
-    this.serviceGrid.innerHTML = '';
-    
-    this.services.forEach(service => {
-      const card = this.createServiceCard(service);
-      this.serviceGrid.appendChild(card);
+
+  render(){
+    this.grid.innerHTML=this.pkgs.map(p=>`
+      <div class="svc-card" data-slug="${p.slug}" role="button" tabindex="0" aria-pressed="false">
+        <div class="svc-chk">OK</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px">
+          <div class="svc-name">${p.name}${p.popular?` <span style="font-size:.6rem;background:var(--red);color:#fff;border-radius:999px;padding:2px 7px;font-weight:700;vertical-align:middle">Popular</span>`:''}</div>
+          <div style="font-size:.73rem;color:var(--tx3);white-space:normal;text-align:right;line-height:1.2">${p.dur}</div>
+        </div>
+        <div class="svc-price">$${p.price}</div>
+        <div class="svc-desc">${p.desc}</div>
+      </div>`).join('');
+
+    this.grid.querySelectorAll('.svc-card').forEach(card=>{
+      const slug=card.dataset.slug;
+      const pkg=this.pkgs.find(p=>p.slug===slug);
+      const sel=()=>this.select(card,pkg);
+      card.addEventListener('click',sel);
+      card.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); sel(); }});
     });
   }
-  
-  createServiceCard(service) {
-    const card = document.createElement('div');
-    card.className = 'service-card';
-    card.dataset.slug = service.slug;
-    
-    const nameContainer = document.createElement('div');
-    nameContainer.style.display = 'flex';
-    nameContainer.style.alignItems = 'center';
-    nameContainer.style.justifyContent = 'space-between';
-    nameContainer.style.gap = '8px';
-    
-    const name = document.createElement('h3');
-    name.className = 'service-card-name';
-    name.textContent = service.name;
-    name.style.margin = '0';
-    
-    const duration = document.createElement('span');
-    duration.style.fontSize = '0.8rem';
-    duration.style.color = 'var(--cd-muted)';
-    duration.style.whiteSpace = 'nowrap';
-    duration.textContent = service.duration;
-    
-    nameContainer.appendChild(name);
-    nameContainer.appendChild(duration);
-    
-    const price = document.createElement('p');
-    price.className = 'service-card-price';
-    price.textContent = `$${service.price}`;
-    
-    const description = document.createElement('p');
-    description.className = 'service-card-description';
-    description.textContent = service.description;
-    
-    card.appendChild(nameContainer);
-    card.appendChild(price);
-    card.appendChild(description);
-    
-    card.addEventListener('click', () => this.selectService(card, service));
-    
-    return card;
+
+  pickBySlug(slug){
+    const card=this.grid?.querySelector(`[data-slug="${slug}"]`);
+    const pkg=this.pkgs.find(p=>p.slug===slug);
+    if(card&&pkg) this.select(card,pkg);
   }
-  
-  selectService(card, service) {
-    // Remove previous selection
-    if (this.selectedCard) {
-      this.selectedCard.classList.remove('selected');
+
+  select(card,pkg){
+    // Deselect previous
+    if(this.active){ this.active.classList.remove('sel'); this.active.setAttribute('aria-pressed','false'); }
+    card.classList.add('sel');
+    card.setAttribute('aria-pressed','true');
+    this.active=card;
+
+    // Update hidden inputs
+    if(this.hidden) this.hidden.value=pkg.name;
+    const sel=document.getElementById('service-sel');
+    if(sel){ sel.value=pkg.name; sel.dispatchEvent(new Event('change')); }
+    window.selectedServiceSlug=pkg.slug;
+
+    if(window.__trackEvent){
+      window.__trackEvent('service_selected',{
+        surface:'desktop',
+        service_slug:pkg.slug,
+        service_name:pkg.name,
+        price:pkg.price
+      });
     }
-    
-    // Add new selection
-    card.classList.add('selected');
-    this.selectedCard = card;
-    
-    // Update hidden input with service name (for form submission)
-    this.hiddenInput.value = service.name;
-    
-    // Update the hidden select element for date-time-picker compatibility
-    const serviceSelect = document.getElementById('service');
-    if (serviceSelect) {
-      serviceSelect.value = service.name;
-      // Trigger change event so date-time-picker knows to refresh
-      serviceSelect.dispatchEvent(new Event('change'));
+
+    // Goal 2: Upgrade nudge
+    const nudge=document.getElementById('up-nudge');
+    if(nudge) nudge.classList.toggle('hide',pkg.slug!=='basic-detail');
+
+    // Goal 3: Add-ons — show for Basic/Standard, hide Premium (already has them)
+    const aw=document.getElementById('addon-wrap');
+    if(aw){
+      if(pkg.slug==='premium-detail') aw.classList.remove('open');
+      else aw.classList.add('open');
+      // Reset checked state when switching
+      document.querySelectorAll('#addon-wrap .achk.on').forEach(el=>el.classList.remove('on'));
+      const sub=document.getElementById('addon-sub');
+      if(sub) sub.classList.remove('show');
     }
-    
-    // Store the slug for Cal.com API
-    window.selectedServiceSlug = service.slug;
-    console.log('Service selected:', service.name, 'Slug:', service.slug);
-    
-    // Dispatch custom event to notify date-time-picker
+
+    // Sidebar summary
+    const s=document.getElementById('bk-summary');
+    if(s){
+      s.style.display='';
+      const n=document.getElementById('sum-name');
+      const p=document.getElementById('sum-price');
+      const d=document.getElementById('sum-dur');
+      if(n) n.textContent=pkg.name;
+      if(p) p.textContent='$'+pkg.price;
+      if(d) d.textContent=pkg.dur;
+    }
+
+    // Clear service error
+    const err=document.getElementById('svc-err');
+    if(err) err.classList.add('hide');
+
     document.dispatchEvent(new CustomEvent('serviceSelected'));
-  }
-  
-  getSelectedService() {
-    return this.selectedCard ? this.selectedCard.dataset.slug : null;
   }
 }
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  window.serviceSelector = new ServiceSelector();
-});
+document.addEventListener('DOMContentLoaded',()=>{ window.serviceSelector=new ServiceSelector(); });

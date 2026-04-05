@@ -1,132 +1,356 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Booking • Southern Utah Detailing</title>
-    <meta name="description" content="Book premium mobile car detailing: wash, interior refresh, full detail." />
-    <meta property="og:title" content="Booking • Southern Utah Detailing" />
-    <meta property="og:description" content="Book premium mobile car detailing: wash, interior refresh, full detail." />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://images.unsplash.com/photo-1607860108855-39f85d4b45da?q=80&w=1200&auto=format&fit=crop" />
-  <link rel="stylesheet" href="/css/style.css" />
-  <link rel="stylesheet" href="/css/components.css" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Book Your Detail · Southern Utah Detailing</title>
+  <meta name="description" content="Book mobile car detailing in Cedar City and nearby communities. Basic $129 · Standard $179 · Premium $249. We come to you with same-week availability."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <link rel="stylesheet" href="/css/components.css"/>
 </head>
 <body>
-  <header class="header">
-    <div class="container nav cd-navbar">
-      <button class="nav-toggle" aria-label="Toggle menu">☰</button>
-      <a href="/index.html" class="nav-brand cd-logo">Southern Utah Detailing</a>
-      <nav class="nav-menu" aria-label="Primary">
-        <a href="/services.html">Services</a>
-        <a href="/booking.html" aria-current="page">Booking</a>
-        <a href="/contact.html">Contact</a>
-      </nav>
-      <div class="nav-actions">
-        <img src="/images/Logo.PNG" alt="Southern Utah Detailing Logo" class="nav-logo" />
-        <a class="button" href="/booking.html">Book Now</a>
+
+<header class="header" id="site-header">
+  <div class="container nav">
+    <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">☰</button>
+    <a href="/index.html" class="nav-brand">
+      <img src="/images/Logo.PNG" alt="So.U.Detail logo" class="nav-logo"/>
+      Southern Utah Detailing
+    </a>
+    <div class="nav-spacer"></div>
+    <nav class="nav-menu" aria-label="Primary">
+      <a href="/index.html">Home</a>
+      <a href="/services.html">Services</a>
+      <a href="/booking.html" aria-current="page">Booking</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="button outline" href="tel:+14359994052">Call Us</a>
+    </div>
+  </div>
+</header>
+
+<!-- Page hero -->
+<section style="padding:56px 0 36px;background:var(--bg-up);border-bottom:1px solid var(--bdr)">
+  <div class="container" data-reveal>
+    <span class="eyebrow">Schedule Your Detail</span>
+    <h1 class="h1" style="margin-bottom:8px">Book Your Detail</h1>
+    <p class="muted">Pick your service, choose a time, and we come to you. Takes under 2 minutes.</p>
+    <p class="pay-note" style="max-width:560px;margin-top:12px"><strong>No payment is due now.</strong> You only pay after your appointment is completed.</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top:36px">
+  <div class="container">
+
+    <!-- Status alert -->
+    <div id="bk-alert" class="alert hide mb-16" role="alert" aria-live="assertive"></div>
+
+    <!-- Goal 8: Confirmation card (hidden until booking completes) -->
+    <div class="conf-card" id="conf-card">
+      <div class="conf-ico">OK</div>
+      <div class="conf-title">You're all booked!</div>
+      <div class="conf-sub" id="conf-sub">A confirmation is on its way to your email. We'll see you soon.</div>
+      <div class="conf-box" id="conf-box">
+        <div class="conf-row"><span class="conf-k">Service</span><span class="conf-v" id="cv-service">—</span></div>
+        <div class="conf-row"><span class="conf-k">Add-ons</span><span class="conf-v" id="cv-addons">None</span></div>
+        <div class="conf-row"><span class="conf-k">Date &amp; Time</span><span class="conf-v" id="cv-datetime">—</span></div>
+        <div class="conf-row"><span class="conf-k">Location</span><span class="conf-v" id="cv-location">—</span></div>
+        <div class="conf-row"><span class="conf-k" style="font-weight:700;color:var(--tx)">Total</span><span class="conf-v" style="color:var(--red);font-size:1.05rem" id="cv-total">—</span></div>
+      </div>
+      <div style="background:var(--srf2);border-radius:var(--rsm);padding:18px;margin-bottom:20px;text-align:left">
+        <div class="sc-title" style="margin-bottom:12px">What to Expect</div>
+        <div class="wex">
+          <div class="wex-row"><div class="wex-n">1</div>We'll confirm your booking within the hour via email.</div>
+          <div class="wex-row"><div class="wex-n">2</div>We arrive fully equipped — just tell us where to park.</div>
+          <div class="wex-row"><div class="wex-n">3</div>When we finish, do a quick walkthrough. Happy? You're done.</div>
+        </div>
+      </div>
+      <div class="conf-acts">
+        <a class="button block" id="cv-ics" href="#" download="detail-appointment.ics">Add to Calendar (.ics)</a>
+        <a class="button block ghost" id="cv-rebook" href="/booking.html">Book Another Detail</a>
+        <a class="button block outline" href="/index.html">Back to Home</a>
       </div>
     </div>
-  </header>
 
-  <section class="section">
-    <div class="container">
-      <h1 class="h1">Book Your Detail</h1>
-      <p class="muted">Select your preferred date and time to schedule your service.</p>
+    <!-- Main booking content (hidden after confirmation) -->
+    <div id="bk-main">
+      <div class="bk-layout">
 
-      <div id="form-errors" class="card mb-16 hide" role="alert" aria-live="assertive"></div>
+        <!-- ─── DESKTOP FORM (hidden on mobile) ─────────────────── -->
+        <div class="bk-panel desktop-form" data-reveal>
+          <form id="bk-form" class="form" novalidate>
 
-      <form id="booking-form" class="form" aria-label="Booking form">
-        <div class="form-row">
-          <div>
-            <label for="service" class="muted">Service <span class="required">*</span></label>
-            <div class="service-grid" id="service-grid">
-              <!-- Services will be populated here -->
-            </div>
-            <input type="hidden" id="selected-service" name="service" required />
-            <select id="service" style="display: none;">
-              <option value="">Select a service</option>
-              <option>Express Wash</option>
-              <option>Interior Refresh</option>
-              <option>Full Detail</option>
-            </select>
-            <div class="service-error hide" id="service-error" style="color: #D32F2F; font-size: 0.9rem; margin-top: 8px; display: none;">Please select a service to continue</div>
-          </div>
-        </div>
-
-        <div class="form-row grid cols-2" aria-label="Contact details">
-          <div>
-            <label for="name" class="muted">Full Name</label>
-            <input id="name" name="name" class="input" type="text" required />
-          </div>
-          <div>
-            <label for="email" class="muted">Email</label>
-            <input id="email" name="email" class="input" type="email" required />
-          </div>
-        </div>
-
-        <div class="form-row grid cols-2" aria-label="Contact info">
-          <div>
-            <label for="phone" class="muted">Phone</label>
-            <input id="phone" name="phone" class="input" type="tel" placeholder="(435) 999-4052" required />
-          </div>
-          <div>
-            <label for="street-address" class="muted">Street Address</label>
-            <input id="street-address" name="street-address" class="input" type="text" autocomplete="street-address" required />
-          </div>
-        </div>
-
-        <div class="form-row grid cols-2" aria-label="Address details">
-          <div>
-            <label for="city" class="muted">City</label>
-            <input id="city" name="address-level2" class="input" type="text" autocomplete="address-level2" required />
-          </div>
-          <div>
-            <label for="state" class="muted">State</label>
-            <input id="state" name="address-level1" class="input" type="text" autocomplete="address-level1" required />
-          </div>
-        </div>
-
-        <div class="form-row grid cols-2" aria-label="Postal info">
-          <div>
-            <label for="zip" class="muted">ZIP Code</label>
-            <input id="zip" name="postal-code" class="input" type="text" autocomplete="postal-code" required />
-          </div>
-          <div>
-            <label for="date-time-picker" class="muted">Date & Time</label>
-            <div id="date-time-picker" class="date-time-picker">
-              <button type="button" class="date-time-input" id="date-time-input">Select date and time</button>
-              <div class="date-time-dropdown hide" id="date-time-dropdown">
-                <div class="calendar-header">
-                  <button type="button" class="calendar-nav" id="prev-month">←</button>
-                  <div class="calendar-title" id="calendar-title">January 2026</div>
-                  <button type="button" class="calendar-nav" id="next-month">→</button>
-                </div>
-                <div class="calendar-grid" id="calendar-grid"></div>
-                <div class="time-select-container hide" id="time-select-container">
-                  <div class="time-grid" id="time-grid"></div>
+            <!-- Service selector -->
+            <div class="frow">
+              <div>
+                <label>Service <span class="req">*</span></label>
+                <div class="svc-grid" id="svc-grid"></div>
+                <input type="hidden" id="sel-service" name="service" required/>
+                <select id="service-sel" style="display:none"></select>
+                <div class="svc-error hide" id="svc-err">Please select a service to continue.</div>
+                <!-- Goal 2: upgrade nudge injected by JS -->
+                <div class="upgrade-nudge hide" id="up-nudge">
+                  <div><strong>For just $50 more, Standard adds a full interior vacuum and deep clean.</strong> Most customers who start with Basic upgrade once they see the difference. <a href="#" id="nudge-link">Switch to Standard -></a></div>
                 </div>
               </div>
-              <input type="hidden" id="selected-date" name="date" />
-              <input type="hidden" id="selected-time" name="time" />
             </div>
+
+            <!-- Goal 3: Add-on checkboxes (shown for Basic/Standard, hidden for Premium) -->
+            <div class="addon-wrap" id="addon-wrap">
+              <div class="addon-head">Optional Add-ons — customize your booking</div>
+              <div class="addon-list" id="addon-list">
+                <div class="achk" data-id="pet" data-price="30" onclick="toggleAddon(this)">
+                  <div class="achk-left">
+                    <div class="achk-ico">PH</div>
+                    <div>
+                      <div class="achk-name">Pet Hair Removal</div>
+                      <div class="achk-desc">Deep extraction from seats, carpet &amp; trunk area</div>
+                    </div>
+                  </div>
+                  <div class="achk-right">
+                    <div class="achk-price">+$30</div>
+                    <div class="achk-box"></div>
+                  </div>
+                </div>
+                <div class="achk" data-id="odor" data-price="40" onclick="toggleAddon(this)">
+                  <div class="achk-left">
+                    <div class="achk-ico">OR</div>
+                    <div>
+                      <div class="achk-name">Odor Removal</div>
+                      <div class="achk-desc">Neutralizes smoke, pet, food &amp; musty odors at the source</div>
+                    </div>
+                  </div>
+                  <div class="achk-right">
+                    <div class="achk-price">+$40</div>
+                    <div class="achk-box"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="addon-subtotal" id="addon-sub">
+                <span>Add-ons subtotal</span>
+                <span class="addon-subtotal-val" id="addon-sub-val">$0</span>
+              </div>
+            </div>
+
+            <!-- Contact -->
+            <div class="frow c2">
+              <div><label for="f-name">Full Name <span class="req">*</span></label><input id="f-name" class="inp" type="text" autocomplete="name" placeholder="Jane Smith" required/></div>
+              <div><label for="f-email">Email <span class="req">*</span></label><input id="f-email" class="inp" type="email" autocomplete="email" placeholder="jane@example.com" required/></div>
+            </div>
+            <div class="frow c2">
+              <div><label for="f-phone">Phone <span class="req">*</span></label><input id="f-phone" class="inp" type="tel" autocomplete="tel" placeholder="(435) 555-0100" required/></div>
+              <div><label for="f-street">Street Address <span class="req">*</span></label><input id="f-street" class="inp" type="text" autocomplete="street-address" placeholder="123 Main St" required/></div>
+            </div>
+            <div class="frow c2">
+              <div><label for="f-city">City <span class="req">*</span></label><input id="f-city" class="inp" type="text" autocomplete="address-level2" placeholder="Cedar City" required/></div>
+              <div><label for="f-state">State <span class="req">*</span></label><input id="f-state" class="inp" type="text" autocomplete="address-level1" placeholder="UT" required/></div>
+            </div>
+            <div class="frow c2">
+              <div><label for="f-zip">ZIP Code <span class="req">*</span></label><input id="f-zip" class="inp" type="text" autocomplete="postal-code" placeholder="84720" required/></div>
+              <div>
+                <label>Date &amp; Time <span class="req">*</span></label>
+                <div id="date-time-picker" class="dtp">
+                  <button type="button" class="dtp-btn" id="date-time-input">Select date and time</button>
+                  <div class="dtp-drop hide" id="date-time-dropdown">
+                    <div class="cal-hdr">
+                      <button type="button" class="cal-nav" id="prev-month">←</button>
+                      <div class="cal-title" id="calendar-title">Loading…</div>
+                      <button type="button" class="cal-nav" id="next-month">→</button>
+                    </div>
+                    <div class="cal-grid" id="calendar-grid"></div>
+                    <div class="dtp-meta">Times shown in your local timezone</div>
+                    <div class="time-wrap hide" id="time-select-container">
+                      <div class="time-grid" id="time-grid"></div>
+                    </div>
+                  </div>
+                  <input type="hidden" id="selected-date" name="date"/>
+                  <input type="hidden" id="selected-time" name="time"/>
+                </div>
+                <div class="bk-help">Times are shown in your local timezone.</div>
+              </div>
+            </div>
+
+            <div class="frow c2" style="align-items:end">
+              <button type="submit" class="button block">Confirm Booking — Pay After Service</button>
+              <a href="tel:+14359994052" class="button outline" data-track="booking_desktop_call_instead">Call Instead</a>
+            </div>
+            <p class="pay-note" style="margin-top:-4px"><strong>No payment due when booking.</strong> Payment is collected after your detail appointment.</p>
+          </form>
+        </div>
+
+        <!-- ─── MOBILE STEP FLOW (Goal 6) ───────────────────────── -->
+        <div class="ms-wrap bk-panel">
+          <!-- Step indicator -->
+          <div class="ms-ind" id="ms-ind">
+            <div class="ms-dot act" id="md1">1</div>
+            <div class="ms-line" id="ml1"></div>
+            <div class="ms-dot" id="md2">2</div>
+            <div class="ms-line" id="ml2"></div>
+            <div class="ms-dot" id="md3">3</div>
+            <div class="ms-line" id="ml3"></div>
+            <div class="ms-dot" id="md4">4</div>
+          </div>
+
+          <!-- Step 1: Service + Add-ons -->
+          <div class="ms-step active" id="ms1">
+            <div class="ms-ttl">Choose your service</div>
+            <div class="ms-sub">Pick the package that fits your vehicle.</div>
+            <div id="ms-svcs">
+              <div class="ms-svc" data-slug="basic-detail" data-price="129" onclick="mPickSvc(this)">
+                <div class="mstep-svc-left"><div class="nm">Basic Detail</div><div class="dc">Exterior wash · door jams · light interior · glass</div></div>
+                <div class="pr">$129</div>
+              </div>
+              <div class="ms-svc" data-slug="standard-detail" data-price="179" onclick="mPickSvc(this)">
+                <div class="mstep-svc-left"><div class="nm">Standard Detail <span style="font-size:.62rem;background:var(--red);color:#fff;border-radius:999px;padding:2px 7px;font-weight:700;vertical-align:middle">Popular</span></div><div class="dc">Everything in Basic + full vacuum + interior deep clean</div></div>
+                <div style="font-size:1.12rem;font-weight:800;color:var(--red);letter-spacing:-.02em;flex-shrink:0">$179</div>
+              </div>
+              <div class="ms-svc" data-slug="premium-detail" data-price="249" onclick="mPickSvc(this)">
+                <div class="mstep-svc-left"><div class="nm">Premium Detail</div><div class="dc">Everything in Standard + pet hair · odor · leather conditioning</div></div>
+                <div style="font-size:1.12rem;font-weight:800;color:var(--red);letter-spacing:-.02em;flex-shrink:0">$249</div>
+              </div>
+            </div>
+            <!-- Mobile add-ons (Basic/Standard only) -->
+            <div id="ms-addons" style="display:none;margin-top:12px">
+              <div style="font-size:.67rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);padding:8px 0 10px;border-top:1px solid var(--bdr)">Optional Add-ons</div>
+              <div class="achk" data-id="pet" data-price="30" onclick="mToggleAddon(this)" style="margin-bottom:8px">
+                <div class="achk-left"><div class="achk-ico">PH</div><div><div class="achk-name">Pet Hair Removal</div><div class="achk-desc">Deep removal from seats &amp; carpet</div></div></div>
+                <div class="achk-right"><div class="achk-price">+$30</div><div class="achk-box"></div></div>
+              </div>
+              <div class="achk" data-id="odor" data-price="40" onclick="mToggleAddon(this)">
+                <div class="achk-left"><div class="achk-ico">OR</div><div><div class="achk-name">Odor Removal</div><div class="achk-desc">Eliminates smoke, pet &amp; food odors</div></div></div>
+                <div class="achk-right"><div class="achk-price">+$40</div><div class="achk-box"></div></div>
+              </div>
+            </div>
+            <div class="ms-nav one" style="margin-top:14px">
+              <button class="button block" onclick="mNext(1)" id="mn1" disabled data-track="booking_mobile_next_step1">Next: Pick a time →</button>
+            </div>
+          </div>
+
+          <!-- Step 2: Date & Time -->
+          <div class="ms-step" id="ms2">
+            <div class="ms-ttl">Pick a date &amp; time</div>
+            <div class="ms-sub">Choose an available slot from the calendar.</div>
+            <div id="m-dtp" style="margin-top:4px">
+              <button type="button" class="dtp-btn" id="m-date-time-input">Select date and time</button>
+              <div class="bk-help">Times are shown in your local timezone.</div>
+              <div class="m-picker-modal hide" id="m-picker-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="m-picker-title">
+                <div class="m-picker-sheet">
+                  <div class="m-picker-head">
+                    <div>
+                      <div class="sc-title" style="margin-bottom:4px">Schedule</div>
+                      <div class="m-picker-title" id="m-picker-title">Select date and time</div>
+                      <div class="m-picker-tz" id="m-picker-tz"></div>
+                    </div>
+                    <button type="button" class="m-picker-close" id="m-picker-close" aria-label="Close scheduler">×</button>
+                  </div>
+                  <div class="cal-hdr">
+                    <button type="button" class="cal-nav" id="m-prev">←</button>
+                    <div class="cal-title" id="m-cal-title">Loading…</div>
+                    <button type="button" class="cal-nav" id="m-next">→</button>
+                  </div>
+                  <div class="cal-grid" id="m-cal-grid"></div>
+                  <div class="time-wrap hide" id="m-time-wrap">
+                    <div class="time-grid" id="m-time-grid"></div>
+                  </div>
+                  <button type="button" class="button block m-picker-confirm" id="m-picker-confirm" disabled>Confirm Date &amp; Time</button>
+                </div>
+              </div>
+              <input type="hidden" id="m-date"/>
+              <input type="hidden" id="m-time"/>
+            </div>
+            <div class="ms-nav">
+              <button class="button outline" onclick="mBack(2)">← Back</button>
+              <button class="button" onclick="mNext(2)" id="mn2" disabled data-track="booking_mobile_next_step2">Next: Your details →</button>
+            </div>
+          </div>
+
+          <!-- Step 3: Contact & Address -->
+          <div class="ms-step" id="ms3">
+            <div class="ms-ttl">Your details</div>
+            <div class="ms-sub">Where should we come, and how do we reach you?</div>
+            <div class="form" style="margin-top:4px">
+              <div><label for="m-name">Full Name <span class="req">*</span></label><input id="m-name" class="inp" type="text" autocomplete="name" placeholder="Jane Smith"/></div>
+              <div><label for="m-email">Email <span class="req">*</span></label><input id="m-email" class="inp" type="email" autocomplete="email" placeholder="jane@example.com"/></div>
+              <div><label for="m-phone">Phone <span class="req">*</span></label><input id="m-phone" class="inp" type="tel" autocomplete="tel" placeholder="(435) 555-0100"/></div>
+              <div><label for="m-street">Street Address <span class="req">*</span></label><input id="m-street" class="inp" type="text" autocomplete="street-address" placeholder="123 Main St"/></div>
+              <div class="m-city-zip">
+                <div><label for="m-city">City <span class="req">*</span></label><input id="m-city" class="inp" type="text" autocomplete="address-level2" placeholder="Cedar City"/></div>
+                <div><label for="m-zip">ZIP <span class="req">*</span></label><input id="m-zip" class="inp" type="text" autocomplete="postal-code" placeholder="84720"/></div>
+              </div>
+            </div>
+            <div class="ms-nav">
+              <button class="button outline" onclick="mBack(3)">← Back</button>
+              <button class="button" onclick="mNext(3)" data-track="booking_mobile_next_step3">Review →</button>
+            </div>
+          </div>
+
+          <!-- Step 4: Review & Confirm -->
+          <div class="ms-step" id="ms4">
+            <div class="ms-ttl">Review your booking</div>
+            <div class="ms-sub">Everything look right? Tap confirm to lock it in.</div>
+            <div class="conf-box" id="ms-rev" style="margin:14px 0">
+              <div class="ms-crow"><span class="ms-ck">Service</span><span class="ms-cv" id="mr-svc">—</span></div>
+              <div class="ms-crow"><span class="ms-ck">Add-ons</span><span class="ms-cv" id="mr-add">None</span></div>
+              <div class="ms-crow"><span class="ms-ck">Date &amp; Time</span><span class="ms-cv" id="mr-dt">—</span></div>
+              <div class="ms-crow"><span class="ms-ck">Address</span><span class="ms-cv" id="mr-addr">—</span></div>
+              <div class="ms-crow"><span class="ms-ck">Name</span><span class="ms-cv" id="mr-name">—</span></div>
+              <div class="ms-crow"><span class="ms-ck" style="font-weight:700;color:var(--tx)">Total</span><span class="ms-cv" style="color:var(--red);font-size:1rem" id="mr-total">—</span></div>
+            </div>
+            <div class="pay-note" style="margin:0 0 10px"><strong>No payment is due today.</strong> Pay after the appointment is complete.</div>
+            <div class="ms-nav one">
+              <button class="button block" id="ms-submit" onclick="mSubmit()" data-track="booking_mobile_submit">Confirm Booking — Pay After Service</button>
+            </div>
+            <button class="button outline block" onclick="mBack(4)" style="margin-top:10px">← Edit Details</button>
           </div>
         </div>
 
-        <div class="grid cols-2">
-          <button type="submit" class="button">Confirm Booking</button>
-          <a href="tel:+14359994052" class="button outline">Call Us Instead</a>
-        </div>
-      </form>
+      </div>
+    </div><!-- /bk-main -->
+
+  </div>
+</section>
+
+<section class="section sm" style="padding-top:10px">
+  <div class="container" data-reveal>
+    <div class="bk-reviews-shell">
+      <div class="sc-title" style="margin-bottom:14px">Customer Testimonials</div>
+      <div class="bk-reviews-grid">
+        <article class="rcard">
+          <div class="rcard-stars">★★★★★</div>
+          <p class="rcard-text">"My SUV looks brand new. Booking was simple and they showed up right on time."</p>
+          <div class="rcard-author">— Sarah L.</div>
+        </article>
+        <article class="rcard">
+          <div class="rcard-stars">★★★★★</div>
+          <p class="rcard-text">"Interior was spotless and the process was easy from start to finish."</p>
+          <div class="rcard-author">— Jen M.</div>
+        </article>
+        <article class="rcard">
+          <div class="rcard-stars">★★★★★</div>
+          <p class="rcard-text">"Best mobile detail I've had. Super convenient and worth every dollar."</p>
+          <div class="rcard-author">— Hannah S.</div>
+        </article>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <footer class="footer">
-    <div class="container legal"> <span class="js-year"></span> Southern Utah Detailing. All rights reserved.</div>
-  </footer>
+<footer class="footer">
+  <div class="container">
+    <div class="ft-legal">
+      <span>© <span class="js-year"></span> Southern Utah Detailing LLC.</span>
+      <a href="tel:+14359994052">(435) 999-4052</a>
+    </div>
+  </div>
+</footer>
 
-  <script src="/js/main.js" defer></script>
-  <script src="/js/service-selector.js" defer></script>  <script src="/js/date-time-picker.js" defer></script>
-  <script src="/js/calcom.js" defer></script>
+<script src="/js/analytics.js" defer></script>
+<script src="/js/main.js" defer></script>
+<script src="/js/service-selector.js" defer></script>
+<script src="/js/date-time-picker.js" defer></script>
+<script src="/js/calcom.js" defer></script>
 </body>
 </html>

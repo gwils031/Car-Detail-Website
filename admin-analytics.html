@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Admin Analytics · Southern Utah Detailing</title>
+  <meta name="robots" content="noindex,nofollow"/>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <link rel="stylesheet" href="/css/components.css"/>
+  <style>
+    .admin-shell{max-width:1120px;margin:0 auto;padding:24px}
+    .admin-muted{font-size:.85rem;color:var(--tx2)}
+    .admin-controls{display:grid;grid-template-columns:1fr 1fr auto auto;gap:10px;margin-top:12px}
+    .status{margin-top:10px;font-size:.85rem;color:var(--tx2)}
+    .context-strip{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .context-pill{font-size:.75rem;color:var(--tx2);border:1px solid var(--bdr);background:var(--srf2);border-radius:999px;padding:7px 10px}
+    .admin-tabs{display:flex;gap:8px;overflow:auto;padding-bottom:4px;margin-top:16px}
+    .tab-btn{border:1px solid var(--bdr);background:var(--srf);color:var(--tx2);border-radius:999px;padding:8px 12px;font-size:.8rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;white-space:nowrap}
+    .tab-btn.active{background:linear-gradient(135deg,rgba(225,55,55,.18),rgba(225,55,55,.06));border-color:rgba(225,55,55,.6);color:var(--tx)}
+    .tab-panel{margin-top:14px}
+    .admin-panel{background:var(--srf);border:1px solid var(--bdr);border-radius:var(--r);padding:14px}
+    .admin-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+    .admin-card{background:var(--srf);border:1px solid var(--bdr);border-radius:var(--rsm);padding:14px;min-height:102px}
+    .admin-k{font-size:.67rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--tx3);margin-bottom:8px}
+    .admin-v{font-size:1.45rem;font-weight:800;color:var(--tx);line-height:1.15}
+    .admin-sub{margin-top:6px;font-size:.77rem;color:var(--tx2)}
+    .admin-v.warn{color:#ffcc66}
+    .admin-v.bad{color:#ff7b7b}
+    .admin-v.good{color:#7fe6a8}
+    .split-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .funnel-track{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:12px}
+    .funnel-stage{border:1px solid var(--bdr);background:linear-gradient(180deg,var(--srf),rgba(255,255,255,.01));border-radius:12px;padding:11px}
+    .funnel-label{font-size:.7rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em}
+    .funnel-value{font-size:1.35rem;font-weight:800;color:var(--tx);margin-top:6px}
+    .funnel-rate{font-size:.78rem;color:var(--tx2);margin-top:4px}
+    .admin-table{width:100%;border-collapse:collapse}
+    .admin-table th,.admin-table td{padding:9px 10px;border-bottom:1px solid var(--bdr);text-align:left;font-size:.84rem}
+    .admin-table th{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3)}
+    .section-title{font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);font-weight:800;margin-bottom:8px}
+    .mini-note{font-size:.78rem;color:var(--tx2);margin-top:7px}
+    .chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+    .chart-wrap{border:1px solid var(--bdr);border-radius:10px;background:var(--srf2);padding:8px}
+    .chart-svg{width:100%;height:auto;display:block}
+    .chart-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .legend-item{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--bdr);border-radius:999px;font-size:.74rem;color:var(--tx2)}
+    .legend-dot{width:8px;height:8px;border-radius:50%}
+    .chart-axis-note{font-size:.74rem;color:var(--tx2);margin-top:6px}
+    .admin-nav-menu{display:flex;align-items:center;gap:8px}
+    .admin-nav-menu .tab-btn{padding:7px 11px}
+    .admin-nav-menu .admin-signout{margin-left:6px}
+    @media(max-width:980px){
+      .admin-controls{grid-template-columns:1fr 1fr}
+      .admin-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .split-2{grid-template-columns:1fr}
+      .chart-grid{grid-template-columns:1fr}
+      .funnel-track{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:767px){
+      .admin-nav-menu{display:flex;align-items:stretch;gap:4px}
+      .admin-nav-menu .tab-btn{width:100%;text-align:left;justify-content:flex-start;padding:14px 16px;border-radius:var(--rsm)}
+      .admin-nav-menu .admin-signout{margin-left:0;margin-top:8px;width:100%;justify-content:flex-start}
+    }
+    @media(max-width:640px){
+      .admin-controls{grid-template-columns:1fr}
+      .admin-grid{grid-template-columns:1fr}
+      .funnel-track{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+<header class="header" id="site-header">
+  <div class="container nav">
+    <button class="nav-toggle" id="admin-nav-toggle" aria-label="Open menu" aria-expanded="false">☰</button>
+    <a href="/index.html" class="nav-brand">
+      <img src="/images/Logo.PNG" alt="So.U.Detail logo" class="nav-logo"/>
+      Southern Utah Detailing
+    </a>
+    <div class="nav-spacer"></div>
+    <nav class="nav-menu admin-nav-menu" id="admin-nav-menu" role="tablist" aria-label="Analytics Sections">
+        <button class="tab-btn active" id="tab-overview-btn" role="tab" aria-selected="true" aria-controls="tab-overview" data-tab-target="overview" type="button">Overview</button>
+        <button class="tab-btn" id="tab-funnel-btn" role="tab" aria-selected="false" aria-controls="tab-funnel" data-tab-target="funnel" type="button">Booking Funnel</button>
+        <button class="tab-btn" id="tab-acquisition-btn" role="tab" aria-selected="false" aria-controls="tab-acquisition" data-tab-target="acquisition" type="button">Acquisition</button>
+        <button class="tab-btn" id="tab-reliability-btn" role="tab" aria-selected="false" aria-controls="tab-reliability" data-tab-target="reliability" type="button">Reliability</button>
+        <button class="tab-btn" id="tab-field-btn" role="tab" aria-selected="false" aria-controls="tab-field" data-tab-target="field" type="button">Field Sales</button>
+        <button class="button outline admin-signout" id="signout-btn" type="button">Sign Out</button>
+    </nav>
+  </div>
+</header>
+<div class="nav-backdrop" id="admin-nav-backdrop" aria-hidden="true"></div>
+
+<section class="section" style="padding-top:34px">
+  <div class="admin-shell">
+    <span class="eyebrow">Admin</span>
+    <h1 class="h2" style="margin-top:6px">Analytics Dashboard</h1>
+    <p class="admin-muted">Booking performance workspace with clear conversion context, engagement signals, and reliability diagnostics.</p>
+
+    <div class="admin-controls">
+      <input id="admin-day" class="inp" type="date"/>
+      <select id="admin-days" class="sel">
+        <option value="7" selected>Last 7 days</option>
+        <option value="14">Last 14 days</option>
+        <option value="30">Last 30 days</option>
+      </select>
+      <button id="refresh-btn" class="button">Refresh</button>
+      <a class="button outline" href="/admin-signin.html">Sign-In Page</a>
+    </div>
+    <div class="status" id="status">Loading analytics…</div>
+    <div class="context-strip">
+      <span class="context-pill" id="ctx-window">Window: --</span>
+      <span class="context-pill" id="ctx-traffic">Traffic quality: --</span>
+      <span class="context-pill" id="ctx-close">Close rate: --</span>
+      <span class="context-pill" id="ctx-risk">Operational risk: --</span>
+    </div>
+
+    <section class="tab-panel" id="tab-overview" role="tabpanel" aria-labelledby="tab-overview-btn" data-tab-panel="overview">
+      <div class="admin-grid">
+        <div class="admin-card">
+          <div class="admin-k">Page Views</div>
+          <div class="admin-v" id="k-pageviews">0</div>
+          <div class="admin-sub">Top of funnel traffic volume</div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-k">CTA Clicks</div>
+          <div class="admin-v" id="k-ctaclicks">0</div>
+          <div class="admin-sub">Visitors expressing booking intent</div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-k">Intent Rate</div>
+          <div class="admin-v" id="k-intent">0%</div>
+          <div class="admin-sub">CTA clicks divided by page views</div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-k">Booking Submits</div>
+          <div class="admin-v" id="k-submits">0</div>
+          <div class="admin-sub">Form submits sent to booking API</div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-k">Booking Confirmed</div>
+          <div class="admin-v" id="k-confirmed">0</div>
+          <div class="admin-sub">Successful completions</div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-k">Close Rate</div>
+          <div class="admin-v" id="k-rate">0%</div>
+          <div class="admin-sub">Confirmed divided by submits</div>
+        </div>
+      </div>
+
+      <div class="admin-panel" style="margin-top:12px">
+        <div class="section-title">Top Services In This Window</div>
+        <table class="admin-table">
+          <thead><tr><th>Service</th><th>Events</th></tr></thead>
+          <tbody id="tbl-services-overview"></tbody>
+        </table>
+        <p class="mini-note">Use this to prioritize packages and staffing during peak days.</p>
+      </div>
+    </div>
+
+    <section class="tab-panel" id="tab-funnel" role="tabpanel" aria-labelledby="tab-funnel-btn" data-tab-panel="funnel" hidden>
+      <div class="admin-panel">
+        <div class="section-title">Booking Funnel Health</div>
+        <div class="funnel-track">
+          <div class="funnel-stage">
+            <div class="funnel-label">Visitors</div>
+            <div class="funnel-value" id="f-visitors">0</div>
+            <div class="funnel-rate">Baseline stage</div>
+          </div>
+          <div class="funnel-stage">
+            <div class="funnel-label">Intent (CTA Click)</div>
+            <div class="funnel-value" id="f-intent">0</div>
+            <div class="funnel-rate" id="f-intent-rate">0% of visitors</div>
+          </div>
+          <div class="funnel-stage">
+            <div class="funnel-label">Submit</div>
+            <div class="funnel-value" id="f-submit">0</div>
+            <div class="funnel-rate" id="f-submit-rate">0% of intent</div>
+          </div>
+          <div class="funnel-stage">
+            <div class="funnel-label">Confirmed</div>
+            <div class="funnel-value" id="f-confirmed">0</div>
+            <div class="funnel-rate" id="f-confirmed-rate">0% of submit</div>
+          </div>
+        </div>
+        <p class="mini-note" id="funnel-summary">No funnel context yet.</p>
+      </div>
+
+      <div class="chart-grid">
+        <div class="admin-panel">
+          <div class="section-title">Daily Volume Trend</div>
+          <div class="chart-wrap">
+            <svg id="chart-volume" class="chart-svg" viewBox="0 0 640 220" role="img" aria-label="Daily visitor, intent, submit, and confirmed trend"></svg>
+          </div>
+          <div class="chart-legend" id="chart-volume-legend"></div>
+          <p class="chart-axis-note">Line chart highlights traffic volume and booking completion progression.</p>
+        </div>
+        <div class="admin-panel">
+          <div class="section-title">Daily Rate Trend</div>
+          <div class="chart-wrap">
+            <svg id="chart-rate" class="chart-svg" viewBox="0 0 640 220" role="img" aria-label="Daily conversion and failure rate trend"></svg>
+          </div>
+          <div class="chart-legend" id="chart-rate-legend"></div>
+          <p class="chart-axis-note">Percent trend makes drops in intent or close rate easy to spot quickly.</p>
+        </div>
+      </div>
+
+      <div class="admin-panel" style="margin-top:12px">
+        <div class="section-title">Daily Conversion Trend</div>
+        <table class="admin-table">
+          <thead>
+            <tr><th>Date</th><th>Visitors</th><th>Intent</th><th>Submits</th><th>Confirmed</th><th>Close Rate</th></tr>
+          </thead>
+          <tbody id="tbl-trend"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="tab-acquisition" role="tabpanel" aria-labelledby="tab-acquisition-btn" data-tab-panel="acquisition" hidden>
+      <div class="split-2">
+        <div class="admin-panel">
+          <div class="section-title">Top CTA Drivers</div>
+          <table class="admin-table">
+            <thead><tr><th>CTA</th><th>Clicks</th></tr></thead>
+            <tbody id="tbl-ctas"></tbody>
+          </table>
+        </div>
+        <div class="admin-panel">
+          <div class="section-title">Top Selected Services</div>
+          <table class="admin-table">
+            <thead><tr><th>Service</th><th>Events</th></tr></thead>
+            <tbody id="tbl-services"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="admin-panel" style="margin-top:12px">
+        <div class="section-title">Acquisition Readout</div>
+        <p class="admin-muted" id="acq-readout">No data yet.</p>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="tab-reliability" role="tabpanel" aria-labelledby="tab-reliability-btn" data-tab-panel="reliability" hidden>
+      <div class="admin-grid" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+        <div class="admin-card">
+          <div class="admin-k">Booking Failures</div>
+          <div class="admin-v bad" id="r-failures">0</div>
+          <div class="admin-sub">Total failures in selected window</div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-k">Failure Rate</div>
+          <div class="admin-v" id="r-failure-rate">0%</div>
+          <div class="admin-sub">Failures divided by submits</div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-k">At-Risk Bookings</div>
+          <div class="admin-v" id="r-risk">0</div>
+          <div class="admin-sub">Estimated recoverable submits</div>
+        </div>
+      </div>
+
+      <div class="admin-panel" style="margin-top:12px">
+        <div class="section-title">Reliability Graph</div>
+        <div class="chart-wrap">
+          <svg id="chart-reliability" class="chart-svg" viewBox="0 0 640 220" role="img" aria-label="Daily submit and failure counts trend"></svg>
+        </div>
+        <div class="chart-legend" id="chart-reliability-legend"></div>
+        <p class="chart-axis-note">Use this graph to detect sudden spikes in booking failures or submit volatility.</p>
+      </div>
+
+      <div class="split-2" style="margin-top:12px">
+        <div class="admin-panel">
+          <div class="section-title">Top Failure Reasons</div>
+          <table class="admin-table">
+            <thead><tr><th>Reason</th><th>Count</th></tr></thead>
+            <tbody id="tbl-failures"></tbody>
+          </table>
+        </div>
+        <div class="admin-panel">
+          <div class="section-title">Daily Reliability Trend</div>
+          <table class="admin-table">
+            <thead><tr><th>Date</th><th>Submits</th><th>Failures</th><th>Failure Rate</th></tr></thead>
+            <tbody id="tbl-reliability-trend"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="tab-field" role="tabpanel" aria-labelledby="tab-field-btn" data-tab-panel="field" hidden>
+      <div class="admin-grid" style="grid-template-columns:repeat(6,minmax(0,1fr))">
+        <div class="admin-card">
+          <div class="admin-k">Doors Knocked</div>
+          <div class="admin-v" id="fs-doors">0</div>
+          <div class="admin-sub">Total door events in window</div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-k">Interested</div>
+          <div class="admin-v" id="fs-interested">0</div>
+          <div class="admin-sub">Callbacks, quotes, and on-door books</div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-k">Interest Rate</div>
+          <div class="admin-v" id="fs-interest-rate">0%</div>
+          <div class="admin-sub">Interested divided by doors</div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-k">On-Door Booked</div>
+          <div class="admin-v" id="fs-ondoor">0</div>
+          <div class="admin-sub">Closed immediately at the door</div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-k">Attributed Bookings</div>
+          <div class="admin-v" id="fs-attrib">0</div>
+          <div class="admin-sub">Bookings tied to rep and lead metadata</div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-k">Overdue Follow-ups</div>
+          <div class="admin-v" id="fs-overdue">0</div>
+          <div class="admin-sub">Open items past scheduled time</div>
+        </div>
+      </div>
+
+      <div class="split-2" style="margin-top:12px">
+        <div class="admin-panel">
+          <div class="section-title">Top Reps</div>
+          <table class="admin-table">
+            <thead><tr><th>Rep</th><th>Doors</th><th>Interested</th><th>Bookings</th><th>Rate</th></tr></thead>
+            <tbody id="tbl-field-reps"></tbody>
+          </table>
+        </div>
+        <div class="admin-panel">
+          <div class="section-title">Daily Field Trend</div>
+          <table class="admin-table">
+            <thead><tr><th>Date</th><th>Doors</th><th>On-Door</th><th>Attributed</th></tr></thead>
+            <tbody id="tbl-field-trend"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="admin-panel" style="margin-top:12px">
+        <div class="section-title">Provision Rep Login</div>
+        <div class="admin-controls" style="grid-template-columns:1fr 1fr 1fr auto">
+          <input id="fs-rep-id" class="inp" type="text" placeholder="rep id (ex: west-team-1)"/>
+          <input id="fs-rep-name" class="inp" type="text" placeholder="Display name"/>
+          <input id="fs-rep-pin" class="inp" type="password" placeholder="PIN (4-12 digits)"/>
+          <button class="button" id="fs-create-rep-btn" type="button">Save Rep</button>
+        </div>
+        <p class="mini-note" id="fs-create-rep-status">Use this to create or rotate a rep PIN for the field console.</p>
+      </div>
+    </section>
+
+  </div>
+</section>
+
+<script>
+(function(){
+  'use strict';
+
+  const API_BASE='https://calcom-proxy.southernutahdetail.workers.dev';
+  const TOKEN_KEY='sud_admin_analytics_token';
+
+  const dayInput=document.getElementById('admin-day');
+  const daysInput=document.getElementById('admin-days');
+  const refreshBtn=document.getElementById('refresh-btn');
+  const signoutBtn=document.getElementById('signout-btn');
+  const navToggle=document.getElementById('admin-nav-toggle');
+  const navMenu=document.getElementById('admin-nav-menu');
+  const navBackdrop=document.getElementById('admin-nav-backdrop');
+  const statusEl=document.getElementById('status');
+  const createRepBtn=document.getElementById('fs-create-rep-btn');
+  const createRepStatus=document.getElementById('fs-create-rep-status');
+  const tabButtons=Array.from(document.querySelectorAll('[data-tab-target]'));
+  const tabPanels=Array.from(document.querySelectorAll('[data-tab-panel]'));
+
+  const setText=(id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=String(val); };
+  const setClass=(id,className)=>{ const el=document.getElementById(id); if(el) el.className=className; };
+  const fmtNum=n=>Number.isFinite(Number(n))?Number(n).toLocaleString('en-US'):'0';
+  const pct=(a,b)=>b>0?(a/b)*100:0;
+
+  function today(){
+    const d=new Date();
+    return d.toISOString().slice(0,10);
+  }
+
+  function getToken(){
+    try{return sessionStorage.getItem(TOKEN_KEY)||'';}catch(_e){return '';}
+  }
+
+  function redirectToSignIn(reason){
+    const q=reason?`?reason=${encodeURIComponent(reason)}`:'';
+    window.location.href=`/admin-signin.html${q}`;
+  }
+
+  function setStatus(msg,isErr){
+    statusEl.textContent=msg;
+    statusEl.style.color=isErr?'#ff7070':'var(--tx2)';
+  }
+
+  function activateTab(name){
+    tabButtons.forEach((btn)=>{
+      const active=btn.dataset.tabTarget===name;
+      btn.classList.toggle('active',active);
+      btn.setAttribute('aria-selected',active?'true':'false');
+    });
+    tabPanels.forEach((panel)=>{
+      panel.hidden=panel.dataset.tabPanel!==name;
+    });
+  }
+
+  function setMenuOpen(open){
+    if(!navMenu||!navToggle) return;
+    navMenu.classList.toggle('open',open);
+    navToggle.setAttribute('aria-expanded',open?'true':'false');
+    document.body.classList.toggle('menu-open',open);
+  }
+
+  function sumTrend(rows){
+    return rows.reduce((acc,row)=>{
+      acc.pageViews += Number(row.pageViews||0);
+      acc.ctaClicks += Number(row.ctaClicks||0);
+      acc.submits += Number(row.submits||0);
+      acc.confirmed += Number(row.confirmed||0);
+      acc.failures += Number(row.failures||0);
+      return acc;
+    }, { pageViews:0, ctaClicks:0, submits:0, confirmed:0, failures:0 });
+  }
+
+  function renderMetricTone(id,val,goodAt,warnAt,isReverse){
+    const base='admin-v';
+    let tone='';
+    if(isReverse){
+      if(val<=goodAt) tone=' good';
+      else if(val>=warnAt) tone=' bad';
+      else tone=' warn';
+    }else{
+      if(val>=goodAt) tone=' good';
+      else if(val<=warnAt) tone=' bad';
+      else tone=' warn';
+    }
+    setClass(id,base + tone);
+  }
+
+  function shortDateLabel(isoDate){
+    const d=new Date(`${isoDate}T00:00:00`);
+    if(!Number.isFinite(d.getTime())) return String(isoDate||'');
+    return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  }
+
+  function renderMultiLineChart(svgId, legendId, labels, datasets, options){
+    const svg=document.getElementById(svgId);
+    const legend=document.getElementById(legendId);
+    if(!svg||!legend) return;
+
+    if(!labels.length||!datasets.length){
+      svg.innerHTML='<rect x="0" y="0" width="640" height="220" fill="transparent"></rect><text x="320" y="115" text-anchor="middle" fill="var(--tx2)" font-size="14">No trend data yet</text>';
+      legend.innerHTML='';
+      return;
+    }
+
+    const width=640;
+    const height=220;
+    const pad={l:44,r:12,t:12,b:28};
+    const steps=Math.max(labels.length-1,1);
+    const maxFromData=datasets.reduce((m,ds)=>Math.max(m,...ds.values.map((n)=>Number(n)||0)),0);
+    const maxY=Math.max(1,options&&options.maxY?Number(options.maxY):maxFromData);
+
+    const xAt=(i)=>pad.l+((width-pad.l-pad.r)*(i/steps));
+    const yAt=(v)=>{
+      const ratio=Math.max(0,Math.min(1,(Number(v)||0)/maxY));
+      return pad.t+((height-pad.t-pad.b)*(1-ratio));
+    };
+
+    let out='<rect x="0" y="0" width="640" height="220" fill="transparent"></rect>';
+
+    for(let i=0;i<=4;i++){
+      const y=pad.t+((height-pad.t-pad.b)*(i/4));
+      const value=maxY*(1-(i/4));
+      const label=(options&&options.percent)?`${value.toFixed(0)}%`:fmtNum(Math.round(value));
+      out += `<line x1="${pad.l}" y1="${y}" x2="${width-pad.r}" y2="${y}" stroke="rgba(255,255,255,.08)" stroke-width="1"></line>`;
+      out += `<text x="${pad.l-6}" y="${y+4}" text-anchor="end" fill="var(--tx3)" font-size="10">${label}</text>`;
+    }
+
+    const xLabelIdx=[0,Math.floor((labels.length-1)/2),labels.length-1].filter((v,i,a)=>a.indexOf(v)===i);
+    xLabelIdx.forEach((idx)=>{
+      out += `<text x="${xAt(idx)}" y="${height-8}" text-anchor="middle" fill="var(--tx3)" font-size="10">${escapeHtml(labels[idx])}</text>`;
+    });
+
+    datasets.forEach((ds)=>{
+      if(!ds.values.length) return;
+      const points=ds.values.map((v,i)=>`${xAt(i)},${yAt(v)}`).join(' ');
+      out += `<polyline points="${points}" fill="none" stroke="${ds.color}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"></polyline>`;
+      const lastIdx=ds.values.length-1;
+      out += `<circle cx="${xAt(lastIdx)}" cy="${yAt(ds.values[lastIdx])}" r="3.3" fill="${ds.color}"></circle>`;
+    });
+
+    svg.innerHTML=out;
+    legend.innerHTML=datasets.map((ds)=>`<span class="legend-item"><span class="legend-dot" style="background:${ds.color}"></span>${escapeHtml(ds.name)}</span>`).join('');
+  }
+
+  async function fetchJsonWithFallback(endpoints, token){
+    let res=null;
+    for(const ep of endpoints){
+      try{
+        const r=await fetch(ep,{headers:{'x-admin-token':token}});
+        if(r.status===404) continue;
+        res=r;
+        break;
+      }catch(_e){}
+    }
+
+    if(!res) return {error:'Could not reach analytics endpoint.'};
+    if(res.status===401||res.status===403) return {authExpired:true};
+    if(!res.ok){
+      let text='';
+      try{text=await res.text();}catch(_e){}
+      return {error:`Request failed (${res.status}): ${String(text).slice(0,120)}`};
+    }
+
+    const data=await res.json();
+    return {data};
+  }
+
+  function setCreateRepStatus(msg,isErr){
+    if(!createRepStatus) return;
+    createRepStatus.textContent=msg;
+    createRepStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
+  }
+
+  async function createRep(){
+    const token=getToken();
+    if(!token){
+      redirectToSignIn('auth-required');
+      return;
+    }
+
+    const repId=(document.getElementById('fs-rep-id')?.value||'').trim();
+    const displayName=(document.getElementById('fs-rep-name')?.value||'').trim();
+    const pin=(document.getElementById('fs-rep-pin')?.value||'').trim();
+    if(!displayName||!pin){
+      setCreateRepStatus('Display name and PIN are required.',true);
+      return;
+    }
+
+    createRepBtn.disabled=true;
+    setCreateRepStatus('Saving rep...',false);
+    try{
+      const res=await fetch(`${API_BASE}/admin/field/reps`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-admin-token':token},
+        body:JSON.stringify({repId,displayName,pin})
+      });
+      const data=await res.json().catch(()=>null);
+      if(res.status===401||res.status===403){
+        try{ sessionStorage.removeItem(TOKEN_KEY); }catch(_e){}
+        redirectToSignIn('session-expired');
+        return;
+      }
+      if(!res.ok){
+        setCreateRepStatus((data&&data.error)||`Save failed (${res.status})`,true);
+        return;
+      }
+      const id=(data&&data.rep&&data.rep.id)||repId||'rep';
+      setCreateRepStatus(`Rep saved: ${id}`,false);
+      const pinInput=document.getElementById('fs-rep-pin');
+      if(pinInput) pinInput.value='';
+      await fetchAnalytics();
+    }catch(err){
+      setCreateRepStatus(String(err&&err.message?err.message:'Save failed'),true);
+    } finally {
+      createRepBtn.disabled=false;
+    }
+  }
+
+  async function fetchAnalytics(){
+    const token=getToken();
+    if(!token){
+      redirectToSignIn('auth-required');
+      return;
+    }
+
+    const day=dayInput.value||today();
+    const days=daysInput.value||'7';
+
+    const endpoints=[
+      `${API_BASE}/admin/analytics?day=${encodeURIComponent(day)}&days=${encodeURIComponent(days)}`,
+      `${API_BASE}/api/admin/analytics?day=${encodeURIComponent(day)}&days=${encodeURIComponent(days)}`
+    ];
+
+    const fieldEndpoints=[
+      `${API_BASE}/admin/field/summary?day=${encodeURIComponent(day)}&days=${encodeURIComponent(days)}`,
+      `${API_BASE}/api/admin/field/summary?day=${encodeURIComponent(day)}&days=${encodeURIComponent(days)}`
+    ];
+
+    const [analyticsRes, fieldRes]=await Promise.all([
+      fetchJsonWithFallback(endpoints, token),
+      fetchJsonWithFallback(fieldEndpoints, token)
+    ]);
+
+    if(analyticsRes.authExpired||fieldRes.authExpired){
+      try{ sessionStorage.removeItem(TOKEN_KEY); }catch(_e){}
+      redirectToSignIn('session-expired');
+      return;
+    }
+
+    if(analyticsRes.error){
+      setStatus(analyticsRes.error,true);
+      return;
+    }
+
+    render(analyticsRes.data, day, Number(days));
+    renderFieldSales(fieldRes.data || null);
+    setStatus(`Updated ${new Date().toLocaleString('en-US')}`,false);
+  }
+
+  function renderRows(tbodyId, rows, noDataLabel){
+    const tb=document.getElementById(tbodyId);
+    if(!tb) return;
+    if(!rows||!rows.length){
+      tb.innerHTML=`<tr><td colspan="2">${escapeHtml(noDataLabel||'No data yet')}</td></tr>`;
+      return;
+    }
+    tb.innerHTML=rows.map(r=>`<tr><td>${escapeHtml(r.key||'')}</td><td>${fmtNum(r.count||0)}</td></tr>`).join('');
+  }
+
+  function renderTrend(rows){
+    const tb=document.getElementById('tbl-trend');
+    if(!tb) return;
+    if(!rows||!rows.length){
+      tb.innerHTML='<tr><td colspan="6">No trend data yet</td></tr>';
+      return;
+    }
+    tb.innerHTML=rows.map(r=>{
+      const rate=(r.submits||0)>0?((r.confirmed||0)/(r.submits||1)*100):0;
+      return `<tr>
+        <td>${escapeHtml(r.date||'')}</td>
+        <td>${fmtNum(r.pageViews||0)}</td>
+        <td>${fmtNum(r.ctaClicks||0)}</td>
+        <td>${fmtNum(r.submits||0)}</td>
+        <td>${fmtNum(r.confirmed||0)}</td>
+        <td>${rate.toFixed(1)}%</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function renderReliabilityTrend(rows){
+    const tb=document.getElementById('tbl-reliability-trend');
+    if(!tb) return;
+    if(!rows||!rows.length){
+      tb.innerHTML='<tr><td colspan="4">No reliability trend data yet</td></tr>';
+      return;
+    }
+    tb.innerHTML=rows.map(r=>{
+      const rate=pct(Number(r.failures||0), Number(r.submits||0));
+      return `<tr>
+        <td>${escapeHtml(r.date||'')}</td>
+        <td>${fmtNum(r.submits||0)}</td>
+        <td>${fmtNum(r.failures||0)}</td>
+        <td>${rate.toFixed(1)}%</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function renderFieldSales(data){
+    if(!data||typeof data!=='object'){
+      setText('fs-doors',0);
+      setText('fs-interested',0);
+      setText('fs-interest-rate','0%');
+      setText('fs-ondoor',0);
+      setText('fs-attrib',0);
+      setText('fs-overdue',0);
+      renderFieldRepRows([]);
+      renderFieldTrendRows([]);
+      return;
+    }
+
+    const s=data.summary||{};
+    setText('fs-doors',fmtNum(s.doors||0));
+    setText('fs-interested',fmtNum(s.interested||0));
+    setText('fs-interest-rate',`${Number(s.interestRate||0).toFixed(1)}%`);
+    setText('fs-ondoor',fmtNum(s.onDoorBooked||0));
+    setText('fs-attrib',fmtNum(s.attributedBookings||0));
+    setText('fs-overdue',fmtNum(s.overdueFollowups||0));
+
+    renderFieldRepRows(Array.isArray(data.topReps)?data.topReps:[]);
+    renderFieldTrendRows(Array.isArray(data.trend)?data.trend:[]);
+  }
+
+  function renderFieldRepRows(rows){
+    const tb=document.getElementById('tbl-field-reps');
+    if(!tb) return;
+    if(!rows.length){
+      tb.innerHTML='<tr><td colspan="5">No field rep data yet</td></tr>';
+      return;
+    }
+    tb.innerHTML=rows.map((r)=>`<tr>
+      <td>${escapeHtml(r.displayName||r.id||'Rep')}</td>
+      <td>${fmtNum(r.doors||0)}</td>
+      <td>${fmtNum(r.interested||0)}</td>
+      <td>${fmtNum(r.attributedBookings||0)}</td>
+      <td>${Number(r.interestRate||0).toFixed(1)}%</td>
+    </tr>`).join('');
+  }
+
+  function renderFieldTrendRows(rows){
+    const tb=document.getElementById('tbl-field-trend');
+    if(!tb) return;
+    if(!rows.length){
+      tb.innerHTML='<tr><td colspan="4">No field trend data yet</td></tr>';
+      return;
+    }
+    tb.innerHTML=rows.map((r)=>`<tr>
+      <td>${escapeHtml(r.date||'')}</td>
+      <td>${fmtNum(r.doors||0)}</td>
+      <td>${fmtNum(r.onDoorBooked||0)}</td>
+      <td>${fmtNum(r.attributedBookings||0)}</td>
+    </tr>`).join('');
+  }
+
+  function riskLabel(metrics){
+    if(metrics.failureRate >= 20 || metrics.closeRate < 50) return 'High';
+    if(metrics.failureRate >= 10 || metrics.closeRate < 60) return 'Moderate';
+    return 'Low';
+  }
+
+  function render(data, day, days){
+    const trend=Array.isArray(data.trend)?data.trend:[];
+    const totals=sumTrend(trend);
+    const intentRate=pct(totals.ctaClicks, totals.pageViews);
+    const submitFromIntentRate=pct(totals.submits, totals.ctaClicks);
+    const closeRate=pct(totals.confirmed, totals.submits);
+    const failureRate=pct(totals.failures, totals.submits);
+    const metrics={ intentRate, submitFromIntentRate, closeRate, failureRate };
+
+    setText('ctx-window', `Window: ${days} day(s) ending ${day}`);
+    setText('ctx-traffic', `Traffic quality: ${intentRate.toFixed(1)}% intent`);
+    setText('ctx-close', `Close rate: ${closeRate.toFixed(1)}%`);
+    setText('ctx-risk', `Operational risk: ${riskLabel(metrics)}`);
+
+    setText('k-pageviews',fmtNum(totals.pageViews));
+    setText('k-ctaclicks',fmtNum(totals.ctaClicks));
+    setText('k-intent',`${intentRate.toFixed(1)}%`);
+    setText('k-submits',fmtNum(totals.submits));
+    setText('k-confirmed',fmtNum(totals.confirmed));
+    setText('k-rate',`${closeRate.toFixed(1)}%`);
+
+    renderMetricTone('k-intent',intentRate,5,2,false);
+    renderMetricTone('k-rate',closeRate,60,45,false);
+
+    setText('f-visitors',fmtNum(totals.pageViews));
+    setText('f-intent',fmtNum(totals.ctaClicks));
+    setText('f-submit',fmtNum(totals.submits));
+    setText('f-confirmed',fmtNum(totals.confirmed));
+    setText('f-intent-rate',`${intentRate.toFixed(1)}% of visitors`);
+    setText('f-submit-rate',`${submitFromIntentRate.toFixed(1)}% of intent`);
+    setText('f-confirmed-rate',`${closeRate.toFixed(1)}% of submit`);
+    setText('funnel-summary', `From ${fmtNum(totals.pageViews)} visitors, ${fmtNum(totals.confirmed)} converted to confirmed bookings in this window.`);
+
+    setText('r-failures',fmtNum(totals.failures));
+    setText('r-failure-rate',`${failureRate.toFixed(1)}%`);
+    setText('r-risk',fmtNum(Math.max(0, totals.submits - totals.confirmed)));
+    renderMetricTone('r-failure-rate',failureRate,5,15,true);
+
+    const acqReadout=document.getElementById('acq-readout');
+    if(acqReadout){
+      acqReadout.textContent=`In the selected window, ${fmtNum(totals.ctaClicks)} users clicked CTAs from ${fmtNum(totals.pageViews)} views (${intentRate.toFixed(1)}% intent rate). Focus on top CTA variants and top-selected services to improve upstream quality.`;
+    }
+
+    renderRows('tbl-ctas', data.top&&data.top.ctas ? data.top.ctas : [], 'No CTA data yet');
+    renderRows('tbl-services', data.top&&data.top.services ? data.top.services : [], 'No service data yet');
+    renderRows('tbl-services-overview', data.top&&data.top.services ? data.top.services : [], 'No service data yet');
+    renderRows('tbl-failures', data.top&&data.top.failureReasons ? data.top.failureReasons : [], 'No failure reasons yet');
+
+    const labels=trend.map((r)=>shortDateLabel(r.date||''));
+    renderMultiLineChart('chart-volume','chart-volume-legend',labels,[
+      { name:'Visitors', color:'#83b6ff', values:trend.map((r)=>Number(r.pageViews||0)) },
+      { name:'Intent Clicks', color:'#ffce7a', values:trend.map((r)=>Number(r.ctaClicks||0)) },
+      { name:'Submits', color:'#7fe6a8', values:trend.map((r)=>Number(r.submits||0)) },
+      { name:'Confirmed', color:'#ff7b7b', values:trend.map((r)=>Number(r.confirmed||0)) }
+    ]);
+    renderMultiLineChart('chart-rate','chart-rate-legend',labels,[
+      { name:'Intent Rate', color:'#83b6ff', values:trend.map((r)=>pct(Number(r.ctaClicks||0),Number(r.pageViews||0))) },
+      { name:'Close Rate', color:'#7fe6a8', values:trend.map((r)=>pct(Number(r.confirmed||0),Number(r.submits||0))) },
+      { name:'Failure Rate', color:'#ff7b7b', values:trend.map((r)=>pct(Number(r.failures||0),Number(r.submits||0))) }
+    ], { maxY:100, percent:true });
+    renderMultiLineChart('chart-reliability','chart-reliability-legend',labels,[
+      { name:'Submits', color:'#7fe6a8', values:trend.map((r)=>Number(r.submits||0)) },
+      { name:'Failures', color:'#ff7b7b', values:trend.map((r)=>Number(r.failures||0)) }
+    ]);
+
+    renderTrend(trend);
+    renderReliabilityTrend(trend);
+  }
+
+  function escapeHtml(str){
+    return String(str||'')
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'",'&#39;');
+  }
+
+  dayInput.value=today();
+  navToggle?.addEventListener('click',()=>{
+    setMenuOpen(!(navMenu&&navMenu.classList.contains('open')));
+  });
+  navBackdrop?.addEventListener('click',()=>setMenuOpen(false));
+  tabButtons.forEach((btn)=>{
+    btn.addEventListener('click',()=>{
+      activateTab(btn.dataset.tabTarget||'overview');
+      if(window.matchMedia('(max-width: 767px)').matches){
+        setMenuOpen(false);
+      }
+    });
+  });
+
+  refreshBtn.addEventListener('click',fetchAnalytics);
+  createRepBtn?.addEventListener('click',createRep);
+  signoutBtn?.addEventListener('click',()=>{
+    setMenuOpen(false);
+    try{ sessionStorage.removeItem(TOKEN_KEY); }catch(_e){}
+    redirectToSignIn('signed-out');
+  });
+
+  activateTab('overview');
+  fetchAnalytics();
+})();
+</script>
+</body>
+</html>

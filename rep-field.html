@@ -1,0 +1,1091 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Field Rep Console · Southern Utah Detailing</title>
+  <meta name="robots" content="noindex,nofollow"/>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <link rel="stylesheet" href="/css/components.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+  <style>
+    .rep-shell{max-width:980px;margin:0 auto;padding:22px}
+    .rep-card{background:var(--srf);border:1px solid var(--bdr);border-radius:var(--r);padding:14px}
+    .rep-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .rep-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+    .rep-kpi{background:var(--srf);border:1px solid var(--bdr);border-radius:10px;padding:10px}
+    .rep-k{font-size:.67rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .rep-v{font-size:1.2rem;font-weight:800;color:var(--tx);margin-top:4px}
+    .rep-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .rep-status{margin-top:8px;font-size:.83rem;color:var(--tx2)}
+    .rep-list{display:grid;gap:8px}
+    .rep-item{border:1px solid var(--bdr);border-radius:10px;background:var(--srf2);padding:10px}
+    .rep-item h4{margin:0 0 6px;font-size:.9rem}
+    .rep-item p{margin:0;font-size:.8rem;color:var(--tx2)}
+    .rep-hidden{display:none}
+    .rep-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .rep-note{font-size:.8rem;color:var(--tx2);margin-top:6px}
+    .rep-map{height:320px;border:1px solid var(--bdr);border-radius:10px;overflow:hidden;background:#e5e7eb}
+    .rep-map-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .rep-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--bdr);border-radius:999px;background:var(--srf2);font-size:.75rem;color:var(--tx2)}
+    .rep-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .rep-legend-item{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--bdr);border-radius:999px;background:var(--srf2);font-size:.74rem;color:var(--tx2)}
+    .rep-legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+    .rep-slots{display:grid;gap:8px;margin-top:10px}
+    .rep-slot-item{border:1px solid var(--bdr);border-radius:10px;background:var(--srf2);padding:10px}
+    .rep-slot-date{font-size:.84rem;font-weight:700;color:var(--tx)}
+    .rep-slot-times{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+    .rep-slot-time{font-size:.74rem;padding:3px 8px;border-radius:999px;border:1px solid var(--bdr);background:var(--srf)}
+    .rep-modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:5000;padding:14px}
+    .rep-modal-backdrop.open{display:flex}
+    .rep-modal{position:relative;z-index:5001;width:min(460px,100%);background:var(--srf);border:1px solid var(--bdr);border-radius:14px;padding:14px;box-shadow:0 16px 38px rgba(0,0,0,.24)}
+    .rep-modal h3{margin:0 0 6px}
+    .rep-modal p{margin:0;color:var(--tx2);font-size:.86rem}
+    .rep-quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+    .rep-quick-grid.guard{pointer-events:none}
+    .rep-quick-btn{padding:10px;border-radius:10px;border:1px solid var(--bdr);background:var(--srf2);font-weight:700;color:var(--tx);cursor:pointer}
+    .rep-quick-btn:disabled{opacity:.55;cursor:not-allowed}
+    .rep-quick-btn:hover{border-color:var(--red);color:var(--red)}
+    .rep-modal-actions{display:flex;justify-content:space-between;gap:8px;margin-top:12px}
+    @media(max-width:980px){
+      .rep-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+      .rep-grid,.rep-row{grid-template-columns:1fr}
+    }
+    @media(max-width:640px){
+      .rep-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .rep-map{height:260px}
+      .rep-quick-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+<header class="header" id="site-header">
+  <div class="container nav">
+    <a href="/index.html" class="nav-brand">
+      <img src="/images/Logo.PNG" alt="So.U.Detail logo" class="nav-logo"/>
+      Southern Utah Detailing
+    </a>
+    <div class="nav-spacer"></div>
+    <div class="nav-actions" style="display:flex;gap:8px;align-items:center">
+      <a class="button outline" href="/admin-signin.html">Admin</a>
+      <button class="button outline rep-hidden" id="rep-logout-btn" type="button">Sign Out</button>
+    </div>
+  </div>
+</header>
+
+<section class="section" style="padding-top:34px">
+  <div class="rep-shell">
+    <span class="eyebrow">Field Sales</span>
+    <h1 class="h2" style="margin-top:6px">Rep Console</h1>
+    <p class="muted" style="font-size:.9rem">Log doors quickly, schedule follow-ups, and generate rep-attributed booking links.</p>
+
+    <div class="rep-card" id="rep-login-card">
+      <div class="rep-row">
+        <div>
+          <label for="rep-id">Rep ID</label>
+          <input id="rep-id" class="inp" type="text" autocomplete="username" placeholder="rep id"/>
+        </div>
+        <div>
+          <label for="rep-pin">PIN</label>
+          <input id="rep-pin" class="inp" type="password" autocomplete="current-password" placeholder="4 to 12 digits"/>
+        </div>
+      </div>
+      <div class="rep-actions" style="margin-top:10px">
+        <button class="button" id="rep-login-btn" type="button">Sign In</button>
+      </div>
+      <div class="rep-status" id="rep-login-status">Waiting for sign in...</div>
+    </div>
+
+    <div id="rep-app" class="rep-hidden">
+      <div class="rep-card" style="margin-top:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+          <div>
+            <div class="rep-k">Signed In As</div>
+            <div class="rep-v" id="rep-name">Rep</div>
+          </div>
+          <div class="rep-actions">
+            <button class="button outline" id="rep-refresh-btn" type="button">Refresh</button>
+            <a class="button outline" id="rep-book-link" href="/booking.html">Open Booking</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="rep-kpis" style="margin-top:12px">
+        <div class="rep-kpi"><div class="rep-k">Doors</div><div class="rep-v" id="k-doors">0</div></div>
+        <div class="rep-kpi"><div class="rep-k">Interested</div><div class="rep-v" id="k-interested">0</div></div>
+        <div class="rep-kpi"><div class="rep-k">On-Door Booked</div><div class="rep-v" id="k-ondoor">0</div></div>
+        <div class="rep-kpi"><div class="rep-k">Attributed Bookings</div><div class="rep-v" id="k-attrib">0</div></div>
+        <div class="rep-kpi"><div class="rep-k">Open Follow-ups</div><div class="rep-v" id="k-open">0</div></div>
+        <div class="rep-kpi"><div class="rep-k">Overdue Follow-ups</div><div class="rep-v" id="k-overdue">0</div></div>
+      </div>
+
+      <div class="rep-grid" style="margin-top:12px">
+        <div class="rep-card">
+          <div class="section-title">Map Quick Log</div>
+          <p class="rep-note">Tap and hold on the map to place a pin, then choose outcome: Not Home, Not Interested, Call Back, or Sale Made.</p>
+          <div id="rep-map" class="rep-map" aria-label="Rep route map"></div>
+          <div class="rep-map-meta">
+            <div class="rep-chip" id="map-pin-label">No pin selected</div>
+            <div class="rep-actions">
+              <button class="button outline" id="map-my-location-btn" type="button">Use My Location</button>
+              <button class="button outline" id="map-clear-btn" type="button">Clear Pin</button>
+            </div>
+          </div>
+          <div class="rep-status" id="map-status">Map ready. Press and hold to drop a pin.</div>
+          <div class="rep-note" id="map-history-status">Map activity not loaded yet.</div>
+          <div class="rep-legend" id="map-legend"></div>
+        </div>
+
+        <div class="rep-card">
+          <div class="section-title">Live Schedule</div>
+          <p class="rep-note">Real-time availability from Cal.com so reps can confirm open slots before promising times.</p>
+          <div class="rep-row">
+            <div>
+              <label for="sched-service">Service</label>
+              <select id="sched-service" class="sel">
+                <option value="basic-detail">Basic Detail</option>
+                <option value="standard-detail" selected>Standard Detail</option>
+                <option value="premium-detail">Premium Detail</option>
+              </select>
+            </div>
+            <div>
+              <label for="sched-days">Window</label>
+              <select id="sched-days" class="sel">
+                <option value="3">Next 3 Days</option>
+                <option value="7" selected>Next 7 Days</option>
+                <option value="14">Next 14 Days</option>
+              </select>
+            </div>
+          </div>
+          <div class="rep-actions" style="margin-top:10px">
+            <button class="button" id="sched-refresh-btn" type="button">Refresh Schedule</button>
+            <a class="button outline" id="sched-open-booking" href="/booking.html" target="_blank" rel="noopener">Open Booking Calendar</a>
+          </div>
+          <div class="rep-status" id="sched-status">Ready to load live availability.</div>
+          <div class="rep-slots" id="sched-list">
+            <div class="rep-slot-item">
+              <div class="rep-slot-date">No schedule loaded yet</div>
+              <div class="rep-note">Tap Refresh Schedule to pull latest availability.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rep-grid" style="margin-top:12px">
+        <div class="rep-card">
+          <div class="section-title">Log Door Event</div>
+          <div class="rep-row">
+            <div>
+              <label for="de-outcome">Outcome</label>
+              <select id="de-outcome" class="sel">
+                <option value="no_answer">No Answer</option>
+                <option value="not_interested">Not Interested</option>
+                <option value="interested_callback">Interested / Callback</option>
+                <option value="quote_requested">Quote Requested</option>
+                <option value="booked_on_door">Booked On Door</option>
+                <option value="bad_address">Bad Address</option>
+              </select>
+            </div>
+            <div>
+              <label for="de-service">Service Interest</label>
+              <select id="de-service" class="sel">
+                <option value="">None</option>
+                <option value="basic-detail">Basic Detail</option>
+                <option value="standard-detail">Standard Detail</option>
+                <option value="premium-detail">Premium Detail</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="rep-row" style="margin-top:10px">
+            <div>
+              <label for="de-address">Address</label>
+              <input id="de-address" class="inp" type="text" placeholder="123 Main St"/>
+            </div>
+            <div>
+              <label for="de-city">City</label>
+              <input id="de-city" class="inp" type="text" placeholder="Cedar City"/>
+            </div>
+          </div>
+          <input id="de-lat" type="hidden"/>
+          <input id="de-lng" type="hidden"/>
+          <div class="rep-note" id="de-coord-note">No pinned coordinates linked.</div>
+
+          <div class="rep-row" style="margin-top:10px">
+            <div>
+              <label for="de-lead-name">Lead First Name</label>
+              <input id="de-lead-name" class="inp" type="text" placeholder="Jane"/>
+            </div>
+            <div>
+              <label for="de-lead-phone">Lead Phone</label>
+              <input id="de-lead-phone" class="inp" type="tel" placeholder="(435) 555-0100"/>
+            </div>
+          </div>
+
+          <div style="margin-top:10px">
+            <label for="de-notes">Notes</label>
+            <textarea id="de-notes" class="inp" rows="3" placeholder="Quick notes for follow-up"></textarea>
+          </div>
+
+          <div class="rep-row" style="margin-top:10px">
+            <div>
+              <label><input type="checkbox" id="de-followup"/> Needs Follow-up</label>
+            </div>
+            <div>
+              <label for="de-followup-date">Follow-up Date/Time</label>
+              <input id="de-followup-date" class="inp" type="datetime-local"/>
+            </div>
+          </div>
+
+          <div class="rep-actions" style="margin-top:10px">
+            <button class="button" id="de-save-btn" type="button">Save Door Event</button>
+          </div>
+          <div class="rep-status" id="de-status">Ready.</div>
+        </div>
+
+        <div class="rep-card">
+          <div class="section-title">Follow-up Queue</div>
+          <div class="rep-list" id="rep-pipeline-list">
+            <div class="rep-item"><h4>No follow-ups yet</h4><p>Items you schedule will appear here.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rep-modal-backdrop" id="map-modal" aria-hidden="true">
+  <div class="rep-modal" role="dialog" aria-modal="true" aria-labelledby="map-modal-title">
+    <h3 id="map-modal-title">Quick Outcome</h3>
+    <p id="map-modal-address">Pinned location selected.</p>
+    <div class="rep-quick-grid">
+      <button class="rep-quick-btn" type="button" data-quick-outcome="not_home">Not Home</button>
+      <button class="rep-quick-btn" type="button" data-quick-outcome="not_interested">Not Interested</button>
+      <button class="rep-quick-btn" type="button" data-quick-outcome="call_back">Call Back</button>
+      <button class="rep-quick-btn" type="button" data-quick-outcome="sale_made">Sale Made</button>
+    </div>
+    <div class="rep-modal-actions">
+      <button class="button outline" id="map-modal-full-form" type="button">Use Full Form</button>
+      <button class="button outline" id="map-modal-close" type="button">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+<script>
+(function(){
+  'use strict';
+
+  const API_BASE='https://calcom-proxy.southernutahdetail.workers.dev';
+  const TOKEN_KEY='sud_rep_session_token';
+  const REP_KEY='sud_rep_profile';
+  const MAP_HOLD_MS=600;
+  const MODAL_OPEN_DELAY_MS=350;
+  const MODAL_TAP_GUARD_MS=450;
+  const MAP_HISTORY_DAYS=30;
+  const QUICK_OUTCOMES={
+    not_home:{label:'Not Home',outcome:'no_answer',wantsFollowup:false,followupHours:0,note:'Quick map log: no one answered.'},
+    not_interested:{label:'Not Interested',outcome:'not_interested',wantsFollowup:false,followupHours:0,note:'Quick map log: not interested.'},
+    call_back:{label:'Call Back',outcome:'interested_callback',wantsFollowup:true,followupHours:4,note:'Quick map log: requested callback.'},
+    sale_made:{label:'Sale Made',outcome:'booked_on_door',wantsFollowup:false,followupHours:0,note:'Quick map log: booked on door.'}
+  };
+  const OUTCOME_MAP_META={
+    no_answer:{label:'Not Home',color:'#64748b'},
+    not_interested:{label:'Not Interested',color:'#ef4444'},
+    interested_callback:{label:'Call Back',color:'#f59e0b'},
+    quote_requested:{label:'Quote Requested',color:'#0ea5e9'},
+    booked_on_door:{label:'Sale Made',color:'#22c55e'},
+    bad_address:{label:'Bad Address',color:'#8b5cf6'}
+  };
+
+  const loginCard=document.getElementById('rep-login-card');
+  const appWrap=document.getElementById('rep-app');
+  const loginBtn=document.getElementById('rep-login-btn');
+  const logoutBtn=document.getElementById('rep-logout-btn');
+  const refreshBtn=document.getElementById('rep-refresh-btn');
+  const saveDoorBtn=document.getElementById('de-save-btn');
+  const loginStatus=document.getElementById('rep-login-status');
+  const doorStatus=document.getElementById('de-status');
+  const pipelineList=document.getElementById('rep-pipeline-list');
+  const bookLink=document.getElementById('rep-book-link');
+  const coordNote=document.getElementById('de-coord-note');
+  const mapEl=document.getElementById('rep-map');
+  const mapStatus=document.getElementById('map-status');
+  const mapHistoryStatus=document.getElementById('map-history-status');
+  const mapLegend=document.getElementById('map-legend');
+  const mapPinLabel=document.getElementById('map-pin-label');
+  const mapMyLocationBtn=document.getElementById('map-my-location-btn');
+  const mapClearBtn=document.getElementById('map-clear-btn');
+  const mapModal=document.getElementById('map-modal');
+  const mapModalAddress=document.getElementById('map-modal-address');
+  const mapModalClose=document.getElementById('map-modal-close');
+  const mapModalFullForm=document.getElementById('map-modal-full-form');
+  const quickGrid=document.querySelector('.rep-quick-grid');
+  const quickOutcomeButtons=document.querySelectorAll('[data-quick-outcome]');
+  const schedService=document.getElementById('sched-service');
+  const schedDays=document.getElementById('sched-days');
+  const schedRefreshBtn=document.getElementById('sched-refresh-btn');
+  const schedStatus=document.getElementById('sched-status');
+  const schedList=document.getElementById('sched-list');
+  const schedOpenBooking=document.getElementById('sched-open-booking');
+  const deService=document.getElementById('de-service');
+
+  let repMap=null;
+  let repMarker=null;
+  let mapHistoryLayer=null;
+  let mapHoldTimer=null;
+  let mapInitialized=false;
+  let latestPin=null;
+  let latestPinSeq=0;
+  let modalOpenDelayTimer=null;
+  let modalTapGuardUntil=0;
+  let modalTapGuardTimer=null;
+
+  function getToken(){
+    try{return sessionStorage.getItem(TOKEN_KEY)||'';}catch(_e){return '';}
+  }
+
+  function getRep(){
+    try{
+      const raw=sessionStorage.getItem(REP_KEY)||'';
+      return raw?JSON.parse(raw):null;
+    }catch(_e){
+      return null;
+    }
+  }
+
+  function setRepSession(token, rep){
+    try{
+      sessionStorage.setItem(TOKEN_KEY, token||'');
+      sessionStorage.setItem(REP_KEY, JSON.stringify(rep||{}));
+    }catch(_e){}
+  }
+
+  function clearRepSession(){
+    try{
+      sessionStorage.removeItem(TOKEN_KEY);
+      sessionStorage.removeItem(REP_KEY);
+    }catch(_e){}
+  }
+
+  function setLoginStatus(msg, isErr){
+    loginStatus.textContent=msg;
+    loginStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
+  }
+
+  function setDoorStatus(msg, isErr){
+    doorStatus.textContent=msg;
+    doorStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
+  }
+
+  function setMapStatus(msg, isErr){
+    if(!mapStatus) return;
+    mapStatus.textContent=msg;
+    mapStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
+  }
+
+  function setScheduleStatus(msg, isErr){
+    if(!schedStatus) return;
+    schedStatus.textContent=msg;
+    schedStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
+  }
+
+  function setMapHistoryStatus(msg, isErr){
+    if(!mapHistoryStatus) return;
+    mapHistoryStatus.textContent=msg;
+    mapHistoryStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
+  }
+
+  function val(id){
+    const el=document.getElementById(id);
+    return (el&&typeof el.value==='string'?el.value:'')||'';
+  }
+
+  function setVal(id, value){
+    const el=document.getElementById(id);
+    if(el&&typeof el.value==='string') el.value=value||'';
+  }
+
+  function esc(str){
+    return String(str||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
+  }
+
+  function toYmd(date){
+    const y=date.getFullYear();
+    const m=String(date.getMonth()+1).padStart(2,'0');
+    const d=String(date.getDate()).padStart(2,'0');
+    return `${y}-${m}-${d}`;
+  }
+
+  function formatCoord(n){
+    return Number(n).toFixed(5);
+  }
+
+  function formatDateLabel(dateStr){
+    const dt=new Date(`${dateStr}T12:00:00`);
+    return dt.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  }
+
+  function formatSlotTime(iso){
+    const dt=new Date(iso);
+    if(Number.isNaN(dt.getTime())) return '';
+    return dt.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+  }
+
+  function updateCoordinateNote(){
+    const lat=Number(val('de-lat'));
+    const lng=Number(val('de-lng'));
+    if(coordNote){
+      if(Number.isFinite(lat)&&Number.isFinite(lng)){
+        coordNote.textContent=`Pinned coordinates linked: ${formatCoord(lat)}, ${formatCoord(lng)}`;
+      }else{
+        coordNote.textContent='No pinned coordinates linked.';
+      }
+    }
+  }
+
+  function setBookingLink(url){
+    if(bookLink) bookLink.setAttribute('href',url);
+    if(schedOpenBooking) schedOpenBooking.setAttribute('href',url);
+  }
+
+  function outcomeMeta(outcome){
+    return OUTCOME_MAP_META[outcome] || {label: outcome || 'Unknown', color:'#94a3b8'};
+  }
+
+  function popupAddress(item){
+    return [item.addressLine1||'', item.city||'', item.state||'', item.postalCode||''].filter(Boolean).join(', ');
+  }
+
+  function renderMapLegend(byOutcome, total){
+    if(!mapLegend) return;
+    const entries=Object.keys(OUTCOME_MAP_META)
+      .filter((k)=>Number(byOutcome&&byOutcome[k]||0)>0)
+      .map((k)=>{
+        const meta=outcomeMeta(k);
+        return `<span class="rep-legend-item"><span class="rep-legend-dot" style="background:${meta.color}"></span>${esc(meta.label)} (${Number(byOutcome[k]||0)})</span>`;
+      });
+    if(!entries.length){
+      mapLegend.innerHTML='<span class="rep-legend-item">No mapped events yet</span>';
+      return;
+    }
+    mapLegend.innerHTML=entries.join('')+`<span class="rep-legend-item">Total (${Number(total||0)})</span>`;
+  }
+
+  function markerHtml(item){
+    const meta=outcomeMeta(item.outcome);
+    const when=item.happenedAt?new Date(item.happenedAt).toLocaleString('en-US'):'Unknown time';
+    const addr=popupAddress(item)||'No address';
+    const detail=item.outcomeDetail?esc(item.outcomeDetail):'';
+    return `<div style="min-width:220px">
+      <div style="font-weight:800;color:${meta.color}">${esc(meta.label)}</div>
+      <div style="font-size:.82rem;color:#d1d5db">${esc(when)}</div>
+      <div style="margin-top:6px;font-size:.84rem">${esc(addr)}</div>
+      ${detail?`<div style="margin-top:6px;font-size:.8rem;color:#9ca3af">${detail}</div>`:''}
+    </div>`;
+  }
+
+  async function refreshMapHistory(){
+    if(!repMap||!mapHistoryLayer) return;
+    setMapHistoryStatus('Loading map history...', false);
+    try{
+      const data=await api(`/field/me/map-events?days=${MAP_HISTORY_DAYS}&limit=700`,'GET');
+      const items=(data&&Array.isArray(data.items))?data.items:[];
+      const byOutcome=(data&&data.byOutcome&&typeof data.byOutcome==='object')?data.byOutcome:{};
+
+      mapHistoryLayer.clearLayers();
+      if(!items.length){
+        renderMapLegend({},0);
+        setMapHistoryStatus('No map pins found for selected history window.', false);
+        return;
+      }
+
+      const bounds=[];
+      items.forEach((item)=>{
+        const lat=Number(item.lat);
+        const lng=Number(item.lng);
+        if(!Number.isFinite(lat)||!Number.isFinite(lng)) return;
+        const meta=outcomeMeta(item.outcome);
+        const marker=L.circleMarker([lat,lng],{
+          radius:item.outcome==='booked_on_door'?8:6,
+          color:meta.color,
+          weight:2,
+          fillColor:meta.color,
+          fillOpacity:item.outcome==='booked_on_door'?0.95:0.75
+        });
+        marker.bindPopup(markerHtml(item));
+        marker.addTo(mapHistoryLayer);
+        bounds.push([lat,lng]);
+      });
+
+      renderMapLegend(byOutcome, items.length);
+      setMapHistoryStatus(`Loaded ${items.length} mapped events for last ${MAP_HISTORY_DAYS} days.`, false);
+
+      if(bounds.length && !latestPin){
+        repMap.fitBounds(bounds,{padding:[28,28],maxZoom:16});
+      }
+    }catch(err){
+      setMapHistoryStatus(String(err&&err.message?err.message:'Could not load map history.'), true);
+    }
+  }
+
+  async function api(path, method, body){
+    const token=getToken();
+    const headers={'Content-Type':'application/json'};
+    if(token) headers['x-rep-session']=token;
+    const res=await fetch(API_BASE+path, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined
+    });
+
+    if(res.status===401){
+      clearRepSession();
+      showLogin();
+      throw new Error('Session expired. Please sign in again.');
+    }
+
+    if(!res.ok){
+      let text='';
+      try{text=await res.text();}catch(_e){}
+      throw new Error(text || ('Request failed: '+res.status));
+    }
+
+    if(res.status===204) return null;
+    return await res.json();
+  }
+
+  async function signIn(){
+    const repId=(document.getElementById('rep-id').value||'').trim();
+    const pin=(document.getElementById('rep-pin').value||'').trim();
+    if(!repId||!pin){
+      setLoginStatus('Rep ID and PIN are required.', true);
+      return;
+    }
+
+    loginBtn.disabled=true;
+    setLoginStatus('Signing in...', false);
+    try{
+      const res=await fetch(API_BASE+'/field/auth/login', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({repId, pin})
+      });
+      const data=await res.json().catch(()=>null);
+      if(!res.ok||!data||!data.token){
+        setLoginStatus((data&&data.error) || 'Sign in failed.', true);
+        return;
+      }
+      setRepSession(data.token, data.rep||{});
+      showApp();
+      await Promise.all([refreshData(), refreshSchedule(), refreshMapHistory().catch(()=>null)]);
+      setLoginStatus('Signed in.', false);
+    }catch(err){
+      setLoginStatus(String(err&&err.message?err.message:'Could not sign in'), true);
+    } finally {
+      loginBtn.disabled=false;
+    }
+  }
+
+  async function signOut(){
+    try{ await api('/field/auth/logout','POST'); }catch(_e){}
+    clearRepSession();
+    closeMapModal();
+    showLogin();
+    setLoginStatus('Signed out.', false);
+  }
+
+  function showApp(){
+    const rep=getRep()||{};
+    loginCard.classList.add('rep-hidden');
+    appWrap.classList.remove('rep-hidden');
+    logoutBtn.classList.remove('rep-hidden');
+    document.getElementById('rep-name').textContent=rep.displayName||rep.id||'Rep';
+    const repId=rep.id||'';
+    setBookingLink(`/booking.html?src=field_sales&rep_id=${encodeURIComponent(repId)}`);
+    if(!mapInitialized) initMap();
+  }
+
+  function showLogin(){
+    loginCard.classList.remove('rep-hidden');
+    appWrap.classList.add('rep-hidden');
+    logoutBtn.classList.add('rep-hidden');
+  }
+
+  function renderKpis(summary){
+    const s=summary||{};
+    document.getElementById('k-doors').textContent=String(Number(s.doors||0));
+    document.getElementById('k-interested').textContent=String(Number(s.interested||0));
+    document.getElementById('k-ondoor').textContent=String(Number(s.onDoorBooked||0));
+    document.getElementById('k-attrib').textContent=String(Number(s.attributedBookings||0));
+    document.getElementById('k-open').textContent=String(Number(s.openFollowups||0));
+    document.getElementById('k-overdue').textContent=String(Number(s.overdueFollowups||0));
+  }
+
+  function renderPipeline(items){
+    if(!items||!items.length){
+      pipelineList.innerHTML='<div class="rep-item"><h4>No open follow-ups</h4><p>Great work. Keep logging door outcomes.</p></div>';
+      return;
+    }
+
+    pipelineList.innerHTML=items.slice(0,12).map((it)=>{
+      const nm=[it.firstName||'',it.lastName||''].join(' ').trim()||'Lead';
+      const when=it.scheduledFor?new Date(it.scheduledFor).toLocaleString('en-US'):'No date set';
+      const addr=[it.addressLine1||'',it.city||'',it.state||''].filter(Boolean).join(', ')||'No address';
+      return `<div class="rep-item">
+        <h4>${esc(nm)} · ${esc(it.status||'open')}</h4>
+        <p>${esc(addr)}</p>
+        <p>${esc(when)}</p>
+      </div>`;
+    }).join('');
+  }
+
+  async function refreshData(){
+    const today=await api('/field/me/today','GET');
+    renderKpis(today&&today.summary?today.summary:{});
+    const pipeline=await api('/field/me/pipeline','GET');
+    renderPipeline(pipeline&&pipeline.items?pipeline.items:[]);
+  }
+
+  function setQuickButtonsEnabled(enabled){
+    quickOutcomeButtons.forEach((btn)=>{ btn.disabled=!enabled; });
+  }
+
+  function cancelPendingModalOpen(){
+    if(modalOpenDelayTimer){
+      clearTimeout(modalOpenDelayTimer);
+      modalOpenDelayTimer=null;
+    }
+  }
+
+  function beginModalTapGuard(){
+    modalTapGuardUntil=Date.now()+MODAL_TAP_GUARD_MS;
+    if(quickGrid) quickGrid.classList.add('guard');
+    setQuickButtonsEnabled(false);
+    if(modalTapGuardTimer){
+      clearTimeout(modalTapGuardTimer);
+      modalTapGuardTimer=null;
+    }
+    modalTapGuardTimer=setTimeout(()=>{
+      modalTapGuardTimer=null;
+      if(quickGrid) quickGrid.classList.remove('guard');
+      setQuickButtonsEnabled(true);
+    }, MODAL_TAP_GUARD_MS);
+  }
+
+  function isModalTapGuardActive(){
+    return Date.now()<modalTapGuardUntil;
+  }
+
+  function openMapModal(){
+    if(!mapModal) return;
+    mapModal.classList.add('open');
+    mapModal.setAttribute('aria-hidden','false');
+    beginModalTapGuard();
+  }
+
+  function closeMapModal(){
+    if(!mapModal) return;
+    cancelPendingModalOpen();
+    mapModal.classList.remove('open');
+    mapModal.setAttribute('aria-hidden','true');
+    if(modalTapGuardTimer){
+      clearTimeout(modalTapGuardTimer);
+      modalTapGuardTimer=null;
+    }
+    if(quickGrid) quickGrid.classList.remove('guard');
+    setQuickButtonsEnabled(true);
+    modalTapGuardUntil=0;
+  }
+
+  function updateMapModalAddress(){
+    if(!mapModalAddress) return;
+    if(!latestPin){
+      mapModalAddress.textContent='Pinned location selected.';
+      return;
+    }
+    mapModalAddress.textContent=latestPin.label || `${formatCoord(latestPin.lat)}, ${formatCoord(latestPin.lng)}`;
+  }
+
+  function clearPin(){
+    cancelPendingModalOpen();
+    latestPin=null;
+    latestPinSeq=0;
+    setVal('de-lat','');
+    setVal('de-lng','');
+    if(repMarker&&repMap){
+      repMap.removeLayer(repMarker);
+      repMarker=null;
+    }
+    if(mapPinLabel) mapPinLabel.textContent='No pin selected';
+    updateCoordinateNote();
+    setMapStatus('Pin cleared.', false);
+  }
+
+  function setPin(lat, lng, openModalFlag){
+    cancelPendingModalOpen();
+    const clippedLat=Math.max(-90,Math.min(90,Number(lat)));
+    const clippedLng=Math.max(-180,Math.min(180,Number(lng)));
+    latestPinSeq+=1;
+    const currentPinSeq=latestPinSeq;
+    latestPin={
+      lat:Number(clippedLat.toFixed(6)),
+      lng:Number(clippedLng.toFixed(6)),
+      addressLine1:'',
+      city:'',
+      state:'',
+      postalCode:'',
+      label:`${formatCoord(clippedLat)}, ${formatCoord(clippedLng)}`
+    };
+    setVal('de-lat',String(latestPin.lat));
+    setVal('de-lng',String(latestPin.lng));
+    updateCoordinateNote();
+    if(repMap){
+      if(repMarker){
+        repMarker.setLatLng([latestPin.lat,latestPin.lng]);
+      }else{
+        repMarker=L.marker([latestPin.lat,latestPin.lng]).addTo(repMap);
+      }
+      repMap.panTo([latestPin.lat,latestPin.lng]);
+    }
+    if(mapPinLabel) mapPinLabel.textContent=`Pin ${formatCoord(latestPin.lat)}, ${formatCoord(latestPin.lng)}`;
+    setMapStatus(openModalFlag ? 'Pin dropped. Opening quick outcome...' : 'Pin dropped. Choose an outcome.', false);
+    updateMapModalAddress();
+    if(openModalFlag){
+      modalOpenDelayTimer=setTimeout(()=>{
+        modalOpenDelayTimer=null;
+        if(currentPinSeq!==latestPinSeq) return;
+        openMapModal();
+      }, MODAL_OPEN_DELAY_MS);
+    }
+    reverseGeocodeLatestPin().catch(()=>null);
+  }
+
+  function parseReverseGeocode(data){
+    const addr=(data&&typeof data.address==='object')?data.address:{};
+    const addressLine1=[addr.house_number||'',addr.road||''].filter(Boolean).join(' ').trim() || addr.road || addr.neighbourhood || '';
+    const city=addr.city || addr.town || addr.village || addr.hamlet || '';
+    const state=addr.state || '';
+    const postalCode=addr.postcode || '';
+    const display=(data&&data.display_name)||[addressLine1,city,state,postalCode].filter(Boolean).join(', ');
+    return {addressLine1,city,state,postalCode,display};
+  }
+
+  async function reverseGeocodeLatestPin(){
+    if(!latestPin) return;
+    const lat=latestPin.lat;
+    const lng=latestPin.lng;
+    const url=`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(String(lat))}&lon=${encodeURIComponent(String(lng))}`;
+    const res=await fetch(url,{headers:{'Accept':'application/json'}});
+    if(!res.ok) return;
+    const data=await res.json().catch(()=>null);
+    if(!latestPin||latestPin.lat!==lat||latestPin.lng!==lng||!data) return;
+    const parsed=parseReverseGeocode(data);
+    latestPin=Object.assign({},latestPin,{
+      addressLine1:parsed.addressLine1||latestPin.addressLine1,
+      city:parsed.city||latestPin.city,
+      state:parsed.state||latestPin.state,
+      postalCode:parsed.postalCode||latestPin.postalCode,
+      label:parsed.display||latestPin.label
+    });
+    if(parsed.addressLine1&&!val('de-address')) setVal('de-address',parsed.addressLine1);
+    if(parsed.city&&!val('de-city')) setVal('de-city',parsed.city);
+    if(mapPinLabel) mapPinLabel.textContent=latestPin.label.length>90?`${latestPin.label.slice(0,87)}...`:latestPin.label;
+    updateMapModalAddress();
+  }
+
+  function applyPinToFormDefaults(choiceKey){
+    const preset=QUICK_OUTCOMES[choiceKey];
+    if(!preset) return;
+    setVal('de-outcome',preset.outcome);
+    if(latestPin){
+      if(latestPin.addressLine1&&!val('de-address')) setVal('de-address',latestPin.addressLine1);
+      if(latestPin.city&&!val('de-city')) setVal('de-city',latestPin.city);
+    }
+    const needsFollowup=Boolean(preset.wantsFollowup);
+    const followupCheckbox=document.getElementById('de-followup');
+    if(followupCheckbox) followupCheckbox.checked=needsFollowup;
+    if(needsFollowup){
+      const due=new Date(Date.now()+(preset.followupHours||4)*60*60*1000);
+      const localInputValue=new Date(due.getTime()-due.getTimezoneOffset()*60*1000).toISOString().slice(0,16);
+      setVal('de-followup-date',localInputValue);
+    }
+  }
+
+  function buildDoorPayload(overrides){
+    const merged=overrides||{};
+    const outcomeRaw=String(merged.outcome!==undefined?merged.outcome:val('de-outcome')).trim();
+    const followupDateRaw=String(merged.followupDueAt!==undefined?merged.followupDueAt:val('de-followup-date')).trim();
+    let followupDueAt='';
+    if(followupDateRaw){
+      const parsed=new Date(followupDateRaw);
+      if(!Number.isNaN(parsed.getTime())) followupDueAt=parsed.toISOString();
+    }
+    const lat=Number(val('de-lat'));
+    const lng=Number(val('de-lng'));
+
+    const payload={
+      outcome:outcomeRaw,
+      serviceInterestSlug:String(merged.serviceInterestSlug!==undefined?merged.serviceInterestSlug:val('de-service')).trim(),
+      addressLine1:String(merged.addressLine1!==undefined?merged.addressLine1:val('de-address')).trim(),
+      city:String(merged.city!==undefined?merged.city:val('de-city')).trim(),
+      state:String(merged.state!==undefined?merged.state:(latestPin&&latestPin.state)||'').trim(),
+      postalCode:String(merged.postalCode!==undefined?merged.postalCode:(latestPin&&latestPin.postalCode)||'').trim(),
+      wantsFollowup:merged.wantsFollowup!==undefined?Boolean(merged.wantsFollowup):Boolean(document.getElementById('de-followup').checked),
+      followupDueAt,
+      outcomeDetail:String(merged.outcomeDetail!==undefined?merged.outcomeDetail:val('de-notes')).trim(),
+      lead:merged.lead!==undefined?merged.lead:{
+        firstName:val('de-lead-name').trim(),
+        phone:val('de-lead-phone').trim(),
+        notes:val('de-notes').trim()
+      }
+    };
+
+    if(Number.isFinite(lat)&&Number.isFinite(lng)){
+      payload.lat=Number(lat.toFixed(6));
+      payload.lng=Number(lng.toFixed(6));
+    }
+
+    return payload;
+  }
+
+  async function submitDoorPayload(payload, okMessage){
+    if(!payload||!payload.outcome){
+      setDoorStatus('Outcome is required.', true);
+      return;
+    }
+
+    saveDoorBtn.disabled=true;
+    setDoorStatus('Saving...', false);
+    try{
+      const res=await api('/field/door-events','POST',payload);
+      if(res&&res.bookingUrl){
+        setBookingLink(res.bookingUrl);
+      }
+      setDoorStatus(okMessage||'Door event saved.', false);
+      await Promise.all([
+        refreshData(),
+        refreshSchedule(),
+        refreshMapHistory().catch(()=>null)
+      ]);
+    }catch(err){
+      setDoorStatus(String(err&&err.message?err.message:'Save failed'), true);
+    } finally {
+      saveDoorBtn.disabled=false;
+    }
+  }
+
+  async function saveDoorEvent(){
+    const payload=buildDoorPayload({});
+    await submitDoorPayload(payload,'Door event saved.');
+  }
+
+  async function quickLogFromMap(choiceKey){
+    const preset=QUICK_OUTCOMES[choiceKey];
+    if(!preset){
+      setDoorStatus('Unknown quick outcome.', true);
+      return;
+    }
+    if(!latestPin){
+      setDoorStatus('Drop a map pin first.', true);
+      closeMapModal();
+      return;
+    }
+
+    applyPinToFormDefaults(choiceKey);
+    const detail=[preset.note, latestPin.label?`Location: ${latestPin.label}`:''].filter(Boolean).join(' ');
+    const followupDueAt=preset.wantsFollowup?new Date(Date.now()+(preset.followupHours||4)*60*60*1000).toISOString():'';
+    const payload=buildDoorPayload({
+      outcome:preset.outcome,
+      wantsFollowup:preset.wantsFollowup,
+      followupDueAt,
+      outcomeDetail:detail,
+      lead:{
+        firstName:val('de-lead-name').trim(),
+        phone:val('de-lead-phone').trim(),
+        notes:detail
+      }
+    });
+
+    closeMapModal();
+    await submitDoorPayload(payload,`${preset.label} saved.`);
+
+    if(preset.outcome==='booked_on_door'){
+      const href=(bookLink&&bookLink.getAttribute('href'))||'/booking.html';
+      window.open(href,'_blank','noopener');
+    }
+  }
+
+  async function fetchSlotsForDate(serviceSlug, dateStr){
+    const query=`eventTypeSlug=${encodeURIComponent(serviceSlug)}&start=${encodeURIComponent(dateStr)}&end=${encodeURIComponent(dateStr)}`;
+    let res=await fetch(`${API_BASE}/slots?${query}`,{headers:{'Content-Type':'application/json'}});
+    if(!res.ok){
+      res=await fetch(`${API_BASE}/api/slots?${query}`,{headers:{'Content-Type':'application/json'}});
+    }
+    if(!res.ok){
+      throw new Error(`Schedule request failed (${res.status})`);
+    }
+    const data=await res.json().catch(()=>null);
+    const daySlots=(data&&data.data&&Array.isArray(data.data[dateStr]))?data.data[dateStr]:[];
+    return daySlots.map((slot)=>{
+      if(slot&&typeof slot==='object') return String(slot.start||slot.time||'');
+      return String(slot||'');
+    }).filter(Boolean);
+  }
+
+  function renderSchedule(items){
+    if(!schedList) return;
+    const withSlots=(items||[]).filter((row)=>row.slots&&row.slots.length>0);
+    if(!withSlots.length){
+      schedList.innerHTML='<div class="rep-slot-item"><div class="rep-slot-date">No open slots in selected window</div><div class="rep-note">Try a wider window or another service.</div></div>';
+      return;
+    }
+
+    schedList.innerHTML=withSlots.map((row)=>{
+      const times=row.slots.slice(0,8).map((iso)=>`<span class="rep-slot-time">${esc(formatSlotTime(iso))}</span>`).join('');
+      const overflow=row.slots.length>8?`<span class="rep-slot-time">+${row.slots.length-8} more</span>`:'';
+      return `<div class="rep-slot-item">
+        <div class="rep-slot-date">${esc(formatDateLabel(row.date))} (${row.slots.length} open)</div>
+        <div class="rep-slot-times">${times}${overflow}</div>
+      </div>`;
+    }).join('');
+  }
+
+  async function refreshSchedule(){
+    if(!schedService||!schedDays) return;
+    const serviceSlug=(schedService.value||'').trim();
+    const days=Math.max(1,Math.min(14,Number(schedDays.value||7)));
+    if(!serviceSlug){
+      setScheduleStatus('Choose a service first.', true);
+      return;
+    }
+
+    if(deService) deService.value=serviceSlug;
+    setScheduleStatus('Loading live availability...', false);
+    try{
+      const today=new Date();
+      const jobs=[];
+      for(let i=0;i<days;i++){
+        const d=new Date(today);
+        d.setDate(today.getDate()+i);
+        const dateStr=toYmd(d);
+        jobs.push(fetchSlotsForDate(serviceSlug,dateStr).then((slots)=>({date:dateStr,slots})));
+      }
+      const rows=await Promise.all(jobs);
+      renderSchedule(rows);
+      const total=rows.reduce((sum,row)=>sum+row.slots.length,0);
+      setScheduleStatus(`Live schedule loaded. ${total} open slots found.`, false);
+    }catch(err){
+      setScheduleStatus(String(err&&err.message?err.message:'Could not load schedule.'), true);
+    }
+  }
+
+  function initMap(){
+    if(mapInitialized) return;
+    if(!mapEl||typeof L==='undefined'){
+      setMapStatus('Map could not load on this device.', true);
+      return;
+    }
+
+    repMap=L.map(mapEl,{zoomControl:true}).setView([37.6775,-113.0619],13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(repMap);
+    mapHistoryLayer=L.layerGroup().addTo(repMap);
+    mapInitialized=true;
+
+    const beginHold=(evt)=>{
+      const latlng=evt&&evt.latlng;
+      if(!latlng) return;
+      if(mapHoldTimer) clearTimeout(mapHoldTimer);
+      mapHoldTimer=setTimeout(()=>{
+        mapHoldTimer=null;
+        setPin(latlng.lat,latlng.lng,true);
+      },MAP_HOLD_MS);
+    };
+
+    const stopHold=()=>{
+      if(mapHoldTimer){
+        clearTimeout(mapHoldTimer);
+        mapHoldTimer=null;
+      }
+    };
+
+    repMap.on('mousedown',beginHold);
+    repMap.on('touchstart',beginHold);
+    repMap.on('mouseup',stopHold);
+    repMap.on('touchend',stopHold);
+    repMap.on('dragstart',stopHold);
+    repMap.on('mouseout',stopHold);
+    repMap.on('contextmenu',(evt)=>setPin(evt.latlng.lat,evt.latlng.lng,true));
+
+    mapMyLocationBtn&&mapMyLocationBtn.addEventListener('click',()=>{
+      if(!navigator.geolocation){
+        setMapStatus('Geolocation is not available on this browser.', true);
+        return;
+      }
+      navigator.geolocation.getCurrentPosition((pos)=>{
+        const lat=pos&&pos.coords?pos.coords.latitude:null;
+        const lng=pos&&pos.coords?pos.coords.longitude:null;
+        if(Number.isFinite(lat)&&Number.isFinite(lng)){
+          setPin(lat,lng,false);
+          if(repMap) repMap.setView([lat,lng],16);
+        }
+      },()=>setMapStatus('Could not get current location.', true),{enableHighAccuracy:true,timeout:10000});
+    });
+
+    mapClearBtn&&mapClearBtn.addEventListener('click',clearPin);
+    setMapStatus('Map ready. Press and hold to drop a pin.', false);
+  }
+
+  loginBtn.addEventListener('click',signIn);
+  logoutBtn.addEventListener('click',signOut);
+  refreshBtn.addEventListener('click',()=>{
+    Promise.all([
+      refreshData(),
+      refreshSchedule(),
+      refreshMapHistory().catch(()=>null)
+    ]).catch(()=>null);
+  });
+  saveDoorBtn.addEventListener('click',saveDoorEvent);
+
+  schedRefreshBtn&&schedRefreshBtn.addEventListener('click',()=>{ refreshSchedule().catch(()=>null); });
+  schedService&&schedService.addEventListener('change',()=>{ refreshSchedule().catch(()=>null); });
+  schedDays&&schedDays.addEventListener('change',()=>{ refreshSchedule().catch(()=>null); });
+
+  mapModalClose&&mapModalClose.addEventListener('click',closeMapModal);
+  mapModalFullForm&&mapModalFullForm.addEventListener('click',()=>{
+    closeMapModal();
+    if(!val('de-outcome')) setVal('de-outcome','interested_callback');
+  });
+  mapModal&&mapModal.addEventListener('click',(evt)=>{
+    if(evt.target===mapModal) closeMapModal();
+  });
+  document.addEventListener('keydown',(evt)=>{
+    if(evt.key==='Escape') closeMapModal();
+  });
+  quickOutcomeButtons.forEach((btn)=>{
+    btn.addEventListener('click',()=>{
+      if(isModalTapGuardActive()) return;
+      const choice=(btn.getAttribute('data-quick-outcome')||'').trim();
+      quickLogFromMap(choice).catch(()=>null);
+    });
+  });
+
+  updateCoordinateNote();
+
+  const token=getToken();
+  const rep=getRep();
+  if(token&&rep&&rep.id){
+    showApp();
+    Promise.all([
+      refreshData(),
+      refreshSchedule(),
+      refreshMapHistory().catch(()=>null)
+    ]).catch((err)=>setDoorStatus(String(err&&err.message?err.message:'Could not refresh data'),true));
+  }else{
+    showLogin();
+  }
+})();
+</script>
+</body>
+</html>

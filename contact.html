@@ -1,76 +1,135 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Contact • Southern Utah Detailing</title>
-    <meta name="description" content="Contact us to schedule your mobile car detailing appointment." />
-    <meta property="og:title" content="Contact • Southern Utah Detailing" />
-    <meta property="og:description" content="Contact us to schedule your mobile car detailing appointment." />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://images.unsplash.com/photo-1494972688394-4cc796f9c22b?q=80&w=1200&auto=format&fit=crop" />
-  <link rel="stylesheet" href="/css/style.css" />
-  <link rel="stylesheet" href="/css/components.css" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Contact · Southern Utah Detailing Cedar City UT</title>
+  <meta name="description" content="Contact Southern Utah Detailing for mobile car detailing in Cedar City and nearby communities. Call (435) 999-4052."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <link rel="stylesheet" href="/css/components.css"/>
 </head>
 <body>
-  <header class="header">
-    <div class="container nav cd-navbar">
-      <button class="nav-toggle" aria-label="Toggle menu">☰</button>
-      <a href="/index.html" class="nav-brand cd-logo">Southern Utah Detailing</a>
-      <nav class="nav-menu" aria-label="Primary">
-        <a href="/services.html">Services</a>
-        <a href="/booking.html">Booking</a>
-        <a href="/contact.html">Contact</a>
-      </nav>
-      <div class="nav-actions">
-        <img src="/images/Logo.PNG" alt="Southern Utah Detailing Logo" class="nav-logo" />
-        <a class="button" href="/booking.html">Book Now</a>
+<a class="float-cta button lg" id="float-cta" href="/booking.html" data-track="float_book_now">Book Now →</a>
+
+<header class="header" id="site-header">
+  <div class="container nav">
+    <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">☰</button>
+    <a href="/index.html" class="nav-brand">
+      <img src="/images/Logo.PNG" alt="So.U.Detail logo" class="nav-logo"/>
+      Southern Utah Detailing
+    </a>
+    <div class="nav-spacer"></div>
+    <nav class="nav-menu" aria-label="Primary">
+      <a href="/index.html">Home</a>
+      <a href="/services.html">Services</a>
+      <a href="/booking.html">Booking</a>
+      <a href="/contact.html" aria-current="page">Contact</a>
+    </nav>
+    <div class="nav-actions"><a class="button" href="/booking.html" data-track="nav_book_now">Book Now</a></div>
+  </div>
+</header>
+
+<section style="padding:72px 0 48px;background:var(--bg-up);border-bottom:1px solid var(--bdr)">
+  <div class="container" data-reveal>
+    <span class="eyebrow">Get in Touch</span>
+    <h1 class="h1" style="margin-bottom:10px">Contact Us</h1>
+    <p class="muted" style="max-width:440px">Questions, custom quotes, or just want to chat — we typically respond within a few hours.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="ctc-grid">
+      <!-- Form -->
+      <div data-reveal>
+        <div class="bk-panel">
+          <h2 class="h3" style="margin-bottom:22px">Send a Message</h2>
+          <form class="form" id="ctc-form">
+            <div class="frow c2">
+              <div><label for="c-name">Full Name</label><input id="c-name" class="inp" type="text" autocomplete="name" placeholder="Jane Smith" required/></div>
+              <div><label for="c-phone">Phone</label><input id="c-phone" class="inp" type="tel" autocomplete="tel" placeholder="(435) 555-0100"/></div>
+            </div>
+            <div><label for="c-msg">Message</label><textarea id="c-msg" class="inp ta" placeholder="Tell us about your vehicle and what you're looking for…" required></textarea></div>
+            <div class="frow c2">
+              <a id="ctc-link" class="button" href="mailto:SouthernUtahDetail@gmail.com" data-track="contact_send_message">Send Message</a>
+              <a class="button outline" href="tel:+14359994052" data-track="contact_call_now">Call Now</a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Info + map -->
+      <div data-reveal data-delay="2">
+        <div class="sc" style="margin-bottom:14px">
+          <div class="sc-title">Contact Info</div>
+          <div class="info-item"><div class="iico">PH</div><div><div class="ilbl">Phone</div><div class="ival"><a href="tel:+14359994052">(435) 999-4052</a></div></div></div>
+          <div class="info-item"><div class="iico">EM</div><div><div class="ilbl">Email</div><div class="ival"><a href="mailto:SouthernUtahDetail@gmail.com">SouthernUtahDetail@gmail.com</a></div></div></div>
+          <div class="info-item"><div class="iico">HRS</div><div><div class="ilbl">Hours</div><div class="ival">Mon – Sat · 8 am – 6 pm</div></div></div>
+          <div class="info-item"><div class="iico">LOC</div><div><div class="ilbl">Based In</div><div class="ival">Cedar City, Utah 84720</div></div></div>
+        </div>
+        <div class="sc" style="padding:0;overflow:hidden;margin-bottom:14px">
+          <iframe title="Cedar City Utah" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d53856.45384969166!2d-113.08766521953124!3d37.67732500000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80b5617fe05ec2d1%3A0xef14cae28073d1e9!2sCedar%20City%2C%20Utah!5e0!3m2!1sen!2sus!4v1705513248000" width="100%" height="240" style="border:0;display:block" allowfullscreen loading="lazy"></iframe>
+        </div>
+        <div class="sc" style="text-align:center">
+          <div class="sc-title">Skip the Form</div>
+          <p style="font-size:.86rem;color:var(--tx2);margin-bottom:14px">Book directly online — takes under 2 minutes.</p>
+          <a class="button block" href="/booking.html" data-track="contact_skip_form_book">Book Your Detail</a>
+          <p style="font-size:.78rem;color:var(--tx3);margin-top:10px">Typical confirmation response: under 2 hours during business hours.</p>
+        </div>
       </div>
     </div>
-  </header>
+  </div>
+</section>
 
-  <section class="section">
-    <div class="container grid cols-2">
+<!-- Goal 7: Local SEO area content -->
+<section class="section sm" style="background:var(--bg-up);border-top:1px solid var(--bdr)">
+  <div class="container" data-reveal>
+    <span class="eyebrow">Service Area</span>
+    <h2 class="h2" style="font-size:clamp(1.5rem,3vw,2rem);margin-bottom:12px">Serving Cedar City and Nearby Areas</h2>
+    <p class="muted" style="max-width:620px;margin-bottom:28px;font-size:.875rem">Based in Cedar City, we currently serve Cedar City and nearby communities. If your location is nearby but not listed, call us and we will confirm availability.</p>
+    <div class="grid cols-3">
       <div>
-        <h1 class="h1">Get in Touch</h1>
-        <p class="muted">Call or message us to schedule your detail.</p>
-        <form class="form">
-          <div class="form-row grid cols-2">
-            <div>
-              <label for="c-name" class="muted">Full Name</label>
-              <input id="c-name" class="input" type="text" required />
-            </div>
-            <div>
-              <label for="c-phone" class="muted">Phone</label>
-              <input id="c-phone" class="input" type="tel" />
-            </div>
-          </div>
-          <div>
-            <label for="c-msg" class="muted">Message</label>
-            <textarea id="c-msg" class="input textarea" required></textarea>
-          </div>
-          <div class="grid cols-2">
-            <a id="send-message-link" class="button" href="mailto:SouthernUtahDetail@gmail.com">Send Message</a>
-            <a class="button outline" href="tel:+14359994052">Click to Call</a>
-          </div>
-        </form>
+        <div style="font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);margin-bottom:10px">Iron County</div>
+        <div style="display:grid;gap:7px;font-size:.875rem;color:var(--tx2)">
+          <span>Cedar City</span><span>Enoch</span><span>Parowan</span><span>Paragonah</span><span>Brian Head</span><span>Summit</span>
+        </div>
       </div>
       <div>
-        <div class="card"><div class="card-body">
-          <div class="h3">Service Area</div>
-          <p class="muted">Based out of Cedar City, but serving the greater Southern Utah region.</p>
-          <div class="mt-16" style="border-radius: 12px; overflow: hidden;">
-            <iframe title="Google Maps - Cedar City, UT" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d53856.45384969166!2d-113.08766521953124!3d37.67732500000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80b5617fe05ec2d1%3A0xef14cae28073d1e9!2sCedar%20City%2C%20Utah!5e0!3m2!1sen!2sus!4v1705513248000" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-          </div>
-        </div></div>
+        <div style="font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);margin-bottom:10px">Cedar City Area</div>
+        <div style="display:grid;gap:7px;font-size:.875rem;color:var(--tx2)">
+          <span>Cedar Highlands</span><span>Hamiltons Fort</span><span>Kanarraville</span><span>Summit</span><span>Brian Head</span><span>Paragonah</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);margin-bottom:10px">Extended Availability</div>
+        <div style="display:grid;gap:7px;font-size:.875rem;color:var(--tx2)">
+          <span>Nearby requests by availability</span><span>Call to confirm travel coverage</span>
+        </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <footer class="footer">
-    <div class="container legal">© <span class="js-year"></span> Southern Utah Detailing. All rights reserved.</div>
-  </footer>
+<footer class="footer">
+  <div class="container">
+    <div class="ft-grid">
+      <div><div class="ft-brand">Southern Utah Detailing</div><p class="ft-body">Mobile detailing — we come to you.</p></div>
+      <div>
+        <div class="ft-head">Pages</div>
+        <div class="ft-links"><a href="/index.html">Home</a><a href="/services.html">Services</a><a href="/booking.html">Book Now</a><a href="/contact.html">Contact</a></div>
+      </div>
+      <div>
+        <div class="ft-head">Contact</div>
+        <div class="ft-links"><a href="tel:+14359994052">(435) 999-4052</a><a href="mailto:SouthernUtahDetail@gmail.com">SouthernUtahDetail@gmail.com</a></div>
+      </div>
+    </div>
+    <div class="ft-legal"><span>© <span class="js-year"></span> Southern Utah Detailing LLC.</span></div>
+  </div>
+</footer>
 
-  <script src="/js/main.js" defer></script>
+<script src="/js/analytics.js" defer></script>
+<script src="/js/main.js" defer></script>
 </body>
 </html>

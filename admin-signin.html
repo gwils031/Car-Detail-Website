@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Admin Sign In · Southern Utah Detailing</title>
+  <meta name="robots" content="noindex,nofollow"/>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <link rel="stylesheet" href="/css/components.css"/>
+  <style>
+    .signin-wrap{max-width:520px;margin:0 auto;padding:28px}
+    .signin-card{background:var(--srf);border:1px solid var(--bdr);border-radius:var(--r);padding:22px}
+    .signin-actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+    .signin-status{margin-top:10px;font-size:.84rem;color:var(--tx2)}
+    @media(max-width:640px){.signin-actions{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<header class="header" id="site-header">
+  <div class="container nav">
+    <a href="/index.html" class="nav-brand">
+      <img src="/images/Logo.PNG" alt="So.U.Detail logo" class="nav-logo"/>
+      Southern Utah Detailing
+    </a>
+    <div class="nav-spacer"></div>
+    <div class="nav-actions"><a class="button outline" href="/index.html">Back to Site</a></div>
+  </div>
+</header>
+
+<section class="section" style="padding-top:44px">
+  <div class="signin-wrap">
+    <span class="eyebrow">Admin</span>
+    <h1 class="h2" style="margin-top:6px">Analytics Sign In</h1>
+    <p class="muted" style="font-size:.9rem;max-width:460px">Enter your admin token to access the analytics dashboard. Token is stored in this browser session only.</p>
+
+    <div class="signin-card">
+      <label for="admin-token">Admin Token</label>
+      <input id="admin-token" class="inp" type="password" autocomplete="off" placeholder="Paste analytics admin token"/>
+      <div class="signin-actions">
+        <button id="signin-btn" class="button" type="button">Sign In</button>
+      </div>
+      <div class="signin-status" id="signin-status">Waiting for sign in…</div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  'use strict';
+
+  const API_BASE='https://calcom-proxy.southernutahdetail.workers.dev';
+  const TOKEN_KEY='sud_admin_analytics_token';
+
+  const tokenInput=document.getElementById('admin-token');
+  const signinBtn=document.getElementById('signin-btn');
+  const statusEl=document.getElementById('signin-status');
+
+  function today(){
+    return new Date().toISOString().slice(0,10);
+  }
+
+  function setStatus(msg,isErr){
+    statusEl.textContent=msg;
+    statusEl.style.color=isErr?'#ff7070':'var(--tx2)';
+  }
+
+  function getReason(){
+    const reason=new URLSearchParams(window.location.search).get('reason')||'';
+    if(reason==='session-expired') return 'Session expired. Please sign in again.';
+    if(reason==='auth-required') return 'Sign in required to view analytics.';
+    if(reason==='signed-out') return 'Signed out successfully.';
+    return 'Waiting for sign in…';
+  }
+
+  async function verifyToken(token){
+    const qs=`day=${encodeURIComponent(today())}&days=1`;
+    const endpoints=[
+      `${API_BASE}/admin/analytics?${qs}`,
+      `${API_BASE}/api/admin/analytics?${qs}`
+    ];
+
+    for(const ep of endpoints){
+      try{
+        const res=await fetch(ep,{headers:{'x-admin-token':token}});
+        if(res.status===404) continue;
+        return res;
+      }catch(_e){}
+    }
+    return null;
+  }
+
+  async function signIn(){
+    const token=(tokenInput.value||'').trim();
+    if(!token){
+      setStatus('Token is required.',true);
+      return;
+    }
+
+    signinBtn.disabled=true;
+    signinBtn.textContent='Signing In…';
+    setStatus('Validating token…',false);
+
+    const res=await verifyToken(token);
+
+    signinBtn.disabled=false;
+    signinBtn.textContent='Sign In';
+
+    if(!res){
+      setStatus('Could not reach analytics endpoint.',true);
+      return;
+    }
+
+    if(!res.ok){
+      const msg=res.status===401||res.status===403
+        ? 'Invalid token.'
+        : `Sign in failed (${res.status}).`;
+      setStatus(msg,true);
+      return;
+    }
+
+    try{ sessionStorage.setItem(TOKEN_KEY,token); }catch(_e){}
+    setStatus('Sign in successful. Redirecting…',false);
+    window.location.href='/admin-analytics.html';
+  }
+
+  signinBtn.addEventListener('click',signIn);
+  tokenInput.addEventListener('keydown',(e)=>{ if(e.key==='Enter') signIn(); });
+
+  try{
+    const saved=sessionStorage.getItem(TOKEN_KEY)||'';
+    if(saved) tokenInput.value=saved;
+  }catch(_e){}
+
+  setStatus(getReason(),false);
+})();
+</script>
+</body>
+</html>

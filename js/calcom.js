@@ -1,162 +1,139 @@
 /**
- * Cal.com API Integration for Southern Utah Detailing (SECURE)
- * Handles booking submission through Cloudflare Worker proxy
- * API key is securely stored on Cloudflare, NOT exposed to frontend
+ * calcom.js — Booking form submission via Cloudflare Worker
+ * Goal 8: fires __showConfirmation() on success with all booking data
  */
-
-// Cloudflare Worker proxy URL - API key is secure on Cloudflare
-const WORKER_URL = 'https://calcom-proxy.southernutahdetail.workers.dev';
-
-const CAL_COM_CONFIG = {
-  username: 'peter-nielsen-joxtue'
+const WORKER='https://calcom-proxy.southernutahdetail.workers.dev';
+const CAL_USER='peter-nielsen-joxtue';
+const PKG_PRICES={
+  'basic-detail':129,
+  'standard-detail':179,
+  'premium-detail':249
 };
 
-// Initialize form listeners
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('booking-form');
-  if (form) {
-    form.addEventListener('submit', handleBookingSubmit);
-  }
+document.addEventListener('DOMContentLoaded',()=>{
+  const form=document.getElementById('bk-form');
+  if(form) form.addEventListener('submit',handleSubmit);
 });
 
-/**
- * Handle booking form submission
- */
-async function handleBookingSubmit(e) {
+async function handleSubmit(e){
   e.preventDefault();
 
-  const name = document.getElementById('name').value;
-  const email = document.getElementById('email').value;
-  const phone = document.getElementById('phone').value;
-  const streetAddress = document.getElementById('street-address').value;
-  const city = document.getElementById('city').value;
-  const state = document.getElementById('state').value;
-  const zip = document.getElementById('zip').value;
-  const fullAddress = `${streetAddress}, ${city}, ${state} ${zip}`;
-  const selectedServiceInput = document.getElementById('selected-service');
-  const serviceSelectEl = document.getElementById('service');
-  const serviceName = selectedServiceInput ? selectedServiceInput.value : (serviceSelectEl ? serviceSelectEl.value : '');
-  const serviceSlug = window.selectedServiceSlug || (CAL_COM_CONFIG.eventTypes ? CAL_COM_CONFIG.eventTypes[serviceName] : null);
-  const timeSlot = document.getElementById('selected-time').value;
+  const get=id=>(document.getElementById(id)?.value||'').trim();
+  const name=get('f-name'), email=get('f-email'), phone=get('f-phone');
+  const street=get('f-street'), city=get('f-city'), state=get('f-state'), zip=get('f-zip');
+  const svcName=get('sel-service'), slug=window.selectedServiceSlug;
+  const timeISO=get('selected-time');
 
-  if (!name || !email || !phone || !streetAddress || !city || !state || !zip || !serviceName || !serviceSlug || !timeSlot) {
-    showError('Please fill in all fields: service, date, time, and contact information.');
+  // Validate service
+  if(!slug){
+    const e=document.getElementById('svc-err');
+    if(e){ e.textContent='Please select a service.'; e.classList.remove('hide'); }
+    window.__showAlert&&window.__showAlert('Please select a service before booking.','err');
+    return;
+  }
+  if(!name||!email||!phone||!street||!city||!state||!zip||!timeISO){
+    window.__showAlert&&window.__showAlert('Please fill in all required fields including a date and time.','err');
     return;
   }
 
-  try {
-    showLoading('Confirming your booking...');
+  // Collect add-ons
+  const addons=Array.from(document.querySelectorAll('#addon-wrap .achk.on')).map(el=>({
+    name:el.querySelector('.achk-name')?.textContent||'',
+    price:parseInt(el.dataset.price||0)
+  }));
+  const addonTotal=addons.reduce((s,a)=>s+a.price,0);
+  const basePrice=PKG_PRICES[slug]||0;
+  const total=basePrice+addonTotal;
+  const fullAddr=`${street}, ${city}, ${state} ${zip}`;
+  const attribution=getAttributionData();
 
-    const startTime = new Date(timeSlot).toISOString();
+  window.__showAlert&&window.__showAlert('Confirming your booking…','wait');
 
-    const bookingData = {
-      username: CAL_COM_CONFIG.username,
-      eventTypeSlug: serviceSlug,
-      start: startTime,
-      attendee: {
-        name: name,
-        email: email,
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        language: 'en'
-      },
-      location: fullAddress,
-      metadata: {
-        phone: phone
-      }
-    };
+  const metadata={phone,addons:addons.map(a=>a.name).join(', '),total:'$'+total};
+  ['utm_source','utm_medium','utm_campaign','utm_term','utm_content','gclid','fbclid','msclkid','rep_id','lead_id','src'].forEach(key=>{
+    if(attribution[key]) metadata[key]=attribution[key];
+  });
+  if(attribution.rep_id) metadata.channel='field_sales';
 
-    console.log('Creating booking:', bookingData);
+  const payload={
+    username:CAL_USER, eventTypeSlug:slug,
+    start:new Date(timeISO).toISOString(),
+    attendee:{name,email,timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone,language:'en'},
+    location:fullAddr,
+    metadata
+  };
 
-    // Call through Cloudflare Worker (API key is secure)
-    let response = await fetch(`${WORKER_URL}/bookings`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(bookingData)
+  if(window.__trackEvent){
+    window.__trackEvent('booking_submit',{
+      surface:'desktop',
+      service_slug:slug||'',
+      has_addons:addons.length?'true':'false',
+      total:String(total)
     });
+  }
 
-    // Fallback if Worker is mounted under /api
-    if (!response.ok && response.status === 404) {
-      response = await fetch(`${WORKER_URL}/api/bookings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bookingData)
+  try{
+    let res=await fetch(`${WORKER}/bookings`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(!res.ok&&res.status===404)
+      res=await fetch(`${WORKER}/api/bookings`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
+
+    // Hide alert
+    const al=document.getElementById('bk-alert');
+    if(al) al.classList.add('hide');
+
+    // Goal 8
+    if(window.__showConfirmation){
+      window.__showConfirmation({
+        service:svcName,
+        addons:addons.length?addons.map(a=>a.name).join(', '):'None',
+        datetime:new Date(timeISO).toLocaleString('en-US',{month:'long',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}),
+        location:fullAddr, total:'$'+total, email, timeISO
+      });
+    } else {
+      window.__showAlert&&window.__showAlert('Booking confirmed! Confirmation sent to '+email+'.','ok');
+    }
+
+    // Reset form
+    document.getElementById('bk-form')?.reset();
+    const dti=document.getElementById('date-time-input');
+    if(dti) dti.textContent='Select date and time';
+    document.getElementById('date-time-dropdown')?.classList.add('hide');
+    if(window.serviceSelector){ window.serviceSelector.active=null; document.querySelectorAll('.svc-card').forEach(c=>c.classList.remove('sel')); }
+    window.selectedServiceSlug=null;
+    document.querySelectorAll('#addon-wrap .achk.on').forEach(el=>el.classList.remove('on'));
+    document.getElementById('addon-wrap')?.classList.remove('open');
+    document.getElementById('bk-summary')&&(document.getElementById('bk-summary').style.display='none');
+
+  }catch(err){
+    console.error('Booking error:',err);
+    if(window.__trackEvent){
+      window.__trackEvent('booking_failure',{
+        surface:'desktop',
+        service_slug:slug||'',
+        reason:String(err&&err.message?err.message:'submit_failed').slice(0,120)
       });
     }
+    window.__showAlert&&window.__showAlert('Could not confirm your booking. Please try again or call us at (435) 999-4052.','err');
+  }
+}
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Booking error response:', response.status, errorText);
-      const hint = errorText || 'Please try again in a moment.';
-      throw new Error(`Booking failed (${response.status}): ${hint}`);
+function getAttributionData(){
+  const keys=['utm_source','utm_medium','utm_campaign','utm_term','utm_content','gclid','fbclid','msclkid','rep_id','lead_id','src'];
+  const out={};
+  const sp=new URLSearchParams(window.location.search);
+  keys.forEach(k=>{
+    const v=sp.get(k);
+    if(v) out[k]=v;
+  });
+  if(Object.keys(out).length) return out;
+
+  try{
+    const stored=sessionStorage.getItem('sud_attribution');
+    if(stored){
+      const parsed=JSON.parse(stored);
+      if(parsed&&typeof parsed==='object') return parsed;
     }
-
-    const result = await response.json();
-    console.log('Booking result:', result);
-    
-    hideLoading();
-    showSuccess(`Booking confirmed! Confirmation sent to ${email}`);
-    document.getElementById('booking-form').reset();
-    document.getElementById('date-time-input').textContent = 'Select date and time';
-    document.getElementById('date-time-dropdown').classList.add('hide');
-  } catch (error) {
-    console.error('Booking error:', error);
-    hideLoading();
-    showError('We could not confirm the booking. Please check your connection and try again.');
-  }
-}
-
-/**
- * Show loading state
- */
-function showLoading(message) {
-  const errorDiv = document.getElementById('form-errors');
-  if (errorDiv) {
-    errorDiv.textContent = message;
-    errorDiv.style.background = 'var(--cd-surface)';
-    errorDiv.style.color = 'var(--cd-primary)';
-    errorDiv.classList.remove('hide');
-  }
-}
-
-/**
- * Hide loading state
- */
-function hideLoading() {
-  const errorDiv = document.getElementById('form-errors');
-  if (errorDiv) {
-    errorDiv.classList.add('hide');
-  }
-}
-
-/**
- * Show error message
- */
-function showError(message) {
-  const errorDiv = document.getElementById('form-errors');
-  if (errorDiv) {
-    errorDiv.textContent = '⚠ ' + message;
-    errorDiv.style.background = 'rgba(211, 47, 47, 0.1)';
-    errorDiv.style.color = 'var(--cd-primary)';
-    errorDiv.style.padding = '16px';
-    errorDiv.classList.remove('hide');
-  }
-}
-
-/**
- * Show success message
- */
-function showSuccess(message) {
-  const errorDiv = document.getElementById('form-errors');
-  if (errorDiv) {
-    errorDiv.textContent = '✓ ' + message;
-    errorDiv.style.background = 'rgba(76, 175, 80, 0.1)';
-    errorDiv.style.color = '#4CAF50';
-    errorDiv.style.padding = '16px';
-    errorDiv.classList.remove('hide');
-    
-    // Auto-hide after 5 seconds
-    setTimeout(() => errorDiv.classList.add('hide'), 5000);
-  }
+  }catch(_e){}
+  return {};
 }

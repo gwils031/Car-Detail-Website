@@ -140,41 +140,51 @@
     .rep-sched-popup-time{font-size:.78rem;font-weight:700;padding:7px 10px;border-radius:999px;border:1px solid var(--bdr);background:var(--srf);color:var(--tx2);line-height:1.2}
     .rep-sched-popup-empty{font-size:.78rem;color:var(--tx3)}
     .rep-followup-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+    .rep-followup-head h4{font-size:.95rem;letter-spacing:.01em}
     .rep-followup-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
     .rep-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;border:1px solid var(--bdr);background:var(--srf);font-size:.68rem;font-weight:800;letter-spacing:.02em;color:var(--tx2);line-height:1.2}
     .rep-badge-status{text-transform:capitalize}
-    .rep-followup-lines{display:grid;gap:4px;margin-top:8px}
-    .rep-followup-line{font-size:.79rem;color:var(--tx2);line-height:1.4}
+    .rep-followup-lines{display:grid;gap:5px;margin-top:8px}
+    .rep-followup-line{font-size:.79rem;color:var(--tx2);line-height:1.42}
     .rep-followup-line strong{color:var(--tx);font-weight:700}
-    .rep-followup-toolbar{position:sticky;top:10px;z-index:40;display:grid;gap:8px;margin:2px 0 10px;padding:10px;border:1px solid var(--bdr);border-radius:12px;background:rgba(15,23,42,.88);backdrop-filter:blur(8px)}
+    .rep-followup-toolbar{position:sticky;top:10px;z-index:40;display:grid;gap:9px;margin:2px 0 12px;padding:11px;border:1px solid rgba(148,163,184,.35);border-radius:14px;background:linear-gradient(165deg,rgba(15,23,42,.72) 0%,rgba(30,41,59,.68) 100%);backdrop-filter:blur(14px);box-shadow:0 14px 30px rgba(2,6,23,.22),inset 0 1px 0 rgba(255,255,255,.18)}
     .rep-followup-stats{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-    .rep-followup-stat{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid var(--bdr);background:var(--srf);font-size:.68rem;font-weight:800;color:var(--tx2);line-height:1.2}
-    .rep-followup-tabs{display:flex;gap:6px;flex-wrap:wrap}
-    .rep-followup-tab{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--bdr);background:var(--srf);color:var(--tx2);padding:5px 10px;border-radius:999px;font-size:.7rem;font-weight:800;cursor:pointer;line-height:1.2}
-    .rep-followup-tab .count{font-size:.66rem;padding:2px 6px;border-radius:999px;background:var(--srf2);border:1px solid var(--bdr)}
-    .rep-followup-tab:hover{border-color:#5b6b85;color:var(--tx)}
-    .rep-followup-tab.active{border-color:#38bdf8;color:#e0f2fe;background:rgba(12,74,110,.36)}
-    .rep-followup-tab.active .count{border-color:#38bdf8;background:rgba(14,165,233,.24)}
+    .rep-followup-stat{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid rgba(148,163,184,.34);background:rgba(15,23,42,.55);font-size:.68rem;font-weight:800;color:#dbe7ff;line-height:1.2}
+    .rep-followup-tabs{display:flex;gap:6px;flex-wrap:wrap;padding:3px;border-radius:12px;border:1px solid rgba(148,163,184,.26);background:rgba(15,23,42,.36)}
+    .rep-followup-tab{display:inline-flex;align-items:center;gap:6px;border:1px solid transparent;background:transparent;color:#cbd8ef;padding:6px 11px;border-radius:999px;font-size:.7rem;font-weight:800;cursor:pointer;line-height:1.2;transition:all .16s ease}
+    .rep-followup-tab .count{font-size:.66rem;padding:2px 6px;border-radius:999px;background:rgba(15,23,42,.55);border:1px solid rgba(148,163,184,.3)}
+    .rep-followup-tab:hover{color:#eef4ff;background:rgba(148,163,184,.12)}
+    .rep-followup-tab.active{border-color:rgba(125,211,252,.66);color:#eff7ff;background:linear-gradient(180deg,rgba(59,130,246,.4) 0%,rgba(14,165,233,.34) 100%);box-shadow:0 8px 16px rgba(14,165,233,.18)}
+    .rep-followup-tab.active .count{border-color:rgba(186,230,253,.7);background:rgba(12,74,110,.38)}
     .rep-followup-controls{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,.8fr) auto;gap:8px}
-    .rep-followup-controls .inp,.rep-followup-controls .sel{font-size:.78rem;padding:8px 10px;min-height:36px;border-radius:9px}
-    .rep-followup-clear{font-size:.74rem;font-weight:800;padding:8px 10px;border-radius:9px;border:1px solid var(--bdr);background:var(--srf);color:var(--tx2);cursor:pointer}
-    .rep-followup-clear:hover{border-color:#5b6b85;color:var(--tx)}
-    .rep-followup-group{border:1px solid var(--bdr);border-radius:11px;background:var(--srf2);overflow:hidden}
+    .rep-followup-controls .inp,.rep-followup-controls .sel{font-size:.78rem;padding:8px 10px;min-height:36px;border-radius:10px;border-color:rgba(148,163,184,.36);background:rgba(15,23,42,.5)}
+    .rep-followup-clear{font-size:.74rem;font-weight:800;padding:8px 10px;border-radius:10px;border:1px solid rgba(148,163,184,.35);background:rgba(15,23,42,.5);color:#d7e2f7;cursor:pointer}
+    .rep-followup-clear:hover{border-color:#93c5fd;color:#eff6ff}
+    .rep-followup-group{border:1px solid rgba(148,163,184,.28);border-radius:14px;background:linear-gradient(180deg,rgba(15,23,42,.42) 0%,rgba(30,41,59,.34) 100%);overflow:hidden;box-shadow:0 8px 18px rgba(2,6,23,.14)}
     .rep-followup-group + .rep-followup-group{margin-top:10px}
-    .rep-followup-group summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;background:rgba(148,163,184,.08);font-size:.78rem;font-weight:800;color:var(--tx)}
+    .rep-followup-group summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;background:rgba(148,163,184,.08);font-size:.79rem;font-weight:800;color:#eef5ff}
     .rep-followup-group summary::-webkit-details-marker{display:none}
-    .rep-followup-group summary::after{content:'+';font-size:.95rem;color:var(--tx3)}
-    .rep-followup-group[open] summary::after{content:'-'}
-    .rep-followup-group-list{padding:8px;display:grid;gap:8px}
-    .rep-followup-group-count{font-size:.68rem;color:var(--tx3);font-weight:700}
-    .rep-followup-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
-    .rep-followup-action{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid var(--bdr);background:var(--srf);font-size:.72rem;font-weight:800;color:var(--tx2);text-decoration:none;line-height:1.2}
-    .rep-followup-action:hover{border-color:#5b6b85;color:var(--tx)}
-    .rep-followup-action.call,.rep-followup-action.text{border-color:#16a34a;color:#dcfce7;background:rgba(22,163,74,.34)}
-    .rep-followup-action.call:hover,.rep-followup-action.text:hover{border-color:#22c55e;color:#f0fdf4;background:rgba(22,163,74,.5)}
-    .rep-followup-action.book{border-color:var(--bdr);color:var(--tx3);background:transparent}
-    .rep-followup-action.book:hover{border-color:#64748b;color:var(--tx2)}
+    .rep-followup-group summary::after{content:'▾';font-size:.8rem;color:#9fb5d1;transition:transform .16s ease}
+    .rep-followup-group[open] summary::after{transform:rotate(180deg)}
+    .rep-followup-group-list{padding:9px;display:grid;gap:9px;animation:repFadeIn .18s ease}
+    .rep-followup-group-count{font-size:.68rem;color:#abc0db;font-weight:700}
+    .rep-followup-group .rep-item{border-color:rgba(148,163,184,.26);border-radius:13px;background:linear-gradient(180deg,rgba(15,23,42,.52) 0%,rgba(30,41,59,.44) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+    .rep-followup-group .rep-item:hover{transform:translateY(-1px);border-color:rgba(148,163,184,.48)}
+    .rep-followup-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+    .rep-followup-action{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid rgba(148,163,184,.3);background:rgba(15,23,42,.52);font-size:.72rem;font-weight:800;color:#d9e4f8;text-decoration:none;line-height:1.2;transition:all .16s ease}
+    .rep-followup-action:hover{border-color:#93c5fd;color:#f2f8ff}
+    .rep-followup-action.call,.rep-followup-action.text{padding:7px 12px;border-color:#34d399;color:#ecfdf5;background:linear-gradient(180deg,rgba(52,211,153,.45) 0%,rgba(16,185,129,.32) 100%);box-shadow:0 8px 16px rgba(16,185,129,.22)}
+    .rep-followup-action.call:hover,.rep-followup-action.text:hover{border-color:#6ee7b7;color:#ffffff;box-shadow:0 12px 20px rgba(16,185,129,.26)}
+    .rep-followup-action.book{border-color:rgba(148,163,184,.3);color:#b8c7db;background:transparent}
+    .rep-followup-action.book:hover{border-color:#64748b;color:#d7e3f5}
+    .rep-followup-details{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(148,163,184,.3)}
+    .rep-followup-details summary{list-style:none;cursor:pointer;font-size:.72rem;font-weight:800;letter-spacing:.01em;color:#9eb4ce}
+    .rep-followup-details summary::-webkit-details-marker{display:none}
+    .rep-followup-details summary::after{content:' +';color:#8aa2c0}
+    .rep-followup-details[open] summary::after{content:' -'}
+    .rep-followup-details-body{display:grid;gap:4px;margin-top:6px}
     .rep-followup-filter-empty{font-size:.81rem;color:var(--tx2);line-height:1.45}
+    @keyframes repFadeIn{from{opacity:.72;transform:translateY(2px)}to{opacity:1;transform:translateY(0)}}
     .rep-item.rep-due-critical{border-left:4px solid #ef4444}
     .rep-item.rep-due-overdue{border-left:4px solid #f97316}
     .rep-item.rep-due-urgent{border-left:4px solid #f59e0b}
@@ -435,6 +445,7 @@
 
       <div class="rep-card" style="margin-top:12px">
         <div class="section-title">Follow-up Queue</div>
+        <p class="rep-note" style="margin-top:0">Prioritize outreach with quick-call and text actions, then move warm leads to booking.</p>
         <div class="rep-followup-toolbar">
           <div class="rep-followup-stats" id="rep-followup-stats"></div>
           <div class="rep-followup-tabs" id="rep-followup-tabs">
@@ -475,6 +486,7 @@
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.gridlayer.googlemutant@0.14.0/Leaflet.GoogleMutant.js" crossorigin=""></script>
 
 <script>
 (function(){
@@ -489,12 +501,19 @@
   const MAP_HISTORY_DAYS=30;
   const API_TIMEOUT_MS=30000;
   const SLOTS_TIMEOUT_MS=30000;
+  const GOOGLE_MAPS_KEY_STORAGE='sud_google_maps_api_key';
   const QUICK_OUTCOMES={
     not_home:{label:'Not Home',outcome:'no_answer',wantsFollowup:false,followupHours:0,note:'Quick map log: no one answered.'},
     not_interested:{label:'Not Interested',outcome:'not_interested',wantsFollowup:false,followupHours:0,note:'Quick map log: not interested.'},
     call_back:{label:'Call Back',outcome:'interested_callback',wantsFollowup:true,followupHours:4,note:'Quick map log: requested callback.'},
     sale_made:{label:'Sale Made',outcome:'booked_on_door',wantsFollowup:false,followupHours:0,note:'Quick map log: booked on door.'}
   };
+  const FOLLOWUP_WEEK_OPTIONS=[
+    {value:1,label:'1 week'},
+    {value:2,label:'2 weeks'},
+    {value:3,label:'3 weeks'},
+    {value:4,label:'4 weeks'}
+  ];
   const POPUP_OUTCOME_CHOICES=[
     {label:'Interested',outcome:'interested_callback'},
     {label:'Not Home',outcome:'no_answer'},
@@ -561,6 +580,10 @@
   const mapHistoryMarkersById=new Map();
   let mapHoldTimer=null;
   let mapInitialized=false;
+  let mapInitPromise=null;
+  let googleMapsJsPromise=null;
+  let googleMapsApiKeyCache='';
+  let googleMapsApiKeyPromise=null;
   let isMovePinMode=false;
   let latestPin=null;
   let editingDoorEventId='';
@@ -573,6 +596,7 @@
     name:'',
     phone:'',
     email:'',
+    quotedPrice:'',
     service:'',
     saleDate:'',
     monthCursor:'',
@@ -590,6 +614,7 @@
     submitBusy:false,
     submitStatus:'',
     followup:true,
+    followupWeeks:1,
     followupDueAt:'',
     notes:''
   };
@@ -601,6 +626,7 @@
   let saleCongratsToastEl=null;
   let pipelineItemsCache=[];
   let pipelineFilterMode='all';
+  const pipelineActionBusyIds=new Set();
 
   function getToken(){
     try{return sessionStorage.getItem(TOKEN_KEY)||'';}catch(_e){return '';}
@@ -643,6 +669,73 @@
     if(!mapStatus) return;
     mapStatus.textContent=msg;
     mapStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
+  }
+
+  async function getGoogleMapsApiKey(){
+    const direct=String(window.GOOGLE_MAPS_API_KEY||'').trim();
+    if(direct){
+      googleMapsApiKeyCache=direct;
+      return direct;
+    }
+    try{
+      const stored=String(sessionStorage.getItem(GOOGLE_MAPS_KEY_STORAGE)||localStorage.getItem(GOOGLE_MAPS_KEY_STORAGE)||'').trim();
+      if(stored){
+        googleMapsApiKeyCache=stored;
+        return stored;
+      }
+    }catch(_e){
+      // ignore and continue to worker config
+    }
+
+    if(googleMapsApiKeyCache) return googleMapsApiKeyCache;
+    if(googleMapsApiKeyPromise) return googleMapsApiKeyPromise;
+
+    googleMapsApiKeyPromise=(async()=>{
+      const endpoints=[
+        `${API_BASE}/public/maps-config`,
+        `${API_BASE}/api/public/maps-config`
+      ];
+      for(const ep of endpoints){
+        try{
+          const res=await fetch(ep,{method:'GET'});
+          if(!res.ok) continue;
+          const data=await res.json().catch(()=>null);
+          const key=String(data&&data.googleMapsApiKey||'').trim();
+          if(key){
+            googleMapsApiKeyCache=key;
+            return key;
+          }
+        }catch(_e){}
+      }
+      return '';
+    })().finally(()=>{ googleMapsApiKeyPromise=null; });
+
+    return googleMapsApiKeyPromise;
+  }
+
+  function loadGoogleMapsJs(key){
+    if(window.google&&window.google.maps) return Promise.resolve(true);
+    if(!key) return Promise.resolve(false);
+    if(googleMapsJsPromise) return googleMapsJsPromise;
+
+    googleMapsJsPromise=new Promise((resolve)=>{
+      const existing=document.querySelector('script[data-google-maps-api="1"]');
+      if(existing){
+        existing.addEventListener('load',()=>resolve(Boolean(window.google&&window.google.maps)),{once:true});
+        existing.addEventListener('error',()=>resolve(false),{once:true});
+        return;
+      }
+      const script=document.createElement('script');
+      script.src=`https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&v=weekly`;
+      script.async=true;
+      script.defer=true;
+      script.setAttribute('data-google-maps-api','1');
+      script.onload=()=>resolve(Boolean(window.google&&window.google.maps));
+      script.onerror=()=>resolve(false);
+      document.head.appendChild(script);
+    });
+
+    return googleMapsJsPromise;
   }
 
   function setScheduleStatus(msg, isErr){
@@ -1021,6 +1114,27 @@
     return dt.toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
   }
 
+  function priceInputToCents(raw){
+    const cleaned=String(raw||'').trim().replace(/[$,\s]/g,'');
+    if(!cleaned) return 0;
+    if(!/^\d+(\.\d{1,2})?$/.test(cleaned)) return Number.NaN;
+    const amount=Number(cleaned);
+    if(!Number.isFinite(amount)||amount<0) return Number.NaN;
+    return Math.round(amount*100);
+  }
+
+  function centsToPriceInput(value){
+    const cents=Number(value);
+    if(!Number.isFinite(cents)||cents<=0) return '';
+    return (cents/100).toFixed(2);
+  }
+
+  function formatPriceCents(value){
+    const cents=Number(value);
+    if(!Number.isFinite(cents)||cents<=0) return '';
+    return `$${(cents/100).toFixed(2)}`;
+  }
+
   function updateCoordinateNote(){
     const lat=Number(val('de-lat'));
     const lng=Number(val('de-lng'));
@@ -1074,6 +1188,7 @@
       `data-dot-lead-email="${esc(encodePopupData(p.leadEmail||''))}"`,
       `data-dot-followup="${p.wantsFollowup?'1':'0'}"`,
       `data-dot-followup-due="${esc(encodePopupData(p.followupDueAt||''))}"`,
+      `data-dot-estimated-value-cents="${esc(String(Number(p.estimatedValueCents)||0))}"`,
     ].join(' ');
     return `<div class="rep-popup-actions">
       <button class="rep-popup-btn" type="button" data-dot-action="move" ${baseAttrs}>Move</button>
@@ -1087,6 +1202,46 @@
     return new Date(due.getTime()-due.getTimezoneOffset()*60*1000).toISOString().slice(0,16);
   }
 
+  function clampFollowupWeeks(value){
+    const weeks=Number(value);
+    if(!Number.isFinite(weeks)) return 1;
+    return Math.max(1,Math.min(4,Math.round(weeks)));
+  }
+
+  function followupDueLocalValueForWeeks(weeksFromNow){
+    const weeks=clampFollowupWeeks(weeksFromNow);
+    const due=new Date();
+    due.setDate(due.getDate()+(weeks*7));
+    due.setHours(12,0,0,0);
+    return new Date(due.getTime()-due.getTimezoneOffset()*60*1000).toISOString().slice(0,16);
+  }
+
+  function followupWeeksFromDateInputValue(localValue){
+    const raw=String(localValue||'').trim();
+    if(!raw) return 1;
+    const due=new Date(raw);
+    if(Number.isNaN(due.getTime())) return 1;
+    const diffMs=due.getTime()-Date.now();
+    const diffDays=Math.max(0,Math.round(diffMs/(24*60*60*1000)));
+    const weeks=Math.round(diffDays/7);
+    return clampFollowupWeeks(weeks||1);
+  }
+
+  function followupDueDisplayLabel(localValue){
+    const raw=String(localValue||'').trim();
+    if(!raw) return 'No follow-up date selected';
+    const dt=new Date(raw);
+    if(Number.isNaN(dt.getTime())) return 'No follow-up date selected';
+    return dt.toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+  }
+
+  function followupIsoForWeeksAtNoon(weeksFromNow){
+    const localValue=followupDueLocalValueForWeeks(weeksFromNow);
+    const parsed=new Date(localValue);
+    if(Number.isNaN(parsed.getTime())) return '';
+    return parsed.toISOString();
+  }
+
   function todayLocalDateValue(){
     const now=new Date();
     const local=new Date(now.getTime()-now.getTimezoneOffset()*60*1000);
@@ -1095,12 +1250,14 @@
 
   function resetActiveWorkflow(outcome){
     const normalized=String(outcome||'').trim();
+    const defaultFollowupWeeks=1;
     activeWorkflow={
       outcome:normalized,
       reason:'',
       name:val('de-lead-name').trim(),
       phone:val('de-lead-phone').trim(),
       email:'',
+      quotedPrice:'',
       service:(val('de-service')||'').trim(),
       saleDate:todayLocalDateValue(),
       monthCursor:currentMonthValue(),
@@ -1118,7 +1275,8 @@
       submitBusy:false,
       submitStatus:'',
       followup:normalized==='interested_callback',
-      followupDueAt:normalized==='interested_callback'?nextFollowupLocalValue(4):'',
+      followupWeeks:defaultFollowupWeeks,
+      followupDueAt:normalized==='interested_callback'?followupDueLocalValueForWeeks(defaultFollowupWeeks):'',
       notes:''
     };
   }
@@ -1129,12 +1287,14 @@
     const service=String(data&&data.serviceInterestSlug||'').trim();
     const wantsFollowup=Boolean(data&&data.wantsFollowup);
     const followupDueAt=toLocalDateTimeInputValue(data&&data.followupDueAt||'');
+    const followupWeeks=followupWeeksFromDateInputValue(followupDueAt);
     activeWorkflow={
       outcome,
       reason:outcome==='not_interested'?detail:'',
       name:String(data&&data.leadFirstName||val('de-lead-name')||'').trim(),
       phone:String(data&&data.leadPhone||val('de-lead-phone')||'').trim(),
       email:String(data&&data.leadEmail||'').trim(),
+      quotedPrice:centsToPriceInput(data&&data.estimatedValueCents),
       service,
       saleDate:todayLocalDateValue(),
       monthCursor:currentMonthValue(),
@@ -1152,7 +1312,8 @@
       submitBusy:false,
       submitStatus:'',
       followup:wantsFollowup||outcome==='interested_callback',
-      followupDueAt:followupDueAt||(outcome==='interested_callback'?nextFollowupLocalValue(4):''),
+      followupWeeks,
+      followupDueAt:followupDueAt||(outcome==='interested_callback'?followupDueLocalValueForWeeks(followupWeeks):''),
       notes:outcome==='not_interested'?'':detail
     };
   }
@@ -1161,8 +1322,13 @@
     if(!latestPin) return '';
     const outcome=activeWorkflow.outcome||val('de-outcome');
     const detail=activeWorkflow.outcome==='not_interested'?activeWorkflow.reason:activeWorkflow.notes;
+    const existingEventId=String(editingDoorEventId||'').trim();
+    const sourceTag=existingEventId?'history':'active';
+    const estimatedValueCents=priceInputToCents(activeWorkflow.quotedPrice||'');
     return [
-      `data-dot-source="active"`,
+      `data-dot-source="${esc(sourceTag)}"`,
+      `data-dot-marker-id="${esc(existingEventId)}"`,
+      `data-dot-event-id="${esc(existingEventId)}"`,
       `data-dot-lat="${esc(String(latestPin.lat||''))}"`,
       `data-dot-lng="${esc(String(latestPin.lng||''))}"`,
       `data-dot-address="${esc(encodePopupData(latestPin.addressLine1||''))}"`,
@@ -1174,6 +1340,7 @@
       `data-dot-service="${esc(encodePopupData(activeWorkflow.service||''))}"`,
       `data-dot-followup="${activeWorkflow.followup?'1':'0'}"`,
       `data-dot-followup-due="${esc(encodePopupData(activeWorkflow.followupDueAt||''))}"`,
+      `data-dot-estimated-value-cents="${esc(String(Number.isFinite(estimatedValueCents)?estimatedValueCents:0))}"`,
     ].join(' ');
   }
 
@@ -1186,6 +1353,13 @@
       {value:'premium-detail',label:'Premium Detail'},
     ];
     return options.map((opt)=>`<option value="${esc(opt.value)}"${opt.value===current?' selected':''}>${esc(opt.label)}</option>`).join('');
+  }
+
+  function popupFollowupWeekOptions(selectedWeeks){
+    const selected=clampFollowupWeeks(selectedWeeks);
+    return FOLLOWUP_WEEK_OPTIONS
+      .map((opt)=>`<option value="${opt.value}"${opt.value===selected?' selected':''}>${esc(opt.label)}</option>`)
+      .join('');
   }
 
   function popupMonthCalendarHtml(){
@@ -1342,6 +1516,8 @@
     }
 
     if(outcome==='interested_callback'){
+      const followupWeeks=clampFollowupWeeks(activeWorkflow.followupWeeks||1);
+      const followupPreview=followupDueDisplayLabel(activeWorkflow.followupDueAt||followupDueLocalValueForWeeks(followupWeeks));
       return `<div class="rep-popup-form">
         <div class="rep-popup-row">
           <div>
@@ -1359,8 +1535,9 @@
             <select id="wf-service" class="sel">${popupServiceOptions(activeWorkflow.service)}</select>
           </div>
           <div>
-            <label for="wf-followup-date">Follow-up</label>
-            <input id="wf-followup-date" class="inp" type="datetime-local" value="${esc(activeWorkflow.followupDueAt||'')}"/>
+            <label for="wf-followup-weeks">Follow-up</label>
+            <select id="wf-followup-weeks" class="sel">${popupFollowupWeekOptions(followupWeeks)}</select>
+            <div class="rep-note">Scheduled for ${esc(followupPreview)} (local time).</div>
           </div>
         </div>
         <label for="wf-notes">Notes</label>
@@ -1394,6 +1571,12 @@
           <div>
             <label for="wf-email">Email (optional if phone provided)</label>
             <input id="wf-email" class="inp" type="email" value="${esc(activeWorkflow.email||'')}" placeholder="customer@email.com"/>
+          </div>
+        </div>
+        <div class="rep-popup-row">
+          <div>
+            <label for="wf-price">Price (USD)</label>
+            <input id="wf-price" class="inp" type="text" inputmode="decimal" value="${esc(activeWorkflow.quotedPrice||'')}" placeholder="299.99"/>
           </div>
         </div>
         <div class="rep-popup-actions">
@@ -1455,6 +1638,7 @@
     activeWorkflow.name=getText('wf-name');
     activeWorkflow.phone=getText('wf-phone');
     activeWorkflow.email=getText('wf-email');
+    activeWorkflow.quotedPrice=getText('wf-price');
     activeWorkflow.service=getText('wf-service');
     const saleDateInput=getText('wf-sale-date');
     if(saleDateInput) activeWorkflow.saleDate=saleDateInput;
@@ -1462,10 +1646,13 @@
     if(selectedSlotInput) activeWorkflow.selectedSlot=selectedSlotInput;
     activeWorkflow.notes=getText('wf-notes');
     if(outcome==='interested_callback'){
+      const selectedWeeks=clampFollowupWeeks(getText('wf-followup-weeks')||activeWorkflow.followupWeeks||1);
       activeWorkflow.followup=true;
-      activeWorkflow.followupDueAt=getText('wf-followup-date');
+      activeWorkflow.followupWeeks=selectedWeeks;
+      activeWorkflow.followupDueAt=followupDueLocalValueForWeeks(selectedWeeks);
     } else {
       activeWorkflow.followup=false;
+      activeWorkflow.followupWeeks=1;
       activeWorkflow.followupDueAt='';
     }
 
@@ -1522,6 +1709,7 @@
     const contact=[item.leadFirstName||'', item.leadPhone||''].filter(Boolean).join(' · ');
     const followupText=item.followupDueAt?new Date(item.followupDueAt).toLocaleString('en-US'):'';
     const serviceLabel=item.serviceInterestSlug?esc(item.serviceInterestSlug.replaceAll('-',' ')):'';
+    const priceLabel=formatPriceCents(item.estimatedValueCents||0);
     const markerId=String(item.id||'');
     return `<div class="rep-dot-dialog">
       <div class="rep-dot-title" style="color:${meta.color}">${esc(meta.label)}</div>
@@ -1529,6 +1717,7 @@
       <div class="rep-dot-address">${esc(addr)}</div>
       ${contact?`<div class="rep-dot-sub">${esc(contact)}</div>`:''}
       ${serviceLabel?`<div class="rep-dot-sub">Service: ${serviceLabel}</div>`:''}
+      ${priceLabel?`<div class="rep-dot-sub">Quoted Price: ${esc(priceLabel)}</div>`:''}
       ${followupText?`<div class="rep-dot-sub">Follow-up: ${esc(followupText)}</div>`:''}
       ${detail?`<div class="rep-dot-detail">${detail}</div>`:''}
       ${popupActionButtons({
@@ -1549,6 +1738,7 @@
         leadEmail:item.leadEmail,
         wantsFollowup:Boolean(item.wantsFollowup),
         followupDueAt:item.followupDueAt,
+        estimatedValueCents:item.estimatedValueCents,
       })}
     </div>`;
   }
@@ -1638,24 +1828,47 @@
     }
   }
 
+  function apiEndpointPair(path){
+    return [`${API_BASE}${path}`, `${API_BASE}/api${path}`];
+  }
+
   async function api(path, method, body){
     const token=getToken();
     const headers={'Content-Type':'application/json'};
     if(token) headers['x-rep-session']=token;
-    const timeout=withTimeout(API_TIMEOUT_MS);
-    let res;
-    try{
-      res=await fetch(API_BASE+path, {
-        method,
-        headers,
-        signal:timeout.signal,
-        body: body ? JSON.stringify(body) : undefined
-      });
-    }catch(err){
-      if(err&&err.name==='AbortError') throw new Error('Request timed out. Please try again.');
-      throw err;
-    } finally {
-      timeout.cancel();
+    let res=null;
+    let saw404=false;
+    let lastNetworkError='';
+
+    for(const ep of apiEndpointPair(path)){
+      const timeout=withTimeout(API_TIMEOUT_MS);
+      try{
+        const candidate=await fetch(ep, {
+          method,
+          headers,
+          signal:timeout.signal,
+          body: body ? JSON.stringify(body) : undefined
+        });
+        if(candidate.status===404){
+          saw404=true;
+          continue;
+        }
+        res=candidate;
+        break;
+      }catch(err){
+        if(err&&err.name==='AbortError'){
+          lastNetworkError='Request timed out. Please try again.';
+        }else{
+          lastNetworkError=String(err&&err.message?err.message:'Network request failed');
+        }
+      } finally {
+        timeout.cancel();
+      }
+    }
+
+    if(!res){
+      if(saw404) throw new Error('Field endpoint not deployed (404).');
+      throw new Error(`Could not reach field endpoint (network/CORS): ${lastNetworkError||'request blocked or unavailable'}`);
     }
 
     if(res.status===401){
@@ -1685,11 +1898,44 @@
     loginBtn.disabled=true;
     setLoginStatus('Signing in...', false);
     try{
-      const res=await fetch(API_BASE+'/field/auth/login', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({repId, pin})
-      });
+      let res=null;
+      let saw404=false;
+      let lastNetworkError='';
+      for(const ep of apiEndpointPair('/field/auth/login')){
+        const timeout=withTimeout(API_TIMEOUT_MS);
+        try{
+          const candidate=await fetch(ep, {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            signal:timeout.signal,
+            body:JSON.stringify({repId, pin})
+          });
+          if(candidate.status===404){
+            saw404=true;
+            continue;
+          }
+          res=candidate;
+          break;
+        }catch(err){
+          if(err&&err.name==='AbortError'){
+            lastNetworkError='Request timed out. Please try again.';
+          }else{
+            lastNetworkError=String(err&&err.message?err.message:'Network request failed');
+          }
+        } finally {
+          timeout.cancel();
+        }
+      }
+
+      if(!res){
+        if(saw404){
+          setLoginStatus('Rep auth endpoint not deployed (404).', true);
+        }else{
+          setLoginStatus(`Could not reach sign-in endpoint (network/CORS): ${lastNetworkError||'request blocked or unavailable'}`, true);
+        }
+        return;
+      }
+
       const data=await res.json().catch(()=>null);
       if(!res.ok||!data||!data.token){
         setLoginStatus((data&&data.error) || 'Sign in failed.', true);
@@ -1905,10 +2151,20 @@
     const emailHref=row.email?`mailto:${row.email}`:'';
     const bookingHref=bookingHrefFromRow(row);
     const actions=[];
+    const isBusy=row.id && pipelineActionBusyIds.has(row.id);
+    const busyAttr=isBusy?' disabled':'';
     if(callHref) actions.push(`<a class="rep-followup-action call" href="${esc(callHref)}">Call</a>`);
     if(smsHref) actions.push(`<a class="rep-followup-action text" href="${esc(smsHref)}">Text</a>`);
     if(emailHref) actions.push(`<a class="rep-followup-action" href="${esc(emailHref)}">Email</a>`);
     actions.push(`<a class="rep-followup-action book" href="${esc(bookingHref)}" target="_blank" rel="noopener">Book</a>`);
+    const weekOptions=popupFollowupWeekOptions(row.defaultWeeks||1);
+    const manageActions=row.id ? `<div class="rep-followup-actions">
+      <div class="rep-followup-line"><strong>Interested Lead:</strong> Next follow-up can be moved in one tap.</div>
+      <select class="sel" data-followup-weeks-select="${esc(row.id)}"${busyAttr}>${weekOptions}</select>
+      <button type="button" class="rep-followup-action" data-followup-action="reschedule" data-followup-id="${esc(row.id)}"${busyAttr}>Reschedule</button>
+      <button type="button" class="rep-followup-action" data-followup-action="complete" data-followup-id="${esc(row.id)}"${busyAttr}>Mark Done</button>
+    </div>` : '';
+    const quotedLabel=row.quotedPriceCents>0?formatPriceCents(row.quotedPriceCents):'';
 
     return `<div class="rep-item ${row.due.className}">
       <div class="rep-followup-head">
@@ -1921,11 +2177,18 @@
       <div class="rep-followup-lines">
         <div class="rep-followup-line"><strong>Due:</strong> ${esc(row.due.localLabel)}${row.due.hint?` · ${esc(row.due.hint)}`:''}</div>
         <div class="rep-followup-line"><strong>Contact:</strong> ${esc(contact)}</div>
-        <div class="rep-followup-line"><strong>Address:</strong> ${esc(row.addr)}</div>
         <div class="rep-followup-line"><strong>Service:</strong> ${esc(row.svc||'Not selected')}</div>
-        ${row.notes?`<div class="rep-followup-line"><strong>Notes:</strong> ${esc(row.notes)}</div>`:''}
+        ${quotedLabel?`<div class="rep-followup-line"><strong>Quoted:</strong> ${esc(quotedLabel)}</div>`:''}
+        <details class="rep-followup-details">
+          <summary>Details</summary>
+          <div class="rep-followup-details-body">
+            <div class="rep-followup-line"><strong>Address:</strong> ${esc(row.addr)}</div>
+            ${row.notes?`<div class="rep-followup-line"><strong>Notes:</strong> ${esc(row.notes)}</div>`:''}
+          </div>
+        </details>
       </div>
       <div class="rep-followup-actions">${actions.join('')}</div>
+      ${manageActions}
     </div>`;
   }
 
@@ -1943,14 +2206,17 @@
       const dueIso=pickField(it,['scheduledFor','followupDueAt','dueAt']);
       const due=dueMeta(dueIso);
       const status=statusLabel(pickField(it,['status']) || 'open');
+      const id=pickField(it,['id']);
       const phone=pickField(it,['phone','leadPhone','contactPhone']);
       const email=pickField(it,['email','leadEmail','contactEmail']);
       const svcSlug=pickField(it,['serviceInterestSlug','serviceSlug','service']);
       const svc=serviceLabel(svcSlug);
       const addr=[it.addressLine1||'',it.city||'',it.state||'',it.postalCode||''].filter(Boolean).join(', ') || 'No address';
       const notes=pickField(it,['notes','outcomeDetail']);
-      const searchable=[nm,status,phone,email,svc,addr,notes,due.localLabel,due.hint].join(' ').toLowerCase();
-      return {it,name:nm,due,status,phone,email,svcSlug,svc,addr,notes,searchable};
+      const quotedPriceCents=Math.max(0,Number(pickField(it,['estimatedValueCents','quotedPriceCents'])||0));
+      const defaultWeeks=followupWeeksFromDateInputValue(toLocalDateTimeInputValue(dueIso));
+      const searchable=[nm,status,phone,email,svc,addr,notes,due.localLabel,due.hint,String(quotedPriceCents)].join(' ').toLowerCase();
+      return {it,id,name:nm,due,status,phone,email,svcSlug,svc,addr,notes,quotedPriceCents,defaultWeeks,searchable};
     });
 
     const query=String(pipelineSearch&&pipelineSearch.value||'').trim().toLowerCase();
@@ -2021,6 +2287,59 @@
     renderKpis(today&&today.summary?today.summary:{});
     const pipeline=await api('/field/me/pipeline','GET');
     renderPipeline(pipeline&&pipeline.items?pipeline.items:[]);
+  }
+
+  async function updateFollowupFromPipeline(followupId, payload, successMessage){
+    const id=String(followupId||'').trim();
+    if(!id) return;
+    if(pipelineActionBusyIds.has(id)) return;
+    pipelineActionBusyIds.add(id);
+    renderPipeline(pipelineItemsCache);
+    try{
+      await api(`/field/followups/${encodeURIComponent(id)}`,'PATCH',payload);
+      if(successMessage) setDoorStatus(successMessage, false);
+      await refreshData();
+    }catch(err){
+      setDoorStatus(String(err&&err.message?err.message:'Could not update follow-up.'), true);
+    } finally {
+      pipelineActionBusyIds.delete(id);
+      renderPipeline(pipelineItemsCache);
+    }
+  }
+
+  async function handlePipelineActionClick(evt){
+    const btn=evt&&evt.target&&evt.target.closest?evt.target.closest('[data-followup-action][data-followup-id]'):null;
+    if(!btn) return;
+    evt.preventDefault();
+    evt.stopPropagation();
+
+    const action=String(btn.getAttribute('data-followup-action')||'').trim();
+    const followupId=String(btn.getAttribute('data-followup-id')||'').trim();
+    if(!action || !followupId) return;
+
+    if(action==='complete'){
+      await updateFollowupFromPipeline(
+        followupId,
+        { status:'completed', result:'contacted' },
+        'Interested lead marked complete.'
+      );
+      return;
+    }
+
+    if(action==='reschedule'){
+      const manageWrap=btn.closest('.rep-followup-actions');
+      const selectEl=manageWrap&&manageWrap.querySelector
+        ? manageWrap.querySelector('[data-followup-weeks-select]')
+        : null;
+      const selectedWeeks=clampFollowupWeeks(selectEl&&selectEl.value?selectEl.value:'1');
+      const dueIso=followupIsoForWeeksAtNoon(selectedWeeks);
+      const dueLocalLabel=followupDueDisplayLabel(followupDueLocalValueForWeeks(selectedWeeks));
+      await updateFollowupFromPipeline(
+        followupId,
+        { status:'scheduled', scheduledFor:dueIso },
+        `Interested lead rescheduled for ${dueLocalLabel}.`
+      );
+    }
   }
 
   function setQuickButtonsEnabled(enabled){
@@ -2330,13 +2649,15 @@
       leadEmail:decodePopupData(btn.getAttribute('data-dot-lead-email')),
       wantsFollowup:String(btn.getAttribute('data-dot-followup')||'').trim()==='1',
       followupDueAt:decodePopupData(btn.getAttribute('data-dot-followup-due')),
+      estimatedValueCents:Number(btn.getAttribute('data-dot-estimated-value-cents')),
     };
 
     if(action==='delete'){
-      if(source==='history' && eventId){
+      const effectiveEventId=(eventId||editingDoorEventId||'').trim();
+      if(source==='history' && effectiveEventId){
         const confirmed=window.confirm('Delete this door event from backend data?');
         if(!confirmed) return;
-        await deleteDoorEvent(eventId);
+        await deleteDoorEvent(effectiveEventId);
         return;
       }
       clearDoorEventEditState();
@@ -2413,7 +2734,18 @@
       setMapStatus('Dot updated. Drag to edit again, or long-press/right-click to remove.', false);
     });
     repMarker.on('contextmenu',()=>{
-      const shouldRemove=window.confirm('Remove this map dot?');
+      const existingEventId=String(editingDoorEventId||'').trim();
+      if(existingEventId){
+        const shouldDelete=window.confirm('Delete this saved door event from backend data?');
+        if(shouldDelete){
+          deleteDoorEvent(existingEventId).catch((err)=>{
+            setMapStatus(String(err&&err.message?err.message:'Could not delete door event.'), true);
+          });
+        }
+        return;
+      }
+
+      const shouldRemove=window.confirm('Remove this unsaved map dot?');
       if(shouldRemove) clearPin();
     });
     repMarker.on('click',()=>{
@@ -2517,6 +2849,15 @@
     const outcome=String(activeWorkflow.outcome||'').trim();
     if(!outcome||!OUTCOME_MAP_META[outcome]) return null;
 
+    let estimatedValueCents=0;
+    if(outcome==='booked_on_door'){
+      const parsedPriceCents=priceInputToCents(activeWorkflow.quotedPrice);
+      if(!Number.isFinite(parsedPriceCents) || parsedPriceCents<=0){
+        throw new Error('Enter a valid sale price (for example 299.99).');
+      }
+      estimatedValueCents=parsedPriceCents;
+    }
+
     let detail='';
     if(outcome==='not_interested'){
       detail=String(activeWorkflow.reason||'').trim();
@@ -2544,6 +2885,7 @@
       wantsFollowup:Boolean(activeWorkflow.followup),
       followupDueAt,
       outcomeDetail:detail,
+      estimatedValueCents,
       vehiclePhotoName,
       lead:{
         firstName:String(activeWorkflow.name||'').trim(),
@@ -2609,6 +2951,9 @@
     if(leadId) bookingMetadata.lead_id=leadId;
     if(doorEventId) bookingMetadata.door_event_id=doorEventId;
     if(attendeePhone) bookingMetadata.lead_phone=attendeePhone;
+    if(Number(payload&&payload.estimatedValueCents)>0){
+      bookingMetadata.quoted_price_cents=String(Math.round(Number(payload.estimatedValueCents)));
+    }
     if(!String(payload&&payload.lead&&payload.lead.email||'').trim()) bookingMetadata.email_source='phone_fallback';
 
     const bookingPayload={
@@ -2635,7 +2980,13 @@
       setMapStatus('Already processing this request...', false);
       return;
     }
-    const payload=buildPopupWorkflowPayload();
+    let payload=null;
+    try{
+      payload=buildPopupWorkflowPayload();
+    }catch(err){
+      setMapStatus(String(err&&err.message?err.message:'Please fix the workflow form fields.'), true);
+      return;
+    }
     if(!payload){
       setMapStatus('Choose an outcome first.', true);
       return;
@@ -2659,6 +3010,10 @@
       }
       if(!payload.serviceInterestSlug){
         setMapStatus('Choose a service before saving sale made.', true);
+        return;
+      }
+      if(!(Number(payload.estimatedValueCents)>0)){
+        setMapStatus('Enter the quoted sale price before saving sale made.', true);
         return;
       }
       if(!activeWorkflow.saleDate){
@@ -2789,6 +3144,13 @@
         notes:outcomeDetail
       }
     };
+
+    if(Object.prototype.hasOwnProperty.call(merged,'estimatedValueCents')){
+      const parsedEstimate=Number(merged.estimatedValueCents);
+      if(Number.isFinite(parsedEstimate) && parsedEstimate>=0){
+        payload.estimatedValueCents=Math.round(parsedEstimate);
+      }
+    }
 
     if(Number.isFinite(lat)&&Number.isFinite(lng)){
       payload.lat=Number(lat.toFixed(6));
@@ -3095,23 +3457,43 @@
     }
   }
 
-  function initMap(){
+  async function initMap(){
     if(mapInitialized) return;
+    if(mapInitPromise) return mapInitPromise;
     if(!mapEl||typeof L==='undefined'){
       setMapStatus('Map could not load on this device.', true);
       return;
     }
 
-    repMap=L.map(mapEl,{zoomControl:false}).setView([37.6775,-113.0619],13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(repMap);
-    mapHistoryLayer=L.layerGroup().addTo(repMap);
-    mapInitialized=true;
-    if(mapEl && !mapEl.dataset.popupActionBound){
+    mapInitPromise=(async()=>{
+      const googleMapsKey=await getGoogleMapsApiKey();
+      const googleLoaded=await loadGoogleMapsJs(googleMapsKey).catch(()=>false);
+
+      repMap=L.map(mapEl,{zoomControl:false}).setView([37.6775,-113.0619],13);
+      let usingGoogle=false;
+      if(googleLoaded && L.gridLayer && typeof L.gridLayer.googleMutant==='function'){
+        L.gridLayer.googleMutant({type:'roadmap'}).addTo(repMap);
+        usingGoogle=true;
+      }else{
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+          maxZoom:19,
+          attribution:'&copy; OpenStreetMap contributors'
+        }).addTo(repMap);
+      }
+
+      mapHistoryLayer=L.layerGroup().addTo(repMap);
+      mapInitialized=true;
+      if(mapEl && !mapEl.dataset.popupActionBound){
       mapEl.addEventListener('click', handleMapPopupActionClick);
       mapEl.addEventListener('change',(evt)=>{
         const target=evt&&evt.target;
         if(target&&target.id==='wf-photo'){
           handlePopupPhotoChange(target).catch(()=>null);
+          return;
+        }
+        if(target&&target.id==='wf-followup-weeks'&&String(activeWorkflow.outcome||'').trim()==='interested_callback'){
+          syncWorkflowFromPopupInputs();
+          refreshActivePopupIfOpen();
           return;
         }
         if(target&&target.id==='wf-service'&&String(activeWorkflow.outcome||'').trim()==='booked_on_door'){
@@ -3127,10 +3509,10 @@
           loadSaleSlotsForWorkflow(true).catch(()=>null);
         }
       });
-      mapEl.dataset.popupActionBound='1';
-    }
+        mapEl.dataset.popupActionBound='1';
+      }
 
-    const beginHold=(evt)=>{
+      const beginHold=(evt)=>{
       const latlng=evt&&evt.latlng;
       if(!latlng) return;
       if(isMovePinMode) return;
@@ -3143,40 +3525,40 @@
       },MAP_HOLD_MS);
     };
 
-    const stopHold=()=>{
+      const stopHold=()=>{
       if(mapHoldTimer){
         clearTimeout(mapHoldTimer);
         mapHoldTimer=null;
       }
-    };
+      };
 
-    repMap.on('mousedown',beginHold);
-    repMap.on('touchstart',beginHold);
-    repMap.on('mouseup',stopHold);
-    repMap.on('touchend',stopHold);
-    repMap.on('dragstart',stopHold);
-    repMap.on('mouseout',stopHold);
-    repMap.on('click',(evt)=>{
+      repMap.on('mousedown',beginHold);
+      repMap.on('touchstart',beginHold);
+      repMap.on('mouseup',stopHold);
+      repMap.on('touchend',stopHold);
+      repMap.on('dragstart',stopHold);
+      repMap.on('mouseout',stopHold);
+      repMap.on('click',(evt)=>{
       if(!isMovePinMode) return;
       const ll=evt&&evt.latlng;
       if(!ll) return;
       setPin(ll.lat,ll.lng,false);
       setMapStatus('Dot moved. You can save the door event now.', false);
-    });
-    repMap.on('contextmenu',(evt)=>{
+      });
+      repMap.on('contextmenu',(evt)=>{
       if(evt&&evt.originalEvent&&typeof evt.originalEvent.preventDefault==='function') evt.originalEvent.preventDefault();
       clearDoorEventEditState();
       setPin(evt.latlng.lat,evt.latlng.lng,false);
-    });
+      });
 
-    if(mapEl && !mapEl.dataset.touchGuardBound){
+      if(mapEl && !mapEl.dataset.touchGuardBound){
       const preventDefault=(e)=>{ if(e&&typeof e.preventDefault==='function') e.preventDefault(); };
       mapEl.addEventListener('contextmenu',preventDefault);
       mapEl.addEventListener('selectstart',preventDefault);
       mapEl.dataset.touchGuardBound='1';
-    }
+      }
 
-    mapMyLocationBtn&&mapMyLocationBtn.addEventListener('click',()=>{
+      mapMyLocationBtn&&mapMyLocationBtn.addEventListener('click',()=>{
       if(!navigator.geolocation){
         setMapStatus('Geolocation is not available on this browser.', true);
         return;
@@ -3190,11 +3572,22 @@
         .catch((err)=>{
           setMapStatus(geolocationErrorMessage(err), true);
         });
-    });
+      });
 
-    mapClearBtn&&mapClearBtn.addEventListener('click',clearPin);
-    startLiveLocationWatch();
-    setMapStatus('Map ready. Blue dot shows your location when allowed. Press and hold to drop a pin.', false);
+      mapClearBtn&&mapClearBtn.addEventListener('click',clearPin);
+      startLiveLocationWatch();
+      if(usingGoogle){
+        setMapStatus('Map ready (Google road map). Blue dot shows your location when allowed. Press and hold to drop a pin.', false);
+      }else if(googleMapsKey){
+        setMapStatus('Map ready (Google unavailable, using OpenStreetMap). Blue dot shows your location when allowed. Press and hold to drop a pin.', false);
+      }else{
+        setMapStatus('Map ready (OpenStreetMap). To enable Google map view, set window.GOOGLE_MAPS_API_KEY or sud_google_maps_api_key in storage.', false);
+      }
+
+      if(getToken()) await refreshMapHistory().catch(()=>null);
+    })().finally(()=>{ mapInitPromise=null; });
+
+    return mapInitPromise;
   }
 
   loginBtn.addEventListener('click',signIn);
@@ -3226,6 +3619,7 @@
     pipelineFilterMode='all';
     renderPipeline(pipelineItemsCache);
   });
+  pipelineList&&pipelineList.addEventListener('click',(evt)=>{ handlePipelineActionClick(evt).catch(()=>null); });
 
   mapModalClose&&mapModalClose.addEventListener('click',closeMapModal);
   mapModalFullForm&&mapModalFullForm.addEventListener('click',()=>{

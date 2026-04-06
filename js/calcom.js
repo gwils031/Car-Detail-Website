@@ -9,6 +9,16 @@ const PKG_PRICES={
   'standard-detail':179,
   'premium-detail':249
 };
+const SERVICE_NAME_TO_SLUG={
+  'basic detail':'basic-detail',
+  'standard detail':'standard-detail',
+  'premium detail':'premium-detail'
+};
+
+function slugFromServiceName(name){
+  const key=String(name||'').trim().toLowerCase();
+  return SERVICE_NAME_TO_SLUG[key]||'';
+}
 
 document.addEventListener('DOMContentLoaded',()=>{
   const form=document.getElementById('bk-form');
@@ -19,9 +29,17 @@ async function handleSubmit(e){
   e.preventDefault();
 
   const get=id=>(document.getElementById(id)?.value||'').trim();
+  const selectedCard=document.querySelector('#svc-grid .svc-card.sel');
   const name=get('f-name'), email=get('f-email'), phone=get('f-phone');
   const street=get('f-street'), city=get('f-city'), state=get('f-state'), zip=get('f-zip');
-  const svcName=get('sel-service'), slug=window.selectedServiceSlug;
+  const svcName=get('sel-service');
+  const slug=(
+    selectedCard?.dataset.slug
+    || slugFromServiceName(svcName)
+    || slugFromServiceName(get('service-sel'))
+    || window.selectedServiceSlug
+    || ''
+  ).trim();
   const timeISO=get('selected-time');
 
   // Validate service

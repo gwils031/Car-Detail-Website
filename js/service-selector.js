@@ -14,11 +14,8 @@ class ServiceSelector {
       {name:'Premium Detail',  slug:'premium-detail',   price:249, dur:'3–4 hours',  desc:'Everything in Standard plus pet hair removal, odor removal, and leather conditioning.', popular:false}
     ];
     if(this.grid) this.render();
-    // Auto-select after render
-    setTimeout(()=>{
-      const slug=window.__autoSlug;
-      if(slug) this.pickBySlug(slug);
-    },150);
+    const slug=window.__autoSlug;
+    if(slug) this.pickBySlug(slug,true);
   }
 
   render(){
@@ -36,19 +33,19 @@ class ServiceSelector {
     this.grid.querySelectorAll('.svc-card').forEach(card=>{
       const slug=card.dataset.slug;
       const pkg=this.pkgs.find(p=>p.slug===slug);
-      const sel=()=>this.select(card,pkg);
+      const sel=()=>this.select(card,pkg,false);
       card.addEventListener('click',sel);
       card.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); sel(); }});
     });
   }
 
-  pickBySlug(slug){
+  pickBySlug(slug,isAuto=false){
     const card=this.grid?.querySelector(`[data-slug="${slug}"]`);
     const pkg=this.pkgs.find(p=>p.slug===slug);
-    if(card&&pkg) this.select(card,pkg);
+    if(card&&pkg) this.select(card,pkg,isAuto);
   }
 
-  select(card,pkg){
+  select(card,pkg,isAuto=false){
     // Deselect previous
     if(this.active){ this.active.classList.remove('sel'); this.active.setAttribute('aria-pressed','false'); }
     card.classList.add('sel');
@@ -60,8 +57,9 @@ class ServiceSelector {
     const sel=document.getElementById('service-sel');
     if(sel){ sel.value=pkg.name; sel.dispatchEvent(new Event('change')); }
     window.selectedServiceSlug=pkg.slug;
+    if(!isAuto) window.__autoSlug='';
 
-    if(window.__trackEvent){
+    if(window.__trackEvent && !isAuto){
       window.__trackEvent('service_selected',{
         surface:'desktop',
         service_slug:pkg.slug,

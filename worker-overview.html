@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Worker Console Weekly Plan - Southern Utah Detailing</title>
+  <meta name="robots" content="noindex,nofollow"/>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <link rel="stylesheet" href="/css/components.css"/>
+  <link rel="stylesheet" href="/css/worker-console.css"/>
+</head>
+<body>
+<header class="header" id="site-header">
+  <div class="container nav">
+    <a href="/index.html" class="nav-brand">
+      <img src="/images/Logo.PNG" alt="So.U.Detail logo" class="nav-logo"/>
+      Southern Utah Detailing
+    </a>
+    <div class="nav-spacer"></div>
+    <div class="nav-actions wc-nav" style="display:flex;gap:8px;align-items:center">
+      <a class="wc-nav-link active" href="/worker-overview.html">Overview</a>
+      <a class="wc-nav-link" href="/worker-field.html">On The Job</a>
+      <a class="wc-nav-link" href="/worker-finance.html">Finance</a>
+      <button class="button outline" id="worker-logout-btn" type="button" hidden>Sign Out</button>
+    </div>
+  </div>
+</header>
+
+<section class="section" style="padding-top:28px">
+  <div class="wc-shell">
+    <span class="eyebrow">Field Operations</span>
+    <h1 class="h2" style="margin-top:6px">Worker Console - Weekly Plan</h1>
+    <p class="muted" style="font-size:.9rem">Set your weekly availability and claim jobs that fit your schedule.</p>
+
+    <div class="wc-card" id="worker-login-card">
+      <div class="wc-row">
+        <div>
+          <label for="worker-id">Worker ID</label>
+          <input id="worker-id" class="inp" type="text" autocomplete="username" placeholder="worker id"/>
+        </div>
+        <div>
+          <label for="worker-pin">PIN</label>
+          <input id="worker-pin" class="inp" type="password" inputmode="numeric" autocomplete="current-password" placeholder="4 to 12 digits"/>
+        </div>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="button" id="worker-login-btn" type="button">Sign In</button>
+      </div>
+      <div class="wc-status" id="worker-auth-status">Waiting for sign in...</div>
+    </div>
+
+    <div id="worker-app" hidden>
+      <div class="wc-card soft">
+        <div class="wc-header">
+          <div>
+            <div class="wc-k">Signed In Worker</div>
+            <div class="wc-v" id="worker-name">Worker</div>
+            <div class="wc-sub" id="worker-rate">$0.00/hr</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="button outline" id="worker-refresh-btn" type="button">Refresh</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="wc-grid three">
+        <div class="wc-card"><div class="wc-k">Active Days</div><div class="wc-v" id="k-active-days">0</div><div class="wc-sub">Days enabled this week</div></div>
+        <div class="wc-card"><div class="wc-k">Fit Jobs (Week)</div><div class="wc-v" id="k-fit-jobs">0</div><div class="wc-sub">Unclaimed jobs in your hours</div></div>
+        <div class="wc-card"><div class="wc-k">My Week Jobs</div><div class="wc-v" id="k-my-week-jobs">0</div><div class="wc-sub">Assigned this week</div></div>
+      </div>
+
+      <div class="wc-grid two">
+        <div class="wc-card">
+          <div class="section-title">Weekly Availability</div>
+          <div class="wc-status" id="worker-availability-status">Set your available days and time windows.</div>
+          <div class="wc-availability-list" id="worker-availability-list"></div>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="button" id="worker-save-availability-btn" type="button">Save Availability</button>
+          </div>
+        </div>
+        <div class="wc-card">
+          <div class="section-title">Jobs That Fit My Availability</div>
+          <div class="wc-status" id="worker-weekly-status">Loading weekly jobs...</div>
+          <div class="wc-list" id="worker-weekly-fit-list"></div>
+        </div>
+      </div>
+
+      <div class="wc-card">
+        <div class="section-title">My Assigned Jobs This Week</div>
+        <div class="wc-list" id="worker-weekly-myjobs-list"></div>
+      </div>
+
+      <div class="wc-status" id="worker-global-status">Overview ready.</div>
+    </div>
+  </div>
+</section>
+
+<script src="/js/worker-console-core.js" defer></script>
+<script src="/js/worker-overview.js" defer></script>
+</body>
+</html>

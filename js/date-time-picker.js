@@ -1,23 +1,42 @@
 /**
- * Date/Time Picker for Cal.com Availability - Week View (SECURE)
- * Shows 7-day week with available dates, then time slots for selected date
- * Uses Cloudflare Worker proxy to protect API key
+ * Date/Time Picker for Cal.com Availability - Month View (SECURE)
+ * Uses Cloudflare Worker proxy to protect API key.
  */
 
-// Cloudflare Worker proxy URL - API key is secure on Cloudflare
 const AVAIL_WORKER_URL = 'https://calcom-proxy.southernutahdetail.workers.dev';
 
 class DateTimePicker {
   constructor() {
-    this.currentWeekStart = this.getWeekStart(new Date());
+    this.currentMonthStart = this.getMonthStart(new Date());
     this.selectedDate = null;
     this.selectedTime = null;
     this.availableDates = new Set();
     this.slotsForDate = {};
-    this.view = 'week'; // 'week' or 'time'
-    
+    this.view = 'month';
+
     this.initElements();
+    if (!this.picker || !this.input || !this.dropdown || !this.calendarGrid || !this.calendarTitle || !this.prevBtn || !this.nextBtn || !this.timeContainer || !this.timeGrid || !this.selectedDateInput || !this.selectedTimeInput) {
+      return;
+    }
     this.setupListeners();
+  }
+
+  getSelectedServiceSlug() {
+    const selectedCard = document.querySelector('#svc-grid .svc-card.sel');
+    const hiddenName = (document.getElementById('sel-service')?.value || '').trim().toLowerCase();
+    const hiddenSelectName = (document.getElementById('service-sel')?.value || '').trim().toLowerCase();
+    const nameMap = {
+      'basic detail': 'basic-detail',
+      'standard detail': 'standard-detail',
+      'premium detail': 'premium-detail'
+    };
+    return (
+      (selectedCard && selectedCard.dataset && selectedCard.dataset.slug)
+      || nameMap[hiddenName]
+      || nameMap[hiddenSelectName]
+      || window.selectedServiceSlug
+      || ''
+    );
   }
 
   initElements() {
@@ -32,113 +51,100 @@ class DateTimePicker {
     this.timeGrid = document.getElementById('time-grid');
     this.selectedDateInput = document.getElementById('selected-date');
     this.selectedTimeInput = document.getElementById('selected-time');
-    this.serviceInput = document.getElementById('selected-service');
-    this.errorDiv = document.getElementById('form-errors');
+    this.errorDiv = document.getElementById('form-errors') || document.getElementById('bk-alert');
   }
 
   setupListeners() {
-    // Open/close dropdown
     this.input.addEventListener('click', (e) => {
       e.preventDefault();
-      if (!window.selectedServiceSlug) {
+      if (!this.getSelectedServiceSlug()) {
         this.showError('Please select a service first.');
         return;
       }
       this.dropdown.classList.toggle('hide');
       if (!this.dropdown.classList.contains('hide')) {
-        this.resetToWeekView();
-        this.renderWeekView();
+        this.resetToMonthView();
+        this.renderMonthView(true, 0);
       }
     });
 
-    // Close on outside click
     document.addEventListener('click', (e) => {
       if (!this.picker.contains(e.target)) {
         this.dropdown.classList.add('hide');
       }
     });
 
-    // Week navigation
     this.prevBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      this.currentWeekStart.setDate(this.currentWeekStart.getDate() - 7);
+      this.currentMonthStart = this.addMonths(this.currentMonthStart, -1);
       this.timeContainer.classList.add('hide');
-      this.view = 'week';
-      this.renderWeekView();
+      this.view = 'month';
+      this.renderMonthView(false, 0);
     });
 
     this.nextBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      this.currentWeekStart.setDate(this.currentWeekStart.getDate() + 7);
+      this.currentMonthStart = this.addMonths(this.currentMonthStart, 1);
       this.timeContainer.classList.add('hide');
-      this.view = 'week';
-      this.renderWeekView();
+      this.view = 'month';
+      this.renderMonthView(false, 0);
     });
 
-    // Service change - reset when a service card is selected
     document.addEventListener('serviceSelected', () => {
       this.availableDates.clear();
       this.slotsForDate = {};
       this.selectedDate = null;
       this.selectedTime = null;
-      this.view = 'week';
-      this.currentWeekStart = this.getWeekStart(new Date());
+      this.view = 'month';
+      this.currentMonthStart = this.getMonthStart(new Date());
       this.timeContainer.classList.add('hide');
       this.input.textContent = 'Select date and time';
       this.calendarGrid.innerHTML = '';
     });
   }
 
-  getWeekStart(date) {
-    const d = new Date(date);
-    const day = d.getDay();
-    const diff = d.getDate() - day;
-    return new Date(d.setDate(diff));
+  getMonthStart(date) {
+    return new Date(date.getFullYear(), date.getMonth(), 1);
   }
 
-  resetToWeekView() {
-    this.view = 'week';
+  getMonthEnd(date) {
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0);
+  }
+
+  addMonths(date, delta) {
+    return new Date(date.getFullYear(), date.getMonth() + delta, 1);
+  }
+
+  resetToMonthView() {
+    this.view = 'month';
     this.timeContainer.classList.add('hide');
     this.prevBtn.style.display = 'block';
     this.nextBtn.style.display = 'block';
   }
 
-  async fetchAvailabilityForWeek() {
-    const serviceSlug = window.selectedServiceSlug;
+  async fetchAvailabilityForMonth() {
+    const serviceSlug = this.getSelectedServiceSlug();
     if (!serviceSlug) {
       this.showError('Please select a service to see availability.');
       return;
     }
 
-    const promises = [];
-    const compactView = window.matchMedia('(max-width: 420px)').matches;
+    this.availableDates.clear();
+    this.slotsForDate = {};
 
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(this.currentWeekStart);
-      date.setDate(date.getDate() + i);
-      // Use local date string to avoid timezone shifts
-      const dateStr = this.getLocalDateString(date);
-      promises.push(this.fetchSlots(dateStr, 'peter-nielsen-joxtue', serviceSlug));
-    }
+    const monthStart = this.getMonthStart(this.currentMonthStart);
+    const monthEnd = this.getMonthEnd(this.currentMonthStart);
+    const start = this.getLocalDateString(monthStart);
+    const end = this.getLocalDateString(monthEnd);
+    const query = `username=peter-nielsen-joxtue&eventTypeSlug=${encodeURIComponent(serviceSlug)}&start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
 
-    await Promise.all(promises);
-  }
-
-  async fetchSlots(dateStr, username, eventTypeSlug) {
     try {
-      // Send date in YYYY-MM-DD format, Cal.com returns UTC times
-      const url = `${AVAIL_WORKER_URL}/slots?username=${username}&eventTypeSlug=${eventTypeSlug}&start=${dateStr}&end=${dateStr}`;
-      
-      let response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      let response = await fetch(`${AVAIL_WORKER_URL}/slots?${query}`, {
+        headers: { 'Content-Type': 'application/json' }
       });
 
       if (!response.ok) {
-        // Fallback when Worker is bound under /api
-        const apiUrl = url.replace('/slots?', '/api/slots?');
-        response = await fetch(apiUrl, {
+        response = await fetch(`${AVAIL_WORKER_URL}/api/slots?${query}`, {
           headers: { 'Content-Type': 'application/json' }
         });
         if (!response.ok) {
@@ -146,12 +152,17 @@ class DateTimePicker {
           return;
         }
       }
-      const data = await response.json();
-      if (data.data && data.data[dateStr]) {
-        this.slotsForDate[dateStr] = data.data[dateStr];
-        this.availableDates.add(dateStr);
-      } else {
-        this.slotsForDate[dateStr] = [];
+
+      const data = await response.json().catch(() => null);
+      const bag = (data && data.data && typeof data.data === 'object') ? data.data : {};
+
+      const daysInMonth = monthEnd.getDate();
+      for (let day = 1; day <= daysInMonth; day += 1) {
+        const date = new Date(monthStart.getFullYear(), monthStart.getMonth(), day);
+        const dateStr = this.getLocalDateString(date);
+        const slots = Array.isArray(bag[dateStr]) ? bag[dateStr] : [];
+        this.slotsForDate[dateStr] = slots;
+        if (slots.length) this.availableDates.add(dateStr);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -159,14 +170,9 @@ class DateTimePicker {
     }
   }
 
-  async renderWeekView() {
-    // Reset state for the current view so we don't show stale dates
-    this.availableDates.clear();
-    this.slotsForDate = {};
-
-    // Premium loading animation with spinner
+  async renderMonthView(seekNextAvailable = false, seekAttempt = 0) {
     this.calendarGrid.innerHTML = `
-      <div style="padding: 40px 12px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 16px;">
+      <div style="padding: 40px 12px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 16px; grid-column: 1 / -1;">
         <div style="width: 40px; height: 40px; border: 3px solid rgba(211, 47, 47, 0.2); border-top-color: var(--cd-primary); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
         <div style="color: var(--cd-muted); font-size: 0.9rem; font-weight: 500;">Loading availability…</div>
       </div>
@@ -177,124 +183,97 @@ class DateTimePicker {
       </style>
     `;
 
-    await this.fetchAvailabilityForWeek();
+    await this.fetchAvailabilityForMonth();
 
-    const weekEnd = new Date(this.currentWeekStart);
-    weekEnd.setDate(weekEnd.getDate() + 6);
-    const title = `${this.currentWeekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
-    this.calendarTitle.textContent = title;
-
-    this.calendarGrid.innerHTML = '';
-
+    const monthStart = this.getMonthStart(this.currentMonthStart);
+    const monthEnd = this.getMonthEnd(this.currentMonthStart);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(this.currentWeekStart);
-      date.setDate(date.getDate() + i);
-      // Use local date string to avoid timezone shifts
+    this.calendarTitle.textContent = monthStart.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    this.calendarGrid.innerHTML = '';
+
+    ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].forEach((label) => {
+      const h = document.createElement('div');
+      h.className = 'cal-wday';
+      h.textContent = label;
+      this.calendarGrid.appendChild(h);
+    });
+
+    const leadingBlanks = monthStart.getDay();
+    for (let i = 0; i < leadingBlanks; i += 1) {
+      const blank = document.createElement('button');
+      blank.type = 'button';
+      blank.className = 'cal-day om dis';
+      blank.disabled = true;
+      blank.setAttribute('aria-hidden', 'true');
+      this.calendarGrid.appendChild(blank);
+    }
+
+    let firstAvailable = '';
+    const daysInMonth = monthEnd.getDate();
+    for (let day = 1; day <= daysInMonth; day += 1) {
+      const date = new Date(monthStart.getFullYear(), monthStart.getMonth(), day);
       const dateStr = this.getLocalDateString(date);
-      const isToday = date.toDateString() === today.toDateString();
-      const isAvailable = this.availableDates.has(dateStr);
       const isPast = date < today;
+      const slots = this.slotsForDate[dateStr] || [];
+      const isAvailable = !isPast && slots.length > 0;
       const isSelected = this.selectedDate === dateStr;
+
+      if (isAvailable && !firstAvailable) firstAvailable = dateStr;
 
       const dayBtn = document.createElement('button');
       dayBtn.type = 'button';
       dayBtn.dataset.date = dateStr;
-      dayBtn.style.display = 'flex';
-      dayBtn.style.flexDirection = 'column';
-      dayBtn.style.alignItems = 'center';
-      dayBtn.style.padding = compactView ? '10px 6px' : '16px 12px';
-      dayBtn.style.borderRadius = compactView ? '10px' : '12px';
-      dayBtn.style.border = '2px solid var(--cd-border)';
-      dayBtn.style.background = 'var(--cd-input-bg)';
-      dayBtn.style.color = 'var(--cd-text)';
-      dayBtn.style.cursor = 'pointer';
-      dayBtn.style.transition = 'all 0.2s ease';
-      dayBtn.style.opacity = isPast ? '0.4' : '1';
-      dayBtn.style.minWidth = '0';
-      dayBtn.style.width = '100%';
+      dayBtn.className = `cal-day${isAvailable ? ' avail' : ''}${isPast ? ' dis' : ''}${isSelected ? ' picked' : ''}`;
+      dayBtn.innerHTML = `<span>${day}</span>`;
 
-      const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-      const dayNum = date.getDate();
-
-      const nameDiv = document.createElement('div');
-      nameDiv.style.fontSize = compactView ? '0.65rem' : '0.75rem';
-      nameDiv.style.fontWeight = '600';
-      nameDiv.style.color = 'var(--cd-muted)';
-      nameDiv.style.textTransform = 'uppercase';
-      nameDiv.textContent = dayName;
-
-      const numDiv = document.createElement('div');
-      numDiv.style.fontSize = compactView ? '1.2rem' : '1.5rem';
-      numDiv.style.fontWeight = 'bold';
-      numDiv.style.marginTop = compactView ? '4px' : '6px';
-      numDiv.textContent = dayNum;
-
-      dayBtn.appendChild(nameDiv);
-      dayBtn.appendChild(numDiv);
-
-      // Selected state (red highlight)
-      if (isSelected) {
-        dayBtn.style.borderColor = 'var(--cd-primary)';
-        dayBtn.style.background = 'linear-gradient(135deg, rgba(211, 47, 47, 0.3), rgba(255, 87, 87, 0.2))';
-        dayBtn.style.boxShadow = '0 4px 16px rgba(211, 47, 47, 0.4)';
-      }
-      // Today indicator
-      else if (isToday) {
-        dayBtn.style.borderColor = 'rgba(211, 47, 47, 0.5)';
-        dayBtn.style.background = 'rgba(211, 47, 47, 0.08)';
-      }
-
-      if (isAvailable && !isPast) {
-        // Add subtle indicator for available dates
-        const indicator = document.createElement('div');
-        indicator.style.width = '6px';
-        indicator.style.height = '6px';
-        indicator.style.borderRadius = '50%';
-        indicator.style.background = 'var(--cd-primary)';
-        indicator.style.marginTop = compactView ? '4px' : '6px';
-        dayBtn.appendChild(indicator);
-
-        dayBtn.addEventListener('mouseenter', () => {
-          if (!isSelected) {
-            dayBtn.style.background = 'rgba(211, 47, 47, 0.15)';
-            dayBtn.style.borderColor = 'rgba(211, 47, 47, 0.6)';
-            dayBtn.style.transform = 'translateY(-2px)';
-          }
-        });
-
-        dayBtn.addEventListener('mouseleave', () => {
-          if (!isSelected) {
-            dayBtn.style.background = isToday ? 'rgba(211, 47, 47, 0.08)' : 'var(--cd-input-bg)';
-            dayBtn.style.borderColor = isToday ? 'rgba(211, 47, 47, 0.5)' : 'var(--cd-border)';
-            dayBtn.style.transform = 'none';
-          }
-        });
-
+      if (!isAvailable) {
+        dayBtn.disabled = true;
+      } else {
         dayBtn.addEventListener('click', (e) => {
           e.preventDefault();
-          // Update UI for all date buttons
-          Array.from(this.calendarGrid.querySelectorAll('button')).forEach(btn => {
-            const btnDate = btn.dataset.date;
-            const btnIsToday = btn.querySelector('div:first-child')?.textContent === dayName;
-            btn.style.background = btnIsToday ? 'rgba(211, 47, 47, 0.08)' : 'var(--cd-input-bg)';
-            btn.style.borderColor = btnIsToday ? 'rgba(211, 47, 47, 0.5)' : 'var(--cd-border)';
-            btn.style.boxShadow = 'none';
-          });
-          // Highlight selected
-          dayBtn.style.borderColor = 'var(--cd-primary)';
-          dayBtn.style.background = 'linear-gradient(135deg, rgba(211, 47, 47, 0.3), rgba(255, 87, 87, 0.2))';
-          dayBtn.style.boxShadow = '0 4px 16px rgba(211, 47, 47, 0.4)';
+          this.calendarGrid.querySelectorAll('.cal-day.picked').forEach((b) => b.classList.remove('picked'));
+          dayBtn.classList.add('picked');
           this.selectDate(dateStr, date);
         });
-      } else {
-        dayBtn.disabled = true;
-        dayBtn.style.cursor = 'not-allowed';
       }
 
       this.calendarGrid.appendChild(dayBtn);
+    }
+
+    const usedCells = 7 + leadingBlanks + daysInMonth;
+    const trailingBlanks = (7 - (usedCells % 7)) % 7;
+    for (let i = 0; i < trailingBlanks; i += 1) {
+      const blank = document.createElement('button');
+      blank.type = 'button';
+      blank.className = 'cal-day om dis';
+      blank.disabled = true;
+      blank.setAttribute('aria-hidden', 'true');
+      this.calendarGrid.appendChild(blank);
+    }
+
+    const selectedInMonth = Boolean(this.selectedDate && Object.prototype.hasOwnProperty.call(this.slotsForDate, this.selectedDate));
+    if (!selectedInMonth) {
+      this.selectedDate = null;
+      this.selectedDateInput.value = '';
+    }
+
+    if (selectedInMonth && this.selectedDate && this.slotsForDate[this.selectedDate]) {
+      this.selectDate(this.selectedDate, new Date(`${this.selectedDate}T12:00:00`));
+      return;
+    }
+
+    if (!this.selectedDate && firstAvailable) {
+      const firstBtn = this.calendarGrid.querySelector(`[data-date="${firstAvailable}"]`);
+      if (firstBtn) firstBtn.classList.add('picked');
+      this.selectDate(firstAvailable, new Date(`${firstAvailable}T12:00:00`));
+      return;
+    }
+
+    if (!this.selectedDate && seekNextAvailable && seekAttempt < 6) {
+      this.currentMonthStart = this.addMonths(this.currentMonthStart, 1);
+      await this.renderMonthView(true, seekAttempt + 1);
     }
   }
 
@@ -305,12 +284,8 @@ class DateTimePicker {
     this.selectedTimeInput.value = '';
 
     this.view = 'time';
-    // Keep navigation arrows visible
     this.prevBtn.style.display = 'block';
     this.nextBtn.style.display = 'block';
-
-    const dateDisplay = date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
-    this.calendarTitle.innerHTML = `<span style="text-align: center; width: 100%; display: block; font-weight: 600; color: var(--cd-primary);">${dateDisplay}</span>`;
 
     this.timeContainer.classList.remove('hide');
 
@@ -347,25 +322,29 @@ class DateTimePicker {
       btn.dataset.value = timeValue;
       btn.style.padding = '12px 14px';
       btn.style.borderRadius = '12px';
-      btn.style.border = '1px solid rgba(255,255,255,0.08)';
-      btn.style.background = 'linear-gradient(135deg, #1f1f1f, #2b2b2b)';
-      btn.style.color = 'var(--cd-text)';
-      btn.style.fontWeight = '600';
+      btn.style.border = '1px solid rgba(255, 47, 47, 0.9)';
+      btn.style.background = 'rgba(255, 47, 47, 0.36)';
+      btn.style.color = '#FFFFFF';
+      btn.style.fontWeight = '700';
       btn.style.cursor = 'pointer';
       btn.style.transition = 'all var(--cd-transition)';
-      btn.style.boxShadow = '0 10px 30px rgba(0,0,0,0.25)';
+      btn.style.boxShadow = '0 10px 30px rgba(255, 47, 47, 0.22)';
       btn.style.width = '100%';
 
       btn.addEventListener('mouseenter', () => {
+        if (btn.classList.contains('active')) return;
         btn.style.transform = 'translateY(-2px)';
-        btn.style.boxShadow = '0 14px 36px rgba(211, 47, 47, 0.25)';
-        btn.style.borderColor = 'rgba(211, 47, 47, 0.5)';
+        btn.style.boxShadow = '0 14px 36px rgba(255, 47, 47, 0.35)';
+        btn.style.borderColor = '#ff2f2f';
+        btn.style.background = 'rgba(255, 47, 47, 0.5)';
       });
 
       btn.addEventListener('mouseleave', () => {
+        if (btn.classList.contains('active')) return;
         btn.style.transform = 'none';
-        btn.style.boxShadow = '0 10px 30px rgba(0,0,0,0.25)';
-        btn.style.borderColor = 'rgba(255,255,255,0.08)';
+        btn.style.boxShadow = '0 10px 30px rgba(255, 47, 47, 0.22)';
+        btn.style.borderColor = 'rgba(255, 47, 47, 0.9)';
+        btn.style.background = 'rgba(255, 47, 47, 0.36)';
       });
 
       btn.addEventListener('click', () => {
@@ -374,13 +353,18 @@ class DateTimePicker {
         // Remove active state from all time buttons
         Array.from(this.timeGrid.querySelectorAll('button')).forEach(b => {
           b.classList.remove('active');
-          b.style.borderColor = 'rgba(255,255,255,0.08)';
-          b.style.background = 'linear-gradient(135deg, #1f1f1f, #2b2b2b)';
+          b.style.borderColor = 'rgba(255, 47, 47, 0.9)';
+          b.style.background = 'rgba(255, 47, 47, 0.36)';
+          b.style.color = '#FFFFFF';
+          b.style.boxShadow = '0 10px 30px rgba(255, 47, 47, 0.22)';
+          b.style.transform = 'none';
         });
         // Set active state on selected button
         btn.classList.add('active');
-        btn.style.borderColor = 'var(--cd-primary)';
-        btn.style.background = 'linear-gradient(135deg, rgba(211, 47, 47, 0.85), rgba(255, 87, 87, 0.85))';
+        btn.style.borderColor = '#ff2f2f';
+        btn.style.background = '#ff2f2f';
+        btn.style.color = '#FFFFFF';
+        btn.style.boxShadow = '0 14px 34px rgba(255, 47, 47, 0.5)';
         // Don't auto-close - user must click Confirm Time button
       });
 

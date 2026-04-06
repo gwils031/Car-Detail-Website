@@ -64,6 +64,19 @@
     statusEl.style.color=isErr?'#ff7070':'var(--tx2)';
   }
 
+  function endpointCandidates(path, queryString){
+    const localBase=(window.location&&typeof window.location.origin==='string')?window.location.origin.replace(/\/+$/,''):'';
+    const suffix=queryString?`${path}?${queryString}`:path;
+    const out=[];
+    if(/^https?:\/\//i.test(localBase)){
+      out.push(`${localBase}${suffix}`);
+      out.push(`${localBase}/api${suffix}`);
+    }
+    out.push(`${API_BASE}${suffix}`);
+    out.push(`${API_BASE}/api${suffix}`);
+    return Array.from(new Set(out));
+  }
+
   function getReason(){
     const reason=new URLSearchParams(window.location.search).get('reason')||'';
     if(reason==='session-expired') return 'Session expired. Please sign in again.';
@@ -75,8 +88,8 @@
   async function verifyToken(token){
     const qs=`day=${encodeURIComponent(today())}&days=1`;
     const endpoints=[
-      `${API_BASE}/admin/analytics?${qs}`,
-      `${API_BASE}/api/admin/analytics?${qs}`
+      ...endpointCandidates('/admin/site-health', qs),
+      ...endpointCandidates('/admin/analytics', qs)
     ];
 
     for(const ep of endpoints){
@@ -106,7 +119,7 @@
     signinBtn.textContent='Sign In';
 
     if(!res){
-      setStatus('Could not reach analytics endpoint.',true);
+      setStatus('Could not reach admin endpoint.',true);
       return;
     }
 
@@ -127,7 +140,7 @@
   tokenInput.addEventListener('keydown',(e)=>{ if(e.key==='Enter') signIn(); });
 
   try{
-    const saved=sessionStorage.getItem(TOKEN_KEY)||'';
+    const saved=String(sessionStorage.getItem(TOKEN_KEY)||'').trim();
     if(saved) tokenInput.value=saved;
   }catch(_e){}
 

@@ -47,6 +47,11 @@
     <!-- Status alert -->
     <div id="bk-alert" class="alert hide mb-16" role="alert" aria-live="assertive"></div>
 
+    <div class="sc" style="margin-bottom:16px;background:var(--srf2);border:1px solid var(--bdr)">
+      <div class="sc-title">Payment Policy</div>
+      <p class="mini-note" style="margin:0">Payment is due when service is completed. This website only reserves your appointment and does not collect payment online.</p>
+    </div>
+
     <!-- Goal 8: Confirmation card (hidden until booking completes) -->
     <div class="conf-card" id="conf-card">
       <div class="conf-ico">OK</div>
@@ -65,6 +70,7 @@
           <div class="wex-row"><div class="wex-n">1</div>We'll confirm your booking within the hour via email.</div>
           <div class="wex-row"><div class="wex-n">2</div>We arrive fully equipped — just tell us where to park.</div>
           <div class="wex-row"><div class="wex-n">3</div>When we finish, do a quick walkthrough. Happy? You're done.</div>
+          <div class="wex-row"><div class="wex-n">4</div>Payment is due at service completion. No online payment is collected on this site.</div>
         </div>
       </div>
       <div class="conf-acts">
@@ -291,14 +297,6 @@
 
         <!-- ─── SIDEBAR ────────────────────────────────────────── -->
         <aside class="bk-side" data-reveal data-delay="2">
-          <!-- Selected summary (updated by JS) -->
-          <div class="sc" id="bk-summary" style="display:none">
-            <div class="sc-title">Your Selection</div>
-            <div id="sum-name" style="font-weight:700;font-size:1rem;color:var(--tx);margin-bottom:4px"></div>
-            <div id="sum-price" style="font-size:1.6rem;font-weight:800;color:var(--red);letter-spacing:-.02em;line-height:1;margin-bottom:4px"></div>
-            <div id="sum-dur" style="font-size:.69rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em"></div>
-            <div id="sum-addons" style="margin-top:8px;font-size:.79rem;color:var(--tx2)"></div>
-          </div>
 
           <!-- Why book -->
           <div class="sc">

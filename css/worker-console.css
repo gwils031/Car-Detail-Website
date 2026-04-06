@@ -1,0 +1,70 @@
+/* Worker console shared UI theme */
+.wc-shell{max-width:1180px;margin:0 auto;padding:22px;display:grid;gap:14px}
+.wc-card{background:var(--srf);border:1px solid var(--bdr);border-radius:14px;padding:14px}
+.wc-card.soft{background:linear-gradient(180deg,var(--srf),var(--srf2))}
+.wc-header{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.wc-title{font-size:1.32rem;font-weight:800;line-height:1.2}
+.wc-sub{font-size:.8rem;color:var(--tx2);margin-top:4px}
+.wc-status{font-size:.8rem;color:var(--tx2);margin-top:8px}
+.wc-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.wc-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.wc-grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.wc-k{font-size:.67rem;text-transform:uppercase;letter-spacing:.09em;color:var(--tx3);font-weight:800}
+.wc-v{font-size:1.3rem;font-weight:800;line-height:1.2}
+.wc-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.wc-list{display:grid;gap:10px}
+.wc-job-item{border:1px solid var(--bdr);border-radius:12px;background:var(--srf2);padding:12px;display:grid;gap:8px}
+.wc-job-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;flex-wrap:wrap}
+.wc-job-title{font-size:.96rem;font-weight:800;line-height:1.25}
+.wc-job-meta{font-size:.79rem;color:var(--tx2);line-height:1.4}
+.wc-job-actions{display:flex;flex-wrap:wrap;gap:7px}
+.wc-pill{display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;border:1px solid var(--bdr);font-size:.67rem;text-transform:uppercase;letter-spacing:.04em;font-weight:800}
+.wc-pill.assigned{color:#fcd34d;border-color:rgba(252,211,77,.55);background:rgba(252,211,77,.12)}
+.wc-pill.accepted{color:#93c5fd;border-color:rgba(147,197,253,.55);background:rgba(147,197,253,.1)}
+.wc-pill.in_progress{color:#fca5a5;border-color:rgba(252,165,165,.55);background:rgba(252,165,165,.1)}
+.wc-pill.completed{color:#86efac;border-color:rgba(134,239,172,.55);background:rgba(134,239,172,.1)}
+.wc-pill.expense{color:#fecaca;border-color:rgba(254,202,202,.55);background:rgba(254,202,202,.1)}
+.wc-pill.income{color:#a7f3d0;border-color:rgba(167,243,208,.55);background:rgba(167,243,208,.1)}
+.wc-photo-tools{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}
+.wc-preview{min-height:72px;border:1px dashed var(--bdr);border-radius:10px;background:var(--srf);display:flex;align-items:center;justify-content:center;overflow:hidden;padding:8px}
+.wc-preview img{max-width:100%;max-height:120px;object-fit:cover;border-radius:8px}
+.wc-job-payment{margin-top:4px;padding:10px;border:1px solid var(--bdr);border-radius:10px;background:linear-gradient(180deg,var(--srf) 0%,rgba(255,255,255,.02) 100%);display:grid;gap:8px}
+.wc-table{width:100%;border-collapse:collapse}
+.wc-table th,.wc-table td{padding:8px;border-bottom:1px solid var(--bdr);font-size:.8rem;text-align:left}
+.wc-table th{font-size:.67rem;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3)}
+.wc-finance-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.wc-finance-grid .full{grid-column:1/-1}
+.wc-availability-list{display:grid;gap:8px}
+.wc-availability-row{display:grid;grid-template-columns:minmax(150px,190px) 1fr;gap:10px;align-items:center;padding:8px;border:1px solid var(--bdr);border-radius:10px;background:var(--srf2)}
+.wc-availability-row.is-inactive{opacity:.7}
+.wc-availability-day{display:flex;align-items:center;gap:8px;font-size:.85rem;font-weight:700}
+.wc-availability-time{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.wc-availability-time .inp{max-width:160px}
+.wc-nav{display:flex;gap:8px;flex-wrap:wrap}
+.wc-nav-link{border:1px solid var(--bdr);background:var(--srf);color:var(--tx2);border-radius:999px;padding:8px 12px;font-size:.78rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;text-decoration:none}
+.wc-nav-link.active{background:linear-gradient(135deg,rgba(225,55,55,.18),rgba(225,55,55,.06));border-color:rgba(225,55,55,.6);color:var(--tx)}
+.wc-nav-link:hover{border-color:rgba(255,255,255,.32);color:var(--tx)}
+
+/* Matches admin console value shimmer behavior */
+.value-loading{position:relative;color:transparent!important;text-shadow:none!important;user-select:none}
+.value-loading::after{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);height:.72em;width:min(78%,160px);border-radius:999px;background:linear-gradient(90deg,rgba(255,255,255,.08) 0%,rgba(255,255,255,.24) 45%,rgba(255,255,255,.08) 100%);background-size:220% 100%;animation:value-shimmer 1.25s ease-in-out infinite;pointer-events:none}
+.wc-status.value-loading::after{height:.58em;width:min(70%,180px)}
+@keyframes value-shimmer{0%{background-position:180% 0}100%{background-position:-40% 0}}
+@media (prefers-reduced-motion: reduce){
+  .value-loading::after{animation:none;background-position:50% 0}
+}
+
+@media(max-width:1024px){
+  .wc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .wc-grid.three{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .wc-row{grid-template-columns:1fr}
+  .wc-finance-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .wc-availability-row{grid-template-columns:1fr}
+}
+
+@media(max-width:720px){
+  .wc-shell{padding:14px}
+  .wc-grid,.wc-grid.three{grid-template-columns:1fr}
+  .wc-finance-grid{grid-template-columns:1fr}
+  .wc-photo-tools{grid-template-columns:1fr}
+}

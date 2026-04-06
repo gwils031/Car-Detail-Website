@@ -53,7 +53,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
   initAttributionCarryover();
   autoSelectFromURL();
   initMobileAutoSelect();
-  setTimeout(initMobileAutoSelect,250);
   setYear();
   initNudgeLink();
 });
@@ -153,9 +152,14 @@ function initBASlider(){
   let drag=false;
 
   const setPos=pct=>{
-    pct=Math.max(2,Math.min(98,pct));
-    clip.style.clipPath=`inset(0 ${100-pct}% 0 0)`;
-    line.style.left=pct+'%';
+    pct=Math.max(0,Math.min(100,pct));
+    const pos=pct.toFixed(2)+'%';
+
+    // Left edge => show AFTER fully. Right edge => show BEFORE fully.
+    wrap.style.setProperty('--ba-pos',pos);
+    clip.style.clipPath=`inset(0 0 0 ${pos})`;
+    clip.style.webkitClipPath=`inset(0 0 0 ${pos})`;
+    line.style.left=pos;
   };
   const getPct=e=>{
     const r=wrap.getBoundingClientRect();
@@ -277,7 +281,7 @@ function initMobileAutoSelect(){
   if(!wrap) return;
   const card=wrap.querySelector(`.ms-svc[data-slug="${slug}"]`);
   if(!card) return;
-  if(typeof window.mPickSvc==='function') window.mPickSvc(card);
+  if(typeof window.mPickSvc==='function') window.mPickSvc(card,true);
 }
 
 /* ── Attribution carry-over (ROI) ───────────────────────────────── */
@@ -400,13 +404,14 @@ function txt(sel,v){ const el=$(sel); if(el) el.textContent=v; }
 
 /* ── G6: Mobile step flow ─────────────────────────────────────────── */
 let mStep=1;
-window.mPickSvc=function(el){
+window.mPickSvc=function(el,isAuto=false){
   $$('.ms-svc').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel');
   MS.svcSlug=el.dataset.slug;
   MS.svcPrice=parseInt(el.dataset.price||0);
   MS.svcName=el.querySelector('.nm')?.textContent?.replace(/\s*Popular\s*/,'').trim()||'';
   window.selectedServiceSlug=MS.svcSlug;
+  if(!isAuto) window.__autoSlug='';
   const btn=$('#mn1'); if(btn) btn.disabled=false;
   const ao=$('#ms-addons');
   if(ao) ao.style.display=MS.svcSlug==='premium-detail'?'none':'block';
@@ -420,7 +425,7 @@ window.mPickSvc=function(el){
   const mn2=$('#mn2');
   if(mn2) mn2.disabled=true;
 
-  if(window.__trackEvent){
+  if(window.__trackEvent && !isAuto){
     window.__trackEvent('service_selected',{
       surface:'mobile',
       service_slug:MS.svcSlug||'',
@@ -447,7 +452,12 @@ window.mNext=function(step){
   if(step===1){
     if(!MS.svcSlug){ mShowFlowError('Please select a service before continuing.'); return; }
     mGoTo(2);
-    if(!window.__mCalReady){ initMobileCal(); window.__mCalReady=true; }
+    if(!window.__mCalReady){
+      initMobileCal();
+      window.__mCalReady=true;
+    } else if(typeof window.__refreshMobileCal==='function'){
+      window.__refreshMobileCal();
+    }
   } else if(step===2){
     if(!MS.date||!MS.timeISO){ mShowFlowError('Please select a date and time before continuing.'); return; }
     mGoTo(3);
@@ -478,16 +488,28 @@ window.mSubmit=async function(){
   const btn=$('#ms-submit');
   if(btn){ btn.disabled=true; btn.textContent='Confirming…'; }
 
+  const selectedMobileCard=$('#ms-svcs .ms-svc.sel');
+  const submitSlug=(selectedMobileCard?.dataset.slug||MS.svcSlug||window.selectedServiceSlug||'').trim();
+  const submitPkg=PKGS.find(p=>p.slug===submitSlug)||null;
+  const submitSvcName=(submitPkg?.name||MS.svcName||'').trim();
+  const submitSvcPrice=Number(submitPkg?.price ?? MS.svcPrice ?? 0);
+  if(!submitSlug){
+    if(btn){ btn.disabled=false; btn.textContent='Confirm Booking'; }
+    mShowFlowError('Please select a service before confirming your booking.');
+    return;
+  }
+  window.selectedServiceSlug=submitSlug;
+
   const addonNames=Object.keys(MS.addons).map(id=>ADDONS.find(a=>a.id===id)?.name||id);
   const addonTotal=Object.values(MS.addons).reduce((s,v)=>s+v,0);
-  const total=MS.svcPrice+addonTotal;
+  const total=submitSvcPrice+addonTotal;
   const addr=`${MS.street}, ${MS.city}, UT ${MS.zip}`;
   const attribution=getAttributionParams();
 
   if(window.__trackEvent){
     window.__trackEvent('booking_submit',{
       surface:'mobile',
-      service_slug:MS.svcSlug||'',
+      service_slug:submitSlug,
       has_addons:addonNames.length?'true':'false',
       total:String(total)
     });
@@ -497,7 +519,7 @@ window.mSubmit=async function(){
     let res=await fetch('https://calcom-proxy.southernutahdetail.workers.dev/bookings',{
       method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        username:'peter-nielsen-joxtue', eventTypeSlug:MS.svcSlug,
+        username:'peter-nielsen-joxtue', eventTypeSlug:submitSlug,
         start:new Date(MS.timeISO).toISOString(),
         attendee:{name:MS.name,email:MS.email,timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone,language:'en'},
         location:addr, metadata:Object.assign({
@@ -509,7 +531,7 @@ window.mSubmit=async function(){
     });
     if(!res.ok) throw new Error(await res.text());
     showConfirmation({
-      service:MS.svcName, addons:addonNames.length?addonNames.join(', '):'None',
+      service:submitSvcName||MS.svcName, addons:addonNames.length?addonNames.join(', '):'None',
       datetime:new Date(MS.timeISO).toLocaleString('en-US',{month:'long',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}),
       location:addr, total:'$'+total, email:MS.email, timeISO:MS.timeISO
     });
@@ -518,7 +540,7 @@ window.mSubmit=async function(){
     if(window.__trackEvent){
       window.__trackEvent('booking_failure',{
         surface:'mobile',
-        service_slug:MS.svcSlug||'',
+        service_slug:submitSlug,
         reason:String(err&&err.message?err.message:'submit_failed').slice(0,120)
       });
     }
@@ -575,18 +597,36 @@ function initMobileCal(){
   const grid=$('#m-cal-grid'), title=$('#m-cal-title');
   const tw=$('#m-time-wrap'), tg=$('#m-time-grid');
   const btn2=$('#mn2');
+  const dateHidden=$('#m-date');
+  const timeHidden=$('#m-time');
   const openBtn=$('#m-date-time-input');
   const modal=$('#m-picker-modal');
   const closeBtn=$('#m-picker-close');
   const confirmBtn=$('#m-picker-confirm');
   const tzLbl=$('#m-picker-tz');
-  const slots={};
-  let weekStart=wkStart(new Date());
+  const hasModalPicker=Boolean(openBtn&&modal&&confirmBtn);
+  const slotsByDate={};
+  let monthCursor=monthStart(new Date());
 
-  if(!grid||!title||!tw||!tg||!btn2||!openBtn||!modal||!confirmBtn) return;
+  if(!grid||!title||!tw||!tg||!btn2) return;
+
+  const syncHiddenInputs=()=>{
+    if(dateHidden) dateHidden.value=MS.date||'';
+    if(timeHidden) timeHidden.value=MS.timeISO||'';
+  };
+
+  const setTimeConfirmState=(hasTime)=>{
+    if(hasModalPicker){
+      confirmBtn.disabled=!hasTime;
+    } else {
+      btn2.disabled=!hasTime;
+    }
+  };
+
   if(tzLbl) tzLbl.textContent='Timezone: '+Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const openModal=()=>{
+    if(!hasModalPicker) return;
     if(!MS.svcSlug){
       mShowFlowError('Please select a service first.');
       return;
@@ -600,66 +640,80 @@ function initMobileCal(){
         service_slug:MS.svcSlug||''
       });
     }
-    renderWk(true,0);
+    renderMonth(true,0);
   };
 
   const closeModal=()=>{
+    if(!hasModalPicker) return;
     modal.classList.add('hide');
     modal.classList.remove('open');
     modal.setAttribute('aria-hidden','true');
   };
 
-  openBtn.addEventListener('click',openModal);
-  closeBtn?.addEventListener('click',closeModal);
-  modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
-  document.addEventListener('keydown',e=>{
-    if(e.key==='Escape'&&!modal.classList.contains('hide')) closeModal();
-  });
+  if(hasModalPicker){
+    openBtn.addEventListener('click',openModal);
+    closeBtn?.addEventListener('click',closeModal);
+    modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
+    document.addEventListener('keydown',e=>{
+      if(e.key==='Escape'&&!modal.classList.contains('hide')) closeModal();
+    });
+  }
 
-  confirmBtn.addEventListener('click',()=>{
-    if(!MS.timeISO) return;
-    const dt=new Date(MS.timeISO);
-    const datePart=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-    const timePart=dt.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
-    openBtn.textContent=`${datePart} at ${timePart}`;
-    btn2.disabled=false;
-    if(window.__trackEvent){
-      window.__trackEvent('time_confirmed',{
-        surface:'mobile',
-        service_slug:MS.svcSlug||'',
-        date:MS.date||''
-      });
-    }
-    closeModal();
-  });
+  if(hasModalPicker){
+    confirmBtn.addEventListener('click',()=>{
+      if(!MS.timeISO) return;
+      const dt=new Date(MS.timeISO);
+      const datePart=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+      const timePart=dt.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+      openBtn.textContent=`${datePart} at ${timePart}`;
+      btn2.disabled=false;
+      if(window.__trackEvent){
+        window.__trackEvent('time_confirmed',{
+          surface:'mobile',
+          service_slug:MS.svcSlug||'',
+          date:MS.date||''
+        });
+      }
+      closeModal();
+    });
+  }
 
-  $('#m-prev')?.addEventListener('click',e=>{e.preventDefault();weekStart.setDate(weekStart.getDate()-7);renderWk(false,0);});
-  $('#m-next')?.addEventListener('click',e=>{e.preventDefault();weekStart.setDate(weekStart.getDate()+7);renderWk(false,0);});
+  $('#m-prev')?.addEventListener('click',e=>{e.preventDefault();monthCursor=shiftMonth(monthCursor,-1);renderMonth(false,0);});
+  $('#m-next')?.addEventListener('click',e=>{e.preventDefault();monthCursor=shiftMonth(monthCursor,1);renderMonth(false,0);});
 
-  async function renderWk(seekNextAvailable=false, seekAttempt=0){
-    const end=new Date(weekStart); end.setDate(end.getDate()+6);
-    title.textContent=`${fmtD(weekStart)} – ${fmtD(end)}`;
+  async function renderMonth(seekNextAvailable=false, seekAttempt=0){
+    const startDate=monthStart(monthCursor);
+    const endDate=monthEnd(monthCursor);
+    title.textContent=startDate.toLocaleDateString('en-US',{month:'long',year:'numeric'});
     grid.innerHTML='<div style="grid-column:1/-1;padding:20px;text-align:center;font-size:.82rem;color:var(--tx3)">Loading…</div>';
     tw.classList.add('hide');
-    confirmBtn.disabled=!MS.timeISO;
+    setTimeConfirmState(Boolean(MS.timeISO));
 
-    const today=new Date(); today.setHours(0,0,0,0);
-    const promises=[];
-    for(let i=0;i<7;i++){
-      const d=new Date(weekStart); d.setDate(d.getDate()+i);
-      const ds=localDate(d);
-      promises.push(
-        (async()=>{
-          const q=`username=peter-nielsen-joxtue&eventTypeSlug=${encodeURIComponent(window.selectedServiceSlug||'')}&start=${encodeURIComponent(ds)}&end=${encodeURIComponent(ds)}`;
-          let res=await fetch(`${WORKER}/slots?${q}`);
-          if(!res.ok) res=await fetch(`${WORKER}/api/slots?${q}`);
-          if(!res.ok){ slots[ds]=[]; return; }
-          const data=await res.json().catch(()=>null);
-          slots[ds]=(data&&data.data&&data.data[ds])||[];
-        })().catch(()=>{ slots[ds]=[]; })
-      );
+    Object.keys(slotsByDate).forEach((k)=>{ delete slotsByDate[k]; });
+
+    const activeMobileCard=$('#ms-svcs .ms-svc.sel');
+    const activeSlug=(activeMobileCard?.dataset.slug||MS.svcSlug||window.selectedServiceSlug||'').trim();
+    const q=`username=peter-nielsen-joxtue&eventTypeSlug=${encodeURIComponent(activeSlug)}&start=${encodeURIComponent(localDate(startDate))}&end=${encodeURIComponent(localDate(endDate))}`;
+    try{
+      let res=await fetch(`${WORKER}/slots?${q}`);
+      if(!res.ok) res=await fetch(`${WORKER}/api/slots?${q}`);
+      if(!res.ok) throw new Error('slots_failed');
+      const data=await res.json().catch(()=>null);
+      const bag=(data&&data.data&&typeof data.data==='object')?data.data:{};
+      const daysInMonth=endDate.getDate();
+      for(let day=1; day<=daysInMonth; day+=1){
+        const d=new Date(startDate.getFullYear(),startDate.getMonth(),day);
+        const ds=localDate(d);
+        slotsByDate[ds]=Array.isArray(bag[ds])?bag[ds]:[];
+      }
+    }catch(_e){
+      const daysInMonth=endDate.getDate();
+      for(let day=1; day<=daysInMonth; day+=1){
+        const d=new Date(startDate.getFullYear(),startDate.getMonth(),day);
+        const ds=localDate(d);
+        slotsByDate[ds]=[];
+      }
     }
-    await Promise.all(promises);
 
     grid.innerHTML='';
     // Weekday headers
@@ -668,23 +722,39 @@ function initMobileCal(){
       h.className='cal-wday'; h.textContent=d;
       grid.appendChild(h);
     });
+
+    const leading=startDate.getDay();
+    for(let i=0;i<leading;i+=1){
+      const blank=document.createElement('button');
+      blank.type='button';
+      blank.className='cal-day om dis';
+      blank.disabled=true;
+      blank.setAttribute('aria-hidden','true');
+      grid.appendChild(blank);
+    }
+
     let firstAvailable='';
-    for(let i=0;i<7;i++){
-      const d=new Date(weekStart); d.setDate(d.getDate()+i);
+    const today=new Date(); today.setHours(0,0,0,0);
+    const daysInMonth=endDate.getDate();
+    for(let day=1; day<=daysInMonth; day+=1){
+      const d=new Date(startDate.getFullYear(),startDate.getMonth(),day);
       const ds=localDate(d);
-      const past=d<today, avail=!past&&slots[ds]&&slots[ds].length>0;
+      const times=Array.isArray(slotsByDate[ds])?slotsByDate[ds]:[];
+      const past=d<today, avail=!past&&times.length>0;
       if(avail&&!firstAvailable) firstAvailable=ds;
       const btn=document.createElement('button');
       btn.type='button';
-      btn.className='cal-day'+(avail?' avail':'')+(past?' dis':'');
-      btn.innerHTML=`<span style="font-size:.68rem;color:var(--tx2);font-weight:700">${d.toLocaleDateString('en-US',{weekday:'short'})}</span><span>${d.getDate()}</span>`;
+      btn.dataset.date=ds;
+      btn.className='cal-day'+(avail?' avail':'')+(past?' dis':'')+(MS.date===ds?' picked':'');
+      btn.innerHTML=`<span>${d.getDate()}</span>`;
       btn.disabled=past||!avail;
       if(avail){
         btn.addEventListener('click',()=>{
           $$('.cal-day',grid).forEach(b=>b.classList.remove('picked'));
           btn.classList.add('picked');
           MS.date=ds; MS.timeISO=''; MS.time='';
-          confirmBtn.disabled=true;
+          syncHiddenInputs();
+          setTimeConfirmState(false);
           btn2.disabled=true;
           if(window.__trackEvent){
             window.__trackEvent('date_selected',{
@@ -693,24 +763,43 @@ function initMobileCal(){
               date:ds
             });
           }
-          showTimes(ds,slots[ds]);
+          showTimes(ds,times);
         });
       }
       grid.appendChild(btn);
-
-      if(MS.date===ds) btn.classList.add('picked');
     }
 
-    if(MS.date&&slots[MS.date]){
-      showTimes(MS.date,slots[MS.date]);
+    const usedCells=7+leading+daysInMonth;
+    const trailing=(7-(usedCells%7))%7;
+    for(let i=0;i<trailing;i+=1){
+      const blank=document.createElement('button');
+      blank.type='button';
+      blank.className='cal-day om dis';
+      blank.disabled=true;
+      blank.setAttribute('aria-hidden','true');
+      grid.appendChild(blank);
+    }
+
+    const selectedInMonth=Boolean(MS.date&&Object.prototype.hasOwnProperty.call(slotsByDate,MS.date));
+    if(!selectedInMonth){
+      MS.date='';
+      MS.time='';
+      MS.timeISO='';
+      syncHiddenInputs();
+      setTimeConfirmState(false);
+      btn2.disabled=true;
+    }
+
+    if(selectedInMonth&&MS.date&&slotsByDate[MS.date]){
+      showTimes(MS.date,slotsByDate[MS.date]);
     } else if(!MS.date&&firstAvailable){
       MS.date=firstAvailable;
       const firstBtn=grid.querySelector(`[data-date="${firstAvailable}"]`);
       if(firstBtn) firstBtn.classList.add('picked');
-      showTimes(firstAvailable,slots[firstAvailable]);
-    } else if(!MS.date&&seekNextAvailable&&seekAttempt<8){
-      weekStart.setDate(weekStart.getDate()+7);
-      return renderWk(true,seekAttempt+1);
+      showTimes(firstAvailable,slotsByDate[firstAvailable]);
+    } else if(!MS.date&&seekNextAvailable&&seekAttempt<6){
+      monthCursor=shiftMonth(monthCursor,1);
+      return renderMonth(true,seekAttempt+1);
     }
   }
 
@@ -724,7 +813,7 @@ function initMobileCal(){
     const d=new Date(ds+'T12:00:00');
     lbl.textContent=d.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
     tg.before(lbl);
-    if(!times.length){ tg.innerHTML='<div style="color:var(--tx2);font-size:.86rem;padding:8px">No times available</div>'; confirmBtn.disabled=true; return; }
+    if(!times.length){ tg.innerHTML='<div style="color:var(--tx2);font-size:.86rem;padding:8px">No times available</div>'; setTimeConfirmState(false); return; }
     times.forEach(slot=>{
       const tv=slot.start||slot.time||slot;
       const t=new Date(tv); if(isNaN(t)) return;
@@ -735,7 +824,9 @@ function initMobileCal(){
         $$('.tbtn',tg).forEach(x=>x.classList.remove('sel'));
         b.classList.add('sel');
         MS.time=ts; MS.timeISO=tv;
-        confirmBtn.disabled=false;
+        syncHiddenInputs();
+        setTimeConfirmState(true);
+        if(!hasModalPicker) btn2.disabled=false;
         if(window.__trackEvent){
           window.__trackEvent('time_selected',{
             surface:'mobile',
@@ -747,16 +838,24 @@ function initMobileCal(){
       });
       if(MS.timeISO===tv){
         b.classList.add('sel');
-        confirmBtn.disabled=false;
+        setTimeConfirmState(true);
+        if(!hasModalPicker) btn2.disabled=false;
       }
       tg.appendChild(b);
     });
   }
 
-  function fmtD(d){ return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
-  function wkStart(d){ const c=new Date(d); c.setDate(c.getDate()-c.getDay()); c.setHours(0,0,0,0); return c; }
+  function monthStart(d){ return new Date(d.getFullYear(),d.getMonth(),1); }
+  function monthEnd(d){ return new Date(d.getFullYear(),d.getMonth()+1,0); }
+  function shiftMonth(d,delta){ return new Date(d.getFullYear(),d.getMonth()+delta,1); }
 
-  renderWk(false,0);
+  window.__refreshMobileCal=()=>{
+    monthCursor=monthStart(new Date());
+    syncHiddenInputs();
+    renderMonth(true,0);
+  };
+
+  renderMonth(!hasModalPicker,0);
 }
 
 /* ── G8: Confirmation card ───────────────────────────────────────── */

@@ -8,6 +8,30 @@
   <link rel="stylesheet" href="/css/style.css"/>
   <link rel="stylesheet" href="/css/components.css"/>
   <style>
+    :root{
+      --red:#111111;
+      --red-dk:#000000;
+      --red-glow:rgba(0,0,0,.16);
+      --red-tint:rgba(0,0,0,.04);
+      --red-tintmd:rgba(0,0,0,.08);
+      --red-border:rgba(0,0,0,.2);
+      --bg:#ffffff;
+      --bg-up:#ffffff;
+      --srf:#ffffff;
+      --srf2:#f7f7f7;
+      --srf3:#ececec;
+      --bdr:rgba(0,0,0,.14);
+      --bdrmd:rgba(0,0,0,.22);
+      --bdrhi:rgba(0,0,0,.3);
+      --tx:#000000;
+      --tx2:#2a2a2a;
+      --tx3:#4f4f4f;
+    }
+    body{background:var(--bg);color:var(--tx)}
+    .header{background:rgba(255,255,255,.96);border-bottom:1px solid var(--bdr)}
+    .header.scrolled{background:rgba(255,255,255,.99);border-bottom-color:var(--bdrmd)}
+    .nav-menu.open{background:#ffffff;border-top:1px solid var(--bdr)}
+    .nav-backdrop{background:rgba(0,0,0,.14)}
     .signin-wrap{max-width:520px;margin:0 auto;padding:28px}
     .signin-card{background:var(--srf);border:1px solid var(--bdr);border-radius:var(--r);padding:22px}
     .signin-actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}

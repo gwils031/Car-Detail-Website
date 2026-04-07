@@ -1,4 +1,28 @@
 /* Worker console shared UI theme */
+:root{
+  --red:#111111;
+  --red-dk:#000000;
+  --red-glow:rgba(0,0,0,.16);
+  --red-tint:rgba(0,0,0,.04);
+  --red-tintmd:rgba(0,0,0,.08);
+  --red-border:rgba(0,0,0,.2);
+  --bg:#ffffff;
+  --bg-up:#ffffff;
+  --srf:#ffffff;
+  --srf2:#f7f7f7;
+  --srf3:#ececec;
+  --bdr:rgba(0,0,0,.14);
+  --bdrmd:rgba(0,0,0,.22);
+  --bdrhi:rgba(0,0,0,.3);
+  --tx:#000000;
+  --tx2:#2a2a2a;
+  --tx3:#4f4f4f;
+}
+body{background:var(--bg);color:var(--tx)}
+.header{background:rgba(255,255,255,.96);border-bottom:1px solid var(--bdr)}
+.header.scrolled{background:rgba(255,255,255,.99);border-bottom-color:var(--bdrmd)}
+.nav-menu.open{background:#ffffff;border-top:1px solid var(--bdr)}
+.nav-backdrop{background:rgba(0,0,0,.14)}
 .wc-shell{max-width:1180px;margin:0 auto;padding:22px;display:grid;gap:14px}
 .wc-card{background:var(--srf);border:1px solid var(--bdr);border-radius:14px;padding:14px}
 .wc-card.soft{background:linear-gradient(180deg,var(--srf),var(--srf2))}
@@ -43,11 +67,11 @@
 .wc-nav{display:flex;gap:8px;flex-wrap:wrap}
 .wc-nav-link{border:1px solid var(--bdr);background:var(--srf);color:var(--tx2);border-radius:999px;padding:8px 12px;font-size:.78rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;text-decoration:none}
 .wc-nav-link.active{background:linear-gradient(135deg,rgba(225,55,55,.18),rgba(225,55,55,.06));border-color:rgba(225,55,55,.6);color:var(--tx)}
-.wc-nav-link:hover{border-color:rgba(255,255,255,.32);color:var(--tx)}
+.wc-nav-link:hover{border-color:rgba(0,0,0,.28);color:var(--tx)}
 
 /* Matches admin console value shimmer behavior */
 .value-loading{position:relative;color:transparent!important;text-shadow:none!important;user-select:none}
-.value-loading::after{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);height:.72em;width:min(78%,160px);border-radius:999px;background:linear-gradient(90deg,rgba(255,255,255,.08) 0%,rgba(255,255,255,.24) 45%,rgba(255,255,255,.08) 100%);background-size:220% 100%;animation:value-shimmer 1.25s ease-in-out infinite;pointer-events:none}
+.value-loading::after{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);height:.72em;width:min(78%,160px);border-radius:999px;background:linear-gradient(90deg,rgba(0,0,0,.05) 0%,rgba(0,0,0,.16) 45%,rgba(0,0,0,.05) 100%);background-size:220% 100%;animation:value-shimmer 1.25s ease-in-out infinite;pointer-events:none}
 .wc-status.value-loading::after{height:.58em;width:min(70%,180px)}
 @keyframes value-shimmer{0%{background-position:180% 0}100%{background-position:-40% 0}}
 @media (prefers-reduced-motion: reduce){

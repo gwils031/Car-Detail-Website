@@ -8,6 +8,30 @@
   <link rel="stylesheet" href="/css/style.css"/>
   <link rel="stylesheet" href="/css/components.css"/>
   <style>
+    :root{
+      --red:#111111;
+      --red-dk:#000000;
+      --red-glow:rgba(0,0,0,.16);
+      --red-tint:rgba(0,0,0,.04);
+      --red-tintmd:rgba(0,0,0,.08);
+      --red-border:rgba(0,0,0,.2);
+      --bg:#ffffff;
+      --bg-up:#ffffff;
+      --srf:#ffffff;
+      --srf2:#f7f7f7;
+      --srf3:#ececec;
+      --bdr:rgba(0,0,0,.14);
+      --bdrmd:rgba(0,0,0,.22);
+      --bdrhi:rgba(0,0,0,.3);
+      --tx:#000000;
+      --tx2:#2a2a2a;
+      --tx3:#4f4f4f;
+    }
+    body{background:var(--bg);color:var(--tx)}
+    .header{background:rgba(255,255,255,.96);border-bottom:1px solid var(--bdr)}
+    .header.scrolled{background:rgba(255,255,255,.99);border-bottom-color:var(--bdrmd)}
+    .nav-menu.open{background:#ffffff;border-top:1px solid var(--bdr)}
+    .nav-backdrop{background:rgba(0,0,0,.14)}
     .admin-shell{max-width:1120px;margin:0 auto;padding:24px}
     .admin-muted{font-size:.85rem;color:var(--tx2)}
     .admin-controls{display:grid;grid-template-columns:1fr 1fr auto auto;gap:10px;margin-top:12px}
@@ -15,7 +39,7 @@
     .analytics-range{min-height:30px;height:30px;max-width:126px;padding:4px 24px 4px 8px;font-size:.74rem;border-radius:7px}
     .analytics-refresh-btn{min-height:30px;height:30px;width:30px;padding:0;border-radius:7px;font-size:.95rem;line-height:1;font-weight:800}
     .value-loading{position:relative;color:transparent !important;text-shadow:none !important;user-select:none}
-    .value-loading::after{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);height:.72em;width:min(78%,160px);border-radius:999px;background:linear-gradient(90deg,rgba(255,255,255,.08) 0%,rgba(255,255,255,.24) 45%,rgba(255,255,255,.08) 100%);background-size:220% 100%;animation:value-shimmer 1.25s ease-in-out infinite;pointer-events:none}
+    .value-loading::after{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);height:.72em;width:min(78%,160px);border-radius:999px;background:linear-gradient(90deg,rgba(0,0,0,.05) 0%,rgba(0,0,0,.16) 45%,rgba(0,0,0,.05) 100%);background-size:220% 100%;animation:value-shimmer 1.25s ease-in-out infinite;pointer-events:none}
     .funnel-rate.value-loading::after{height:.58em;width:min(65%,140px)}
     .context-pill.value-loading::after{height:.55em;width:min(62%,120px)}
     @keyframes value-shimmer{0%{background-position:180% 0}100%{background-position:-40% 0}}
@@ -35,9 +59,9 @@
     .admin-k{font-size:.67rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--tx3);margin-bottom:8px}
     .admin-v{font-size:1.45rem;font-weight:800;color:var(--tx);line-height:1.15}
     .admin-sub{margin-top:6px;font-size:.77rem;color:var(--tx2)}
-    .admin-v.warn{color:#ffcc66}
-    .admin-v.bad{color:#ff7b7b}
-    .admin-v.good{color:#7fe6a8}
+    .admin-v.warn{color:#92400e}
+    .admin-v.bad{color:#991b1b}
+    .admin-v.good{color:#166534}
     .split-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     .funnel-track{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:12px}
     .funnel-stage{border:1px solid var(--bdr);background:linear-gradient(180deg,var(--srf),rgba(255,255,255,.01));border-radius:12px;padding:11px}
@@ -68,9 +92,9 @@
     .ops-filter-bar{display:grid;grid-template-columns:minmax(260px,2.2fr) minmax(180px,1fr) minmax(180px,1fr) auto;gap:10px;margin:12px 0 14px;align-items:center}
     .ops-filter-bar .inp,.ops-filter-bar .sel{height:42px}
     .ops-filter-bar .button{min-height:42px;padding-inline:14px;white-space:nowrap}
-    .ops-jobs-table-wrap{margin-top:4px;border:1px solid var(--bdr);border-radius:12px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.01),rgba(255,255,255,.005))}
+    .ops-jobs-table-wrap{margin-top:4px;border:1px solid var(--bdr);border-radius:12px;overflow:hidden;background:linear-gradient(180deg,rgba(0,0,0,.012),rgba(0,0,0,.025))}
     .ops-jobs-table{width:100%;min-width:0;margin:0;table-layout:fixed}
-    .ops-jobs-table th{position:sticky;top:0;background:rgba(12,14,18,.98);z-index:1}
+    .ops-jobs-table th{position:sticky;top:0;background:rgba(247,247,247,.98);z-index:1}
     .ops-jobs-table th,.ops-jobs-table td{overflow-wrap:anywhere;word-break:break-word;white-space:normal}
     .ops-jobs-table td{vertical-align:top}
     .ops-col-when{width:13%;color:var(--tx2);font-weight:700}
@@ -92,35 +116,35 @@
     .ops-simple-note{margin-top:8px}
     .ops-empty-row{text-align:center;color:var(--tx2);padding:16px 10px}
     .ops-pill{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;border:1px solid var(--bdr);font-size:.74rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase}
-    .ops-pill.scheduled{color:#83b6ff;border-color:rgba(131,182,255,.45);background:rgba(131,182,255,.08)}
-    .ops-pill.in_progress{color:#ffce7a;border-color:rgba(255,206,122,.45);background:rgba(255,206,122,.08)}
-    .ops-pill.completed{color:#7fe6a8;border-color:rgba(127,230,168,.45);background:rgba(127,230,168,.08)}
-    .ops-pill.cancelled{color:#ff7b7b;border-color:rgba(255,123,123,.45);background:rgba(255,123,123,.08)}
-    .ops-pill.unpaid{color:#ff7b7b;border-color:rgba(255,123,123,.45);background:rgba(255,123,123,.08)}
-    .ops-pill.partial{color:#ffce7a;border-color:rgba(255,206,122,.45);background:rgba(255,206,122,.08)}
-    .ops-pill.paid{color:#7fe6a8;border-color:rgba(127,230,168,.45);background:rgba(127,230,168,.08)}
-    .ops-profit-positive{color:#7fe6a8}
-    .ops-profit-negative{color:#ff7b7b}
+    .ops-pill.scheduled{color:#1d4ed8;border-color:#93c5fd;background:#dbeafe}
+    .ops-pill.in_progress{color:#92400e;border-color:#fcd34d;background:#fef3c7}
+    .ops-pill.completed{color:#166534;border-color:#86efac;background:#dcfce7}
+    .ops-pill.cancelled{color:#991b1b;border-color:#fca5a5;background:#fee2e2}
+    .ops-pill.unpaid{color:#991b1b;border-color:#fca5a5;background:#fee2e2}
+    .ops-pill.partial{color:#92400e;border-color:#fcd34d;background:#fef3c7}
+    .ops-pill.paid{color:#166534;border-color:#86efac;background:#dcfce7}
+    .ops-profit-positive{color:#166534}
+    .ops-profit-negative{color:#991b1b}
     .ops-row-actions{display:flex;flex-wrap:wrap;gap:6px}
     .ops-row-actions .button{padding:6px 8px;font-size:.72rem;min-height:unset}
     .ops-mini-select{min-width:0;width:100%}
     .ops-inline-note{font-size:.73rem;color:var(--tx3)}
     .ops-track-tags{display:flex;flex-wrap:wrap;gap:6px}
     .ops-track-chip{display:inline-flex;align-items:center;padding:3px 7px;border:1px solid var(--bdr);border-radius:999px;font-size:.68rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase}
-    .ops-track-chip.warn{color:#ffce7a;border-color:rgba(255,206,122,.45);background:rgba(255,206,122,.08)}
-    .ops-track-chip.bad{color:#ff7b7b;border-color:rgba(255,123,123,.45);background:rgba(255,123,123,.08)}
-    .ops-track-chip.good{color:#7fe6a8;border-color:rgba(127,230,168,.45);background:rgba(127,230,168,.08)}
-    .ops-track-chip.neutral{color:#a9b4c7;border-color:rgba(169,180,199,.45);background:rgba(169,180,199,.08)}
+    .ops-track-chip.warn{color:#92400e;border-color:#fcd34d;background:#fef3c7}
+    .ops-track-chip.bad{color:#991b1b;border-color:#fca5a5;background:#fee2e2}
+    .ops-track-chip.good{color:#166534;border-color:#86efac;background:#dcfce7}
+    .ops-track-chip.neutral{color:#334155;border-color:#cbd5e1;background:#f1f5f9}
     .priority-pill{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;font-size:.66rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;border:1px solid var(--bdr)}
-    .priority-pill.critical{color:#ff7b7b;border-color:rgba(255,123,123,.45);background:rgba(255,123,123,.12)}
-    .priority-pill.high{color:#ffce7a;border-color:rgba(255,206,122,.45);background:rgba(255,206,122,.12)}
-    .priority-pill.medium{color:#83b6ff;border-color:rgba(131,182,255,.45);background:rgba(131,182,255,.12)}
-    .priority-pill.low{color:#7fe6a8;border-color:rgba(127,230,168,.45);background:rgba(127,230,168,.12)}
+    .priority-pill.critical{color:#991b1b;border-color:#fca5a5;background:#fee2e2}
+    .priority-pill.high{color:#92400e;border-color:#fcd34d;background:#fef3c7}
+    .priority-pill.medium{color:#1d4ed8;border-color:#93c5fd;background:#dbeafe}
+    .priority-pill.low{color:#166534;border-color:#86efac;background:#dcfce7}
     .signal-pill{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;font-size:.66rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;border:1px solid var(--bdr)}
-    .signal-pill.good{color:#7fe6a8;border-color:rgba(127,230,168,.45);background:rgba(127,230,168,.12)}
-    .signal-pill.warn{color:#ffce7a;border-color:rgba(255,206,122,.45);background:rgba(255,206,122,.12)}
-    .signal-pill.bad{color:#ff7b7b;border-color:rgba(255,123,123,.45);background:rgba(255,123,123,.12)}
-    .signal-pill.watch{color:#83b6ff;border-color:rgba(131,182,255,.45);background:rgba(131,182,255,.12)}
+    .signal-pill.good{color:#166534;border-color:#86efac;background:#dcfce7}
+    .signal-pill.warn{color:#92400e;border-color:#fcd34d;background:#fef3c7}
+    .signal-pill.bad{color:#991b1b;border-color:#fca5a5;background:#fee2e2}
+    .signal-pill.watch{color:#1d4ed8;border-color:#93c5fd;background:#dbeafe}
     @media(max-width:980px){
       .admin-controls{grid-template-columns:1fr 1fr}
       .admin-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -169,7 +193,7 @@
     #leads-list{overflow:auto;max-height:420px;padding:7px;background:var(--srf2);border-radius:10px;border:1px solid var(--bdr)}
     .lead-row{padding:10px;border:1px solid var(--bdr);border-radius:10px;background:var(--srf);cursor:pointer;transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease}
     .lead-row + .lead-row{margin-top:8px}
-    .lead-row:hover{border-color:#64748b;transform:translateY(-1px);box-shadow:0 10px 18px rgba(2,6,23,.18)}
+    .lead-row:hover{border-color:#4b5563;transform:translateY(-1px);box-shadow:0 8px 16px rgba(0,0,0,.14)}
     .lead-row:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(59,130,246,.26)}
     .lead-row-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
     .lead-row-name{font-weight:800;color:var(--tx)}

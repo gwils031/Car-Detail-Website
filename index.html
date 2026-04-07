@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Southern Utah Detailing · Mobile Auto Detailing Cedar City UT</title>
-  <meta name="description" content="Professional mobile car detailing in Cedar City and nearby communities. Basic $129 · Standard $179 · Premium $249. We come to you."/>
+  <title>Southern Utah Detailing · Mobile Auto Detailing Cedar City & St. George UT</title>
+  <meta name="description" content="Professional mobile car detailing in Cedar City, St. George, and nearby communities. Basic $129 · Standard $179 · Premium $249. We come to you."/>
   <meta property="og:title" content="Southern Utah Detailing · Showroom Shine At Your Door"/>
   <meta property="og:description" content="Professional mobile detailing for cars, trucks, and SUVs. Book online in 60 seconds."/>
   <meta property="og:type" content="website"/>
@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="stylesheet" href="/css/style.css"/>
   <link rel="stylesheet" href="/css/components.css"/>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Southern Utah Detailing","alternateName":"So.U.Detail","description":"Professional mobile car detailing in Cedar City and nearby communities. Basic $129, Standard $179, Premium $249.","telephone":"+14359994052","email":"SouthernUtahDetail@gmail.com","url":"https://www.southernutahdetail.com","priceRange":"$$","openingHours":["Mo-Sa 08:00-18:00"],"address":{"@type":"PostalAddress","addressLocality":"Cedar City","addressRegion":"UT","postalCode":"84720","addressCountry":"US"},"geo":{"@type":"GeoCoordinates","latitude":37.6775,"longitude":-113.0619},"areaServed":[{"@type":"City","name":"Cedar City"},{"@type":"City","name":"Enoch"},{"@type":"City","name":"Cedar Highlands"},{"@type":"City","name":"Hamiltons Fort"},{"@type":"City","name":"Kanarraville"},{"@type":"City","name":"Summit"}],"hasOfferCatalog":{"@type":"OfferCatalog","name":"Detailing Packages","itemListElement":[{"@type":"Offer","name":"Basic Detail","price":"129","priceCurrency":"USD"},{"@type":"Offer","name":"Standard Detail","price":"179","priceCurrency":"USD"},{"@type":"Offer","name":"Premium Detail","price":"249","priceCurrency":"USD"}]},"aggregateRating":{"@type":"AggregateRating","ratingValue":"5","reviewCount":"50","bestRating":"5"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Southern Utah Detailing","alternateName":"So.U.Detail","description":"Professional mobile car detailing in Cedar City, St. George, and nearby communities. Basic $129, Standard $179, Premium $249.","telephone":"+14359994052","email":"SouthernUtahDetail@gmail.com","url":"https://www.southernutahdetail.com","priceRange":"$$","openingHours":["Mo-Sa 08:00-18:00"],"address":{"@type":"PostalAddress","addressLocality":"Cedar City","addressRegion":"UT","postalCode":"84720","addressCountry":"US"},"geo":{"@type":"GeoCoordinates","latitude":37.6775,"longitude":-113.0619},"areaServed":[{"@type":"City","name":"Cedar City"},{"@type":"City","name":"St. George"},{"@type":"City","name":"Enoch"},{"@type":"City","name":"Cedar Highlands"},{"@type":"City","name":"Hamiltons Fort"},{"@type":"City","name":"Kanarraville"},{"@type":"City","name":"Summit"}],"hasOfferCatalog":{"@type":"OfferCatalog","name":"Detailing Packages","itemListElement":[{"@type":"Offer","name":"Basic Detail","price":"129","priceCurrency":"USD"},{"@type":"Offer","name":"Standard Detail","price":"179","priceCurrency":"USD"},{"@type":"Offer","name":"Premium Detail","price":"249","priceCurrency":"USD"}]},"aggregateRating":{"@type":"AggregateRating","ratingValue":"5","reviewCount":"50","bestRating":"5"}}</script>
 </head>
 <body>
 
@@ -44,7 +44,7 @@
   <div class="hero-content">
     <div class="container">
       <div data-reveal>
-        <span class="hero-badge">Mobile · Cedar City Area</span>
+        <span class="hero-badge">Mobile · Cedar City + St. George Area</span>
       </div>
       <h1 class="hero-h1" data-reveal data-delay="1">
         Showroom shine.
@@ -91,7 +91,7 @@
       <div class="fitem">
         <div class="ficon">01</div>
         <div class="ftitle">We Come to You</div>
-        <div class="fbody">No driving anywhere. We bring professional-grade equipment to your home, office, or anywhere in the Cedar City area.</div>
+        <div class="fbody">No driving anywhere. We bring professional-grade equipment to your home, office, or anywhere in the Cedar City and St. George area.</div>
       </div>
       <div class="fitem">
         <div class="ficon">02</div>
@@ -195,13 +195,73 @@
   </div>
 </section>
 
+<!-- Package Finder Modal -->
+<div class="finder-modal" id="finder-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="finder-title">
+  <div class="finder-dialog">
+    <button class="finder-close" id="finder-close" type="button" aria-label="Close package finder">×</button>
+    <div class="center finder-head">
+      <span class="eyebrow">Need Help Choosing?</span>
+      <h2 class="h2 finder-title" id="finder-title">Find My Package in 15 Seconds</h2>
+      <p class="muted finder-sub">Answer 3 quick questions and get the best match before you book.</p>
+    </div>
+    <div class="rec">
+      <div class="rec-head">
+        <div class="rq-bar" id="rq-bar">
+          <div class="rq-bar-seg" id="rq-seg-1"></div>
+          <div class="rq-bar-seg" id="rq-seg-2"></div>
+          <div class="rq-bar-seg" id="rq-seg-3"></div>
+        </div>
+        <div class="rq-lbl" id="rq-lbl">Question 1 of 3</div>
+      </div>
+      <div class="rec-body">
+        <div class="rq-step active" id="rq-1">
+          <div class="rq-q">Do pets ride in your car regularly?</div>
+          <div class="rq-opts">
+            <button class="rq-opt" onclick="rqA(1,'yes')">Yes — dogs, cats, or other pets</button>
+            <button class="rq-opt" onclick="rqA(1,'no')">No pets in my car</button>
+          </div>
+        </div>
+        <div class="rq-step" id="rq-2">
+          <div class="rq-q">Do you have leather seats?</div>
+          <div class="rq-opts">
+            <button class="rq-opt" onclick="rqA(2,'yes')">Yes, leather interior</button>
+            <button class="rq-opt" onclick="rqA(2,'no')">No, cloth or vinyl seats</button>
+          </div>
+        </div>
+        <div class="rq-step" id="rq-3">
+          <div class="rq-q">When was your car last professionally detailed?</div>
+          <div class="rq-opts">
+            <button class="rq-opt" onclick="rqA(3,'recent')">Within the last 3 months</button>
+            <button class="rq-opt" onclick="rqA(3,'old')">3–12 months ago</button>
+            <button class="rq-opt" onclick="rqA(3,'never')">Over a year ago / never</button>
+          </div>
+        </div>
+        <div class="rq-step" id="rq-result">
+          <div class="rq-res">
+            <div class="rq-res-badge">We recommend</div>
+            <div class="rq-res-name" id="rq-name">—</div>
+            <div class="rq-res-price" id="rq-price">—</div>
+            <div class="rq-res-why" id="rq-why">—</div>
+            <ul class="rq-res-points" id="rq-points"></ul>
+            <div class="rq-res-note">Same-week availability. No payment due until service is complete.</div>
+            <div class="rq-res-acts">
+              <a class="button block" id="rq-book" href="/booking.html">Book This Package</a>
+            </div>
+            <button class="rq-restart" onclick="rqReset()">Start over</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ─── FOOTER ─────────────────────────────────────────────────────── -->
 <footer class="footer">
   <div class="container">
     <div class="ft-grid">
       <div>
         <div class="ft-brand">Southern Utah Detailing</div>
-        <p class="ft-body">Premium mobile detailing based in Cedar City, UT. We bring the detail shop to your door throughout the Cedar City area.</p>
+        <p class="ft-body">Premium mobile detailing based in Cedar City, UT. We bring the detail shop to your door throughout the Cedar City and St. George area.</p>
         <p class="ft-body" style="margin-top:10px">Mon – Sat · 8 am – 6 pm</p>
       </div>
       <div>
@@ -211,6 +271,8 @@
           <a href="/services.html">Services</a>
           <a href="/booking.html">Book Now</a>
           <a href="/contact.html">Contact</a>
+          <a href="/terms.html">Terms of Service</a>
+          <a href="/privacy.html">Privacy Policy</a>
           <a href="/admin-signin.html">Admin Login</a>
           <a href="/rep-field.html">Sales Rep Portal</a>
           <a href="/worker-field.html">Field Worker Portal</a>
@@ -227,10 +289,110 @@
     <div class="ft-legal">
       <span>© <span class="js-year"></span> Southern Utah Detailing LLC. All rights reserved.</span>
       <span>Cedar City, Utah</span>
+      <span><a href="/terms.html">Terms of Service</a> · <a href="/privacy.html">Privacy Policy</a></span>
     </div>
   </div>
 </footer>
 
 <script src="/js/main.js" defer></script>
+<script>
+/* ── Homepage Package Finder ───────────────────────────────────── */
+const finderModal=document.getElementById('finder-modal');
+const closeFinderButton=document.getElementById('finder-close');
+const finderSeenKey='sud_finder_seen_session';
+
+function openFinderModal(){
+  if(!finderModal) return;
+  finderModal.classList.add('open');
+  finderModal.setAttribute('aria-hidden','false');
+  document.body.classList.add('finder-open');
+  rqReset();
+}
+
+function closeFinderModal(){
+  if(!finderModal) return;
+  finderModal.classList.remove('open');
+  finderModal.setAttribute('aria-hidden','true');
+  document.body.classList.remove('finder-open');
+  try{ sessionStorage.setItem(finderSeenKey,'1'); }catch(_e){}
+}
+
+if(closeFinderButton) closeFinderButton.addEventListener('click',closeFinderModal);
+if(finderModal){
+  finderModal.addEventListener('click',(e)=>{ if(e.target===finderModal) closeFinderModal(); });
+}
+document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') closeFinderModal(); });
+
+const rqAns={};
+function rqA(q,v){
+  rqAns[q]=v;
+  document.getElementById('rq-seg-'+q).classList.add('done');
+  if(q<3){
+    document.getElementById('rq-'+q).classList.remove('active');
+    document.getElementById('rq-'+(q+1)).classList.add('active');
+    document.getElementById('rq-lbl').textContent='Question '+(q+1)+' of 3';
+  } else {
+    document.getElementById('rq-3').classList.remove('active');
+    document.getElementById('rq-result').classList.add('active');
+    document.getElementById('rq-lbl').textContent='Your recommendation';
+    const pets=rqAns[1]==='yes', leather=rqAns[2]==='yes', old=rqAns[3]!=='recent';
+    let pkg,price,slug,why,points;
+    if(pets||leather){
+      pkg='Premium Detail';price='$249';slug='premium';
+      const r=[];
+      if(pets) r.push('pet hair removal and odor treatment');
+      if(leather) r.push('leather seat conditioning');
+      if(old) r.push('a thorough deep clean after extended time');
+      why='Your car needs '+r.join(', ')+' — all included in Premium at no extra cost.';
+      points=[
+        'Includes specialized treatment for heavy-use interiors',
+        'Most complete interior and exterior reset in one appointment',
+        'Ideal for vehicles with pets, odors, or neglected surfaces'
+      ];
+    } else if(old){
+      pkg='Standard Detail';price='$179';slug='standard';
+      why="It's been a while since your last detail. Standard's full vacuum and thorough interior clean is exactly what a well-maintained car needs after extended use — and it's only $50 more than Basic.";
+      points=[
+        'Best value for regular drivers who want a true reset',
+        'Deep interior clean without paying for premium extras',
+        'Most customers choose this package for monthly upkeep'
+      ];
+    } else {
+      pkg='Basic Detail';price='$129';slug='basic';
+      why='Your car is well-maintained with no special needs. Basic covers the essentials perfectly — exterior wash, door jams, light interior, and glass.';
+      points=[
+        'Fast refresh for well-maintained vehicles',
+        'Covers essentials while keeping price efficient',
+        'Great entry package for first-time mobile detailing'
+      ];
+    }
+    document.getElementById('rq-name').textContent=pkg;
+    document.getElementById('rq-price').textContent=price;
+    document.getElementById('rq-why').textContent=why;
+    const list=document.getElementById('rq-points');
+    if(list) list.innerHTML=points.map(p=>`<li>${p}</li>`).join('');
+    const btn=document.getElementById('rq-book');
+    btn.href='/booking.html?pkg='+slug;
+    btn.textContent='Book '+pkg+' — '+price;
+  }
+}
+
+function rqReset(){
+  Object.keys(rqAns).forEach(k=>delete rqAns[k]);
+  document.querySelectorAll('.rq-step').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.rq-bar-seg').forEach(s=>s.classList.remove('done'));
+  document.getElementById('rq-1').classList.add('active');
+  document.getElementById('rq-lbl').textContent='Question 1 of 3';
+}
+
+setTimeout(()=>{
+  try{
+    if(sessionStorage.getItem(finderSeenKey)==='1') return;
+  }catch(_e){}
+  if(finderModal && !finderModal.classList.contains('open')){
+    openFinderModal();
+  }
+},15000);
+</script>
 </body>
 </html>

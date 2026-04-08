@@ -139,6 +139,12 @@ Known test note from this session:
 Use this folder only for production Worker deploys:
 - calcom-proxy/
 
+Production safety policy for AI agents:
+- Never deploy or push production changes unless the user explicitly asks for production publish/deploy in the current conversation.
+- Treat any ambiguous request as staging-only.
+- Default deploy target is staging.
+- Production deploy requires an explicit user instruction such as: "deploy production", "publish backend to main", or equivalent.
+
 Typical deploy steps:
 1. Open terminal in calcom-proxy/
 2. npm install
@@ -147,16 +153,29 @@ Typical deploy steps:
    - wrangler secret put ANALYTICS_ADMIN_TOKEN
    - wrangler secret put FIELD_REP_SESSION_SECRET
 4. Apply D1 migrations:
-   - wrangler d1 migrations apply field-sales --remote
+   - Staging: npm run migrate:staging
+   - Production: npm run migrate:prod
 5. Deploy:
-   - wrangler deploy
+   - Staging (default): npm run deploy
+   - Explicit staging: npm run deploy:staging
+   - Production (explicit only): npm run deploy:prod
+
+Staging environment details:
+- Worker name: calcom-proxy-staging
+- D1 database: field-sales-staging
+- KV namespace title: ANALYTICS_KV_STAGING
+- Bindings in staging still use the same names expected by code:
+  - ANALYTICS_KV
+  - FIELD_SALES_DB
 
 Optional local/dev:
-- wrangler dev
-- wrangler d1 migrations apply field-sales
+- npm run dev
+- npm run dev:staging
+- npm run dev:prod
 
 Guardrail:
 - Do not run wrangler deploy from CalcomProxy/calcom-proxy.
+- Do not run npm run deploy:prod unless explicitly asked by the user.
 
 ## 7) Testing Runbook
 

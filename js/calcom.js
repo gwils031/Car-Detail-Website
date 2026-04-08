@@ -108,14 +108,24 @@ async function handleSubmit(e){
     const al=document.getElementById('bk-alert');
     if(al) al.classList.add('hide');
 
-    // Goal 8
+    const bookingData={
+      service:svcName,
+      addons:addons.length?addons.map(a=>a.name).join(', '):'None',
+      datetime:new Date(timeISO).toLocaleString('en-US',{month:'long',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}),
+      location:fullAddr,
+      total:'$'+total,
+      email,
+      timeISO
+    };
+
+    // Redirect to a dedicated conversion URL when available.
+    if(window.__redirectToConfirmation){
+      window.__redirectToConfirmation(bookingData);
+      return;
+    }
+
     if(window.__showConfirmation){
-      window.__showConfirmation({
-        service:svcName,
-        addons:addons.length?addons.map(a=>a.name).join(', '):'None',
-        datetime:new Date(timeISO).toLocaleString('en-US',{month:'long',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}),
-        location:fullAddr, total:'$'+total, email, timeISO
-      });
+      window.__showConfirmation(bookingData);
     } else {
       window.__showAlert&&window.__showAlert('Booking confirmed! Confirmation sent to '+email+'.','ok');
     }

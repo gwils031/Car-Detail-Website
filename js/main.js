@@ -535,11 +535,16 @@ window.mSubmit=async function(){
       })
     });
     if(!res.ok) throw new Error(await res.text());
-    showConfirmation({
-      service:submitSvcName||MS.svcName, addons:addonNames.length?addonNames.join(', '):'None',
+    const bookingData={
+      service:submitSvcName||MS.svcName,
+      addons:addonNames.length?addonNames.join(', '):'None',
       datetime:new Date(MS.timeISO).toLocaleString('en-US',{month:'long',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}),
-      location:addr, total:'$'+total, email:MS.email, timeISO:MS.timeISO
-    });
+      location:addr,
+      total:'$'+total,
+      email:MS.email,
+      timeISO:MS.timeISO
+    };
+    redirectToConfirmation(bookingData);
   }catch(err){
     if(btn){ btn.disabled=false; btn.textContent='Confirm Booking'; }
     if(window.__trackEvent){
@@ -864,6 +869,28 @@ function initMobileCal(){
 }
 
 /* ── G8: Confirmation card ───────────────────────────────────────── */
+function redirectToConfirmation(data){
+  const sp=new URLSearchParams();
+  sp.set('success','1');
+  sp.set('service',String(data?.service||''));
+  sp.set('addons',String(data?.addons||'None'));
+  sp.set('datetime',String(data?.datetime||''));
+  sp.set('location',String(data?.location||''));
+  sp.set('total',String(data?.total||''));
+  sp.set('email',String(data?.email||''));
+  sp.set('timeISO',String(data?.timeISO||''));
+
+  // Keep ad attribution in the redirect URL so conversion tools can read it.
+  const current=new URLSearchParams(window.location.search);
+  ['gclid','gbraid','wbraid','utm_source','utm_medium','utm_campaign','utm_term','utm_content','msclkid','fbclid','rep_id','lead_id','src']
+    .forEach(key=>{
+      const val=current.get(key);
+      if(val&&!sp.has(key)) sp.set(key,val);
+    });
+
+  window.location.href='/confirmation.html?'+sp.toString();
+}
+
 function showConfirmation(data){
   const main=$('#bk-main'), card=$('#conf-card');
   if(!main||!card) return;
@@ -904,6 +931,7 @@ function showConfirmation(data){
 
 /* Expose for calcom.js */
 window.__showConfirmation=showConfirmation;
+window.__redirectToConfirmation=redirectToConfirmation;
 
 /* ── Alert helper ────────────────────────────────────────────────── */
 function showAlert(msg,type='err'){

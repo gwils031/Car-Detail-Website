@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Booking Confirmed · Southern Utah Detailing</title>
+  <meta name="description" content="Your appointment is confirmed with Southern Utah Detailing."/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <link rel="canonical" href="https://southernutahdetailing.com/confirmation"/>
+  <link rel="icon" href="/favicon.ico" sizes="any"/>
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48"/>
+  <link rel="icon" type="image/png" href="/favicon.png" sizes="512x512"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180"/>
+  <link rel="manifest" href="/site.webmanifest"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <link rel="stylesheet" href="/css/components.css"/>
+</head>
+<body>
+<header class="header" id="site-header">
+  <div class="container nav">
+    <a href="/index.html" class="nav-brand">
+      <img src="/images/Logo.PNG" alt="So.U.Detail logo" class="nav-logo"/>
+      Southern Utah Detailing
+    </a>
+    <div class="nav-spacer"></div>
+    <nav class="nav-menu" aria-label="Primary">
+      <a href="/index.html">Home</a>
+      <a href="/services.html">Services</a>
+      <a href="/booking.html">Booking</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+    <div class="nav-actions"><a class="button" href="/booking.html">Book Again</a></div>
+  </div>
+</header>
+
+<section class="section" style="padding-top:58px">
+  <div class="container" style="max-width:860px">
+    <article class="bk-panel" style="text-align:center">
+      <div class="conf-ico" style="margin:0 auto 14px">OK</div>
+      <h1 class="h2" style="margin-bottom:8px">You're all booked!</h1>
+      <p class="muted" id="conf-sub" style="margin-bottom:18px">Your confirmation has been sent. We look forward to detailing your vehicle.</p>
+
+      <div class="conf-box" style="text-align:left;margin:0 auto;max-width:680px">
+        <div class="conf-row"><span class="conf-k">Service</span><span class="conf-v" id="cv-service">-</span></div>
+        <div class="conf-row"><span class="conf-k">Add-ons</span><span class="conf-v" id="cv-addons">None</span></div>
+        <div class="conf-row"><span class="conf-k">Date &amp; Time</span><span class="conf-v" id="cv-datetime">-</span></div>
+        <div class="conf-row"><span class="conf-k">Location</span><span class="conf-v" id="cv-location">-</span></div>
+        <div class="conf-row"><span class="conf-k" style="font-weight:700;color:var(--tx)">Total</span><span class="conf-v" id="cv-total" style="color:var(--red);font-size:1.05rem">-</span></div>
+      </div>
+
+      <div class="conf-acts" style="margin-top:18px">
+        <a class="button block" href="/index.html">Back to Home</a>
+        <a class="button block outline" href="/booking.html">Book Another Detail</a>
+      </div>
+    </article>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="ft-legal">
+      <span>© <span class="js-year"></span> Southern Utah Detailing LLC.</span>
+      <a href="tel:+14359994052">(435) 999-4052</a>
+      <span><a href="/terms.html">Terms of Service</a> · <a href="/privacy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  function txt(id,val){
+    var el=document.getElementById(id);
+    if(el) el.textContent=val||'-';
+  }
+
+  function parseTotalToNumber(totalText){
+    var cleaned=String(totalText||'').replace(/[^0-9.]/g,'');
+    var n=Number(cleaned);
+    return Number.isFinite(n)?n:0;
+  }
+
+  function setYear(){
+    var y=new Date().getFullYear();
+    var nodes=document.querySelectorAll('.js-year');
+    nodes.forEach(function(el){ el.textContent=String(y); });
+  }
+
+  var sp=new URLSearchParams(window.location.search);
+  var success=sp.get('success')==='1';
+
+  if(!success){
+    window.location.replace('/booking.html');
+    return;
+  }
+
+  var service=sp.get('service')||'-';
+  var addons=sp.get('addons')||'None';
+  var datetime=sp.get('datetime')||'-';
+  var location=sp.get('location')||'-';
+  var total=sp.get('total')||'-';
+  var email=sp.get('email')||'';
+
+  txt('cv-service',service);
+  txt('cv-addons',addons);
+  txt('cv-datetime',datetime);
+  txt('cv-location',location);
+  txt('cv-total',total);
+  if(email){ txt('conf-sub','A confirmation is on its way to '+email+'. We\'ll see you soon.'); }
+
+  var conversionPayload={
+    event:'booking_confirmation',
+    value:parseTotalToNumber(total),
+    currency:'USD',
+    service:service,
+    datetime:datetime,
+    gclid:sp.get('gclid')||'',
+    wbraid:sp.get('wbraid')||'',
+    gbraid:sp.get('gbraid')||''
+  };
+
+  window.dataLayer=window.dataLayer||[];
+  window.dataLayer.push(conversionPayload);
+
+  if(typeof window.gtag==='function'){
+    window.gtag('event','booking_confirmation',conversionPayload);
+  }
+
+  setYear();
+})();
+</script>
+</body>
+</html>

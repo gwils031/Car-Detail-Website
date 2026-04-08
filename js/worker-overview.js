@@ -12,6 +12,8 @@
   const loginCard=document.getElementById('worker-login-card');
   const app=document.getElementById('worker-app');
   const logoutBtn=document.getElementById('worker-logout-btn');
+  const workerNameEl=document.getElementById('worker-name');
+  const workerRateEl=document.getElementById('worker-rate');
 
   let workerToken='';
   let workerProfile=null;
@@ -22,6 +24,7 @@
   const loadingSelector='.wc-v, #worker-name, #worker-rate, #worker-global-status, #worker-availability-status, #worker-weekly-status';
 
   Core.warmConsolePages(window.location.pathname);
+  Core.setupWorkerSectionCollapsibles({ rootSelector:'#worker-app', defaultCollapsed:true });
 
   function setText(id,val){
     const el=document.getElementById(id);
@@ -29,45 +32,31 @@
   }
 
   function setAuthStatus(msg,isErr){
-    if(!authStatus) return;
-    authStatus.textContent=msg;
-    authStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
+    Core.setStatusText(authStatus,msg,isErr);
   }
 
   function setGlobalStatus(msg,isErr){
-    if(!globalStatus) return;
-    globalStatus.textContent=msg;
-    globalStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
+    Core.setStatusText(globalStatus,msg,isErr);
   }
 
   function setAvailabilityStatus(msg,isErr){
-    if(!availabilityStatus) return;
-    availabilityStatus.textContent=msg;
-    availabilityStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
+    Core.setStatusText(availabilityStatus,msg,isErr);
   }
 
   function setWeeklyStatus(msg,isErr){
-    if(!weeklyStatus) return;
-    weeklyStatus.textContent=msg;
-    weeklyStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
+    Core.setStatusText(weeklyStatus,msg,isErr);
   }
 
   function showApp(){
-    if(loginCard) loginCard.hidden=true;
-    if(app) app.hidden=false;
-    if(logoutBtn) logoutBtn.hidden=false;
+    Core.toggleWorkerApp(loginCard, app, logoutBtn, true);
   }
 
   function showLogin(){
-    if(loginCard) loginCard.hidden=false;
-    if(app) app.hidden=true;
-    if(logoutBtn) logoutBtn.hidden=true;
+    Core.toggleWorkerApp(loginCard, app, logoutBtn, false);
   }
 
   function renderWorkerHeader(){
-    const name=(workerProfile&&workerProfile.fullName)||'Worker';
-    setText('worker-name',name);
-    setText('worker-rate',`${Core.fmtMoneyCents(workerProfile&&workerProfile.hourlyRateCents||0)}/hr`);
+    Core.renderWorkerIdentity(workerProfile,workerNameEl,workerRateEl);
   }
 
   function clampMinute(value,fallback){
@@ -190,10 +179,6 @@
       .filter((job)=>job&&job.scheduledFor&&isWithinNextWeek(new Date(job.scheduledFor)))
       .sort((a,b)=>new Date(a.scheduledFor||0).getTime()-new Date(b.scheduledFor||0).getTime());
 
-    setText('k-fit-jobs',Core.fmtNum(fitJobs.length));
-    setText('k-my-week-jobs',Core.fmtNum(myWeekJobs.length));
-    setText('k-active-days',Core.fmtNum(availabilityItems.filter((item)=>item.active).length));
-
     if(!fitJobs.length){
       fitWrap.innerHTML='<div class="wc-sub">No open jobs match your current weekly availability.</div>';
     }else{
@@ -268,6 +253,10 @@
         jobsDays:14,
         financeDays:45,
         financeLimit:120,
+        includeToday:true,
+        includeJobs:true,
+        includeFinance:false,
+        includeAvailability:true,
         allowStale:true,
       });
       if(cached&&cached.snapshot){
@@ -285,6 +274,10 @@
         jobsDays:14,
         financeDays:45,
         financeLimit:120,
+        includeToday:true,
+        includeJobs:true,
+        includeFinance:false,
+        includeAvailability:true,
       });
       applySnapshot(live&&live.snapshot?live.snapshot:null);
       setGlobalStatus(`Updated ${new Date().toLocaleString('en-US')}`,false);
@@ -362,10 +355,11 @@
   }
 
   async function loginWorker(){
-    const workerId=(document.getElementById('worker-id')?.value||'').trim();
-    const pin=(document.getElementById('worker-pin')?.value||'').trim();
-    if(!workerId||!/^\d{4,12}$/.test(pin)){
-      setAuthStatus('Worker ID and a 4-12 digit PIN are required.',true);
+    const workerId=(document.getElementById('worker-id')?.value||'');
+    const pin=(document.getElementById('worker-pin')?.value||'');
+    const creds=Core.validateWorkerCredentials(workerId,pin);
+    if(!creds.ok){
+      setAuthStatus(creds.error||'Worker ID and a 4-12 digit PIN are required.',true);
       return;
     }
 
@@ -373,30 +367,27 @@
     if(btn) btn.disabled=true;
     setAuthStatus('Signing in...',false);
     try{
-      const data=await Core.login(workerId,pin);
-      workerToken=String(data&&data.token||'').trim();
-      workerProfile=data&&data.worker?data.worker:null;
-      if(!workerToken) throw new Error('Login response did not include a token');
-      Core.storeToken(workerToken);
+      const session=await Core.loginWithStoredSession(creds.workerId,creds.pin);
+      workerToken=String(session&&session.token||'').trim();
+      workerProfile=session&&session.worker?session.worker:null;
       showApp();
       setAuthStatus(`Signed in as ${workerProfile&&workerProfile.fullName?workerProfile.fullName:'worker'}.`,false);
       await refreshAll({preferCache:true});
     }catch(err){
       const msg=String(err&&err.message||'Could not sign in');
-      setAuthStatus(msg==='UNAUTHORIZED'?'Invalid worker credentials.':msg,true);
+      setAuthStatus(msg==='UNAUTHORIZED'||msg==='INVALID_CREDENTIAL_FORMAT'?'Invalid worker credentials.':msg,true);
     }finally{
       if(btn) btn.disabled=false;
     }
   }
 
   async function logoutWorker(isSilent){
-    try{ await Core.logout(workerToken); }catch(_e){}
+    await Core.logoutAndClear(workerToken);
     workerToken='';
     workerProfile=null;
     myJobs=[];
     availableJobs=[];
     availabilityItems=Core.defaultWeeklyAvailability(Core.getLocalTimezone());
-    Core.storeToken('');
     showLogin();
     if(!isSilent){
       setAuthStatus('Signed out.',false);

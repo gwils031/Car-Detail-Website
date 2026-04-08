@@ -14,6 +14,8 @@
   const shiftStatus=document.getElementById('worker-shift-status');
   const shiftClockInBtn=document.getElementById('worker-shift-clockin-btn');
   const shiftClockOutBtn=document.getElementById('worker-shift-clockout-btn');
+  const workerNameEl=document.getElementById('worker-name');
+  const workerRateEl=document.getElementById('worker-rate');
   const loadingSelector='.wc-v, #worker-name, #worker-rate, #worker-jobs-status, #worker-available-status, #worker-shift-status';
 
   let workerToken='';
@@ -23,8 +25,10 @@
   let openDaySession=null;
   const jobPhotoDrafts={};
   let pendingPaymentByJob={};
+  let collapsedCompletedPaidJobs={};
 
   Core.warmConsolePages(window.location.pathname);
+  Core.setupWorkerSectionCollapsibles({ rootSelector:'#worker-app', defaultCollapsed:true });
 
   function escCss(value){
     const txt=String(value||'');
@@ -38,39 +42,27 @@
   }
 
   function setAuthStatus(msg,isErr){
-    if(!authStatus) return;
-    authStatus.textContent=msg;
-    authStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
+    Core.setStatusText(authStatus,msg,isErr);
   }
 
   function setGlobalStatus(msg,isErr){
-    if(!globalStatus) return;
-    globalStatus.textContent=msg;
-    globalStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
+    Core.setStatusText(globalStatus,msg,isErr);
   }
 
   function setShiftStatus(msg,isErr){
-    if(!shiftStatus) return;
-    shiftStatus.textContent=msg;
-    shiftStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
+    Core.setStatusText(shiftStatus,msg,isErr);
   }
 
   function showApp(){
-    if(loginCard) loginCard.hidden=true;
-    if(app) app.hidden=false;
-    if(logoutBtn) logoutBtn.hidden=false;
+    Core.toggleWorkerApp(loginCard, app, logoutBtn, true);
   }
 
   function showLogin(){
-    if(loginCard) loginCard.hidden=false;
-    if(app) app.hidden=true;
-    if(logoutBtn) logoutBtn.hidden=true;
+    Core.toggleWorkerApp(loginCard, app, logoutBtn, false);
   }
 
   function renderWorkerHeader(){
-    const name=(workerProfile&&workerProfile.fullName)||'Worker';
-    setText('worker-name',name);
-    setText('worker-rate',`${Core.fmtMoneyCents(workerProfile&&workerProfile.hourlyRateCents||0)}/hr`);
+    Core.renderWorkerIdentity(workerProfile,workerNameEl,workerRateEl);
   }
 
   function isTodayLocal(value){
@@ -95,15 +87,6 @@
   function getTodayOpenJobs(){
     const today=availableJobs.filter((job)=>isTodayLocal(job&&job.scheduledFor));
     return today.sort((a,b)=>new Date(a.scheduledFor||0).getTime()-new Date(b.scheduledFor||0).getTime());
-  }
-
-  function renderQuickStats(){
-    const todayMine=getTodayMyJobs();
-    const todayOpen=getTodayOpenJobs();
-    const inProgress=todayMine.filter((j)=>String(j.assignmentStatus||'')==='in_progress').length;
-    setText('k-today-jobs',Core.fmtNum(todayMine.length));
-    setText('k-today-open-jobs',Core.fmtNum(todayOpen.length));
-    setText('k-today-in-progress',Core.fmtNum(inProgress));
   }
 
   function setValueLoadingState(isLoading){
@@ -135,6 +118,26 @@
     if(jobStatus==='completed') return 'Completed. Collect payment to close payout.';
     if(jobStatus==='in_progress') return 'In progress. Upload after photos to complete.';
     return 'Ready.';
+  }
+
+  function isCompletedAndPaid(job){
+    const jobStatus=String(job&&job.jobStatus||'').trim();
+    const paidStatus=String(job&&job.paidStatus||'').trim();
+    return jobStatus==='completed' && paidStatus==='paid';
+  }
+
+  function shouldRenderCollapsed(jobId,job){
+    if(!isCompletedAndPaid(job)) return false;
+    return collapsedCompletedPaidJobs[String(jobId||'')]!==false;
+  }
+
+  function setJobCollapsed(jobId,collapsed){
+    const id=String(jobId||'').trim();
+    if(!id) return;
+    const job=myJobs.find((it)=>String(it&&it.id||'')===id);
+    if(!isCompletedAndPaid(job)) return;
+    collapsedCompletedPaidJobs[id]=!!collapsed;
+    renderJobs();
   }
 
   function quotedLabel(job){
@@ -211,12 +214,30 @@
       const status=String(job.assignmentStatus||'assigned');
       const when=job.scheduledFor?new Date(job.scheduledFor).toLocaleString('en-US'):'No schedule';
       const quote=quotedLabel(job);
+      const completedPaid=isCompletedAndPaid(job);
+      const collapsed=shouldRenderCollapsed(id,job);
       const draft=jobPhotoDrafts[id]||{dataUrl:'',type:'before'};
       const directionsUrl=toDirectionsUrl(job.addressLine1);
       const preview=draft.dataUrl
         ? `<img src="${Core.esc(draft.dataUrl)}" alt="Photo preview"/>`
         : '<span class="wc-sub">No photo selected</span>';
       const needsPayment=!!pendingPaymentByJob[id] || (String(job.jobStatus||'')==='completed' && String(job.paidStatus||'')!=='paid');
+
+      if(collapsed){
+        return `<div class="wc-job-item">
+          <div class="wc-job-head">
+            <div>
+              <div class="wc-job-title">${Core.esc(job.serviceName||'Job')}</div>
+              <div class="wc-job-meta">${Core.esc(job.customerName||'Customer')} | ${Core.esc(when)}</div>
+              <div class="wc-job-meta">Completed and paid. Collapsed to keep focus on active jobs.</div>
+            </div>
+            <span class="wc-pill completed">completed</span>
+          </div>
+          <div class="wc-job-actions">
+            <button class="button outline" type="button" data-action="toggle-job-collapse" data-job-id="${Core.esc(id)}" data-collapsed-next="false">Expand</button>
+          </div>
+        </div>`;
+      }
 
       return `<div class="wc-job-item">
         <div class="wc-job-head">
@@ -231,10 +252,9 @@
 
         <div class="wc-job-actions">
           ${directionsUrl?`<a class="button outline" href="${Core.esc(directionsUrl)}" target="_blank" rel="noopener noreferrer">Directions</a>`:''}
-          <button class="button outline" type="button" data-action="start-job" data-job-id="${Core.esc(id)}">Start Job (Backup)</button>
           <button class="button outline" type="button" data-action="end-job" data-job-id="${Core.esc(id)}">End Job</button>
-          <button class="button" type="button" data-action="complete-job" data-job-id="${Core.esc(id)}">End + Complete (Backup)</button>
-          <button class="button outline" type="button" data-action="load-photos" data-job-id="${Core.esc(id)}">View Photos</button>
+          <button class="button" type="button" data-action="complete-job" data-job-id="${Core.esc(id)}">Complete Job</button>
+          ${completedPaid?`<button class="button outline" type="button" data-action="toggle-job-collapse" data-job-id="${Core.esc(id)}" data-collapsed-next="true">Collapse</button>`:''}
         </div>
 
         <div class="wc-photo-tools">
@@ -282,6 +302,32 @@
           </div>
         </div>`:''}
 
+        ${needsPayment?`<div class="wc-job-payment">
+          <div class="wc-k">Record Tip</div>
+          <div class="wc-photo-tools">
+            <div>
+              <label>Tip Amount ($)</label>
+              <input class="inp" type="number" min="0" step="0.01" data-tip-amount="${Core.esc(id)}" placeholder="0.00"/>
+            </div>
+            <div>
+              <label>Method</label>
+              <select class="sel" data-tip-method="${Core.esc(id)}">
+                <option value="cash">Cash</option>
+                <option value="card">Card</option>
+                <option value="zelle">Zelle</option>
+                <option value="venmo">Venmo</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div>
+              <button class="button outline" type="button" data-action="record-tip" data-tip-save="${Core.esc(id)}" data-job-id="${Core.esc(id)}">Record Tip</button>
+            </div>
+          </div>
+          <div style="margin-top:8px">
+            <input class="inp" type="text" data-tip-note="${Core.esc(id)}" placeholder="Optional tip note"/>
+          </div>
+        </div>`:''}
+
         <div class="wc-status" data-job-status="${Core.esc(id)}">${Core.esc(statusDefaultCopy(job))}</div>
       </div>`;
     }).join('');
@@ -296,6 +342,7 @@
     openDaySession=todayData&&todayData.daySession?todayData.daySession:null;
 
     const activeJobIds={};
+    const nextCollapsedState={};
     myJobs.forEach((job)=>{
       const id=String(job&&job.id||'');
       if(!id) return;
@@ -303,14 +350,17 @@
       if(String(job.jobStatus||'')==='completed'&&String(job.paidStatus||'')!=='paid'){
         pendingPaymentByJob[id]=true;
       }
+      if(isCompletedAndPaid(job)){
+        nextCollapsedState[id]=collapsedCompletedPaidJobs[id]===false?false:true;
+      }
     });
     pendingPaymentByJob=Object.keys(pendingPaymentByJob).reduce((acc,key)=>{
       if(activeJobIds[key]) acc[key]=pendingPaymentByJob[key];
       return acc;
     },{});
+    collapsedCompletedPaidJobs=nextCollapsedState;
 
     renderWorkerHeader();
-    renderQuickStats();
     renderShiftPanel();
     renderJobs();
     if(jobsStatus) jobsStatus.textContent=`Loaded ${Core.fmtNum(getTodayMyJobs().length)} jobs for today.`;
@@ -330,6 +380,10 @@
         jobsDays:14,
         financeDays:45,
         financeLimit:120,
+        includeToday:true,
+        includeJobs:true,
+        includeFinance:false,
+        includeAvailability:false,
         allowStale:true,
       });
       if(cached&&cached.snapshot){
@@ -349,6 +403,10 @@
         jobsDays:14,
         financeDays:45,
         financeLimit:120,
+        includeToday:true,
+        includeJobs:true,
+        includeFinance:false,
+        includeAvailability:false,
       });
       applySnapshot(live&&live.snapshot?live.snapshot:null);
       setGlobalStatus(`Updated ${new Date().toLocaleString('en-US')}`,false);
@@ -367,10 +425,11 @@
   }
 
   async function loginWorker(){
-    const workerId=(document.getElementById('worker-id')?.value||'').trim();
-    const pin=(document.getElementById('worker-pin')?.value||'').trim();
-    if(!workerId||!/^[\d]{4,12}$/.test(pin)){
-      setAuthStatus('Worker ID and a 4-12 digit PIN are required.',true);
+    const workerId=(document.getElementById('worker-id')?.value||'');
+    const pin=(document.getElementById('worker-pin')?.value||'');
+    const creds=Core.validateWorkerCredentials(workerId,pin);
+    if(!creds.ok){
+      setAuthStatus(creds.error||'Worker ID and a 4-12 digit PIN are required.',true);
       return;
     }
 
@@ -378,31 +437,28 @@
     if(btn) btn.disabled=true;
     setAuthStatus('Signing in...',false);
     try{
-      const data=await Core.login(workerId,pin);
-      workerToken=String(data&&data.token||'').trim();
-      workerProfile=data&&data.worker?data.worker:null;
-      if(!workerToken) throw new Error('Login response did not include a token');
-      Core.storeToken(workerToken);
+      const session=await Core.loginWithStoredSession(creds.workerId,creds.pin);
+      workerToken=String(session&&session.token||'').trim();
+      workerProfile=session&&session.worker?session.worker:null;
       showApp();
       setAuthStatus(`Signed in as ${workerProfile&&workerProfile.fullName?workerProfile.fullName:'worker'}.`,false);
       await refreshAll({preferCache:true});
     }catch(err){
       const msg=String(err&&err.message||'Could not sign in');
-      setAuthStatus(msg==='UNAUTHORIZED'?'Invalid worker credentials.':msg,true);
+      setAuthStatus(msg==='UNAUTHORIZED'||msg==='INVALID_CREDENTIAL_FORMAT'?'Invalid worker credentials.':msg,true);
     }finally{
       if(btn) btn.disabled=false;
     }
   }
 
   async function logoutWorker(isSilent){
-    try{ await Core.logout(workerToken); }catch(_e){}
+    await Core.logoutAndClear(workerToken);
     workerToken='';
     workerProfile=null;
     myJobs=[];
     availableJobs=[];
     openDaySession=null;
     pendingPaymentByJob={};
-    Core.storeToken('');
     showLogin();
     if(!isSilent){
       setAuthStatus('Signed out.',false);
@@ -418,17 +474,6 @@
       await refreshAll({preferCache:false});
     }catch(err){
       setGlobalStatus(String(err&&err.message||'Could not take job'),true);
-    }
-  }
-
-  async function startJob(jobId){
-    if(!jobId) return;
-    setGlobalStatus('Starting job...',false);
-    try{
-      await Core.clockIn(workerToken,jobId);
-      await refreshAll({preferCache:false});
-    }catch(err){
-      setGlobalStatus(String(err&&err.message||'Could not start job'),true);
     }
   }
 
@@ -450,7 +495,7 @@
       const res=await Core.clockOut(workerToken,jobId,true);
       if(res&&res.completion) pendingPaymentByJob[String(jobId)]=true;
       await refreshAll({preferCache:false});
-      setJobInlineStatus(jobId,'Job completed. Record payment now.',false);
+      setJobInlineStatus(jobId,'Job completed. Record payment and tip now.',false);
     }catch(err){
       setGlobalStatus(String(err&&err.message||'Could not complete job'),true);
     }
@@ -510,30 +555,56 @@
         note:String(noteInput&&noteInput.value||''),
       });
       delete pendingPaymentByJob[id];
+      collapsedCompletedPaidJobs[id]=true;
       setJobInlineStatus(id,'Payment recorded. Commission accrual updated.',false);
       await refreshAll({preferCache:false});
+      setGlobalStatus('Payment recorded. Completed job collapsed so you can focus on the next one.',false);
     }catch(err){
       setJobInlineStatus(id,String(err&&err.message||'Could not record payment'),true);
     }
   }
 
-  async function loadJobPhotos(jobId){
+  async function recordJobTip(jobId){
     const id=String(jobId||'').trim();
     if(!id) return;
-    setJobInlineStatus(id,'Loading photos...',false);
-    try{
-      const data=await Core.fetchJobPhotos(workerToken,id,12);
-      const items=Array.isArray(data&&data.items)?data.items:[];
-      if(!items.length){
-        setJobInlineStatus(id,'No photos uploaded yet for this job.',false);
-        return;
-      }
 
-      setJobInlineStatus(id,`Loaded ${Core.fmtNum(items.length)} photo(s).`,false);
-      const lines=items.slice(0,6).map((item)=>`${item.photoType||'photo'} at ${new Date(item.createdAt||Date.now()).toLocaleString('en-US')}`);
-      setGlobalStatus(`Job ${id}: ${lines.join(' | ')}`,false);
+    const amountInput=document.querySelector(`[data-tip-amount="${escCss(id)}"]`);
+    const methodInput=document.querySelector(`[data-tip-method="${escCss(id)}"]`);
+    const noteInput=document.querySelector(`[data-tip-note="${escCss(id)}"]`);
+    const saveBtn=document.querySelector(`[data-tip-save="${escCss(id)}"]`);
+
+    const dollars=Number(amountInput&&amountInput.value||0);
+    const amountCents=Number.isFinite(dollars)&&dollars>0?Math.round(dollars*100):0;
+    if(amountCents<=0){
+      setJobInlineStatus(id,'Enter a tip amount greater than $0.00.',true);
+      return;
+    }
+
+    const method=String(methodInput&&methodInput.value||'cash').trim()||'cash';
+    const noteRaw=String(noteInput&&noteInput.value||'').trim();
+    const note=noteRaw?`Tip: ${noteRaw}`:'Tip recorded from Worker On The Job.';
+
+    if(saveBtn) saveBtn.disabled=true;
+    setJobInlineStatus(id,'Recording tip...',false);
+    try{
+      await Core.createFinanceEntry(workerToken,{
+        entryType:'income',
+        amountCents,
+        expenseDate:Core.isoDateToday(),
+        jobId:id,
+        category:`tip_${method}`,
+        vendor:'',
+        note,
+      });
+
+      if(amountInput) amountInput.value='';
+      if(noteInput) noteInput.value='';
+      setJobInlineStatus(id,'Tip recorded for tax tracking.',false);
+      setGlobalStatus('Tip saved to worker finance records.',false);
     }catch(err){
-      setJobInlineStatus(id,String(err&&err.message||'Could not load photos'),true);
+      setJobInlineStatus(id,String(err&&err.message||'Could not record tip'),true);
+    } finally {
+      if(saveBtn) saveBtn.disabled=false;
     }
   }
 
@@ -567,11 +638,16 @@
     const target=ev.target&&ev.target.closest?ev.target:null;
     if(!target) return;
 
+    const collapseBtn=target.closest('[data-action="toggle-job-collapse"]');
+    if(collapseBtn){
+      const jobId=collapseBtn.getAttribute('data-job-id')||'';
+      const nextCollapsed=String(collapseBtn.getAttribute('data-collapsed-next')||'').trim()==='true';
+      setJobCollapsed(jobId,nextCollapsed);
+      return;
+    }
+
     const takeBtn=target.closest('[data-action="take-job"]');
     if(takeBtn){ takeJob(takeBtn.getAttribute('data-job-id')||''); return; }
-
-    const startBtn=target.closest('[data-action="start-job"]');
-    if(startBtn){ startJob(startBtn.getAttribute('data-job-id')||''); return; }
 
     const endBtn=target.closest('[data-action="end-job"]');
     if(endBtn){ endJob(endBtn.getAttribute('data-job-id')||''); return; }
@@ -585,8 +661,9 @@
     const paymentBtn=target.closest('[data-action="collect-payment"]');
     if(paymentBtn){ collectJobPayment(paymentBtn.getAttribute('data-job-id')||''); return; }
 
-    const loadPhotosBtn=target.closest('[data-action="load-photos"]');
-    if(loadPhotosBtn){ loadJobPhotos(loadPhotosBtn.getAttribute('data-job-id')||''); }
+    const tipBtn=target.closest('[data-action="record-tip"]');
+    if(tipBtn){ recordJobTip(tipBtn.getAttribute('data-job-id')||''); return; }
+
   });
 
   document.addEventListener('change',async(ev)=>{

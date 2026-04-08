@@ -67,7 +67,15 @@ async function handleSubmit(e){
 
   window.__showAlert&&window.__showAlert('Confirming your booking…','wait');
 
-  const metadata={phone,addons:addons.map(a=>a.name).join(', '),total:'$'+total};
+  const quotedPriceCents=Math.max(0,Math.round(total*100));
+  const metadata={
+    phone,
+    addons:addons.map(a=>a.name).join(', '),
+    total:'$'+total,
+    quoted_price_cents:String(quotedPriceCents),
+    estimated_value_cents:String(quotedPriceCents),
+    total_cents:String(quotedPriceCents)
+  };
   ['utm_source','utm_medium','utm_campaign','utm_term','utm_content','gclid','fbclid','msclkid','rep_id','lead_id','src'].forEach(key=>{
     if(attribution[key]) metadata[key]=attribution[key];
   });

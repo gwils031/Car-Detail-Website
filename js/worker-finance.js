@@ -9,10 +9,11 @@
   const loginCard=document.getElementById('worker-login-card');
   const app=document.getElementById('worker-app');
   const logoutBtn=document.getElementById('worker-logout-btn');
-  const paymentStatus=document.getElementById('wp-status');
   const expenseStatus=document.getElementById('we-status');
   const expenseReceiptInput=document.getElementById('we-receipt');
   const expenseReceiptPreview=document.getElementById('we-receipt-preview');
+  const workerNameEl=document.getElementById('worker-name');
+  const workerRateEl=document.getElementById('worker-rate');
 
   let workerToken='';
   let workerProfile=null;
@@ -21,9 +22,10 @@
   let financeItems=[];
   let payrollWeek=null;
   let expenseReceiptDataUrl='';
-  const loadingSelector='.wc-v, #worker-name, #worker-rate, #worker-global-status, #wp-status, #we-status, #wf-week-status';
+  const loadingSelector='.wc-v, #worker-name, #worker-rate, #worker-global-status, #we-status, #wf-week-status';
 
   Core.warmConsolePages(window.location.pathname);
+  Core.setupWorkerSectionCollapsibles({ rootSelector:'#worker-app', defaultCollapsed:true });
 
   function setText(id,val){
     const el=document.getElementById(id);
@@ -31,45 +33,27 @@
   }
 
   function setAuthStatus(msg,isErr){
-    if(!authStatus) return;
-    authStatus.textContent=msg;
-    authStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
+    Core.setStatusText(authStatus,msg,isErr);
   }
 
   function setGlobalStatus(msg,isErr){
-    if(!globalStatus) return;
-    globalStatus.textContent=msg;
-    globalStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
-  }
-
-  function setPaymentStatus(msg,isErr){
-    if(!paymentStatus) return;
-    paymentStatus.textContent=msg;
-    paymentStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
+    Core.setStatusText(globalStatus,msg,isErr);
   }
 
   function setExpenseStatus(msg,isErr){
-    if(!expenseStatus) return;
-    expenseStatus.textContent=msg;
-    expenseStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
+    Core.setStatusText(expenseStatus,msg,isErr);
   }
 
   function showApp(){
-    if(loginCard) loginCard.hidden=true;
-    if(app) app.hidden=false;
-    if(logoutBtn) logoutBtn.hidden=false;
+    Core.toggleWorkerApp(loginCard, app, logoutBtn, true);
   }
 
   function showLogin(){
-    if(loginCard) loginCard.hidden=false;
-    if(app) app.hidden=true;
-    if(logoutBtn) logoutBtn.hidden=true;
+    Core.toggleWorkerApp(loginCard, app, logoutBtn, false);
   }
 
   function renderWorkerHeader(){
-    const name=(workerProfile&&workerProfile.fullName)||'Worker';
-    setText('worker-name',name);
-    setText('worker-rate',`${Core.fmtMoneyCents(workerProfile&&workerProfile.hourlyRateCents||0)}/hr`);
+    Core.renderWorkerIdentity(workerProfile,workerNameEl,workerRateEl);
   }
 
   function jobLookupById(jobId){
@@ -84,25 +68,9 @@
     return `${base} · Quote ${Core.fmtMoneyCents(quotedCents)}`;
   }
 
-  function renderSummary(todayData){
-    const summary=todayData&&todayData.summary?todayData.summary:{};
-    let incomeCents=0;
-    let expenseCents=0;
-    financeItems.forEach((item)=>{
-      const amount=Number(item&&item.amountCents||0);
-      if(String(item&&item.entryType||'expense')==='income') incomeCents+=amount;
-      else expenseCents+=amount;
-    });
-    setText('k-expenses',Core.fmtMoneyCents(expenseCents));
-    setText('k-income',Core.fmtMoneyCents(incomeCents));
-    setText('k-labor',Core.fmtMoneyCents(summary.laborCostCents||0));
-    setText('k-count',Core.fmtNum(financeItems.length));
-  }
-
   function renderJobSelect(){
-    const paymentJob=document.getElementById('wp-job');
     const expenseJob=document.getElementById('we-job');
-    if(!paymentJob||!expenseJob) return;
+    if(!expenseJob) return;
 
     const options=['<option value="">No job selected</option>'];
     myJobs.forEach((job)=>{
@@ -110,17 +78,7 @@
       options.push(`<option value="${Core.esc(job.id||'')}">${Core.esc(label)}</option>`);
     });
 
-    if(availableJobs.length){
-      options.push('<option value="" disabled>──────────</option>');
-      options.push('<option value="" disabled>Open jobs</option>');
-      availableJobs.slice(0,30).forEach((job)=>{
-        const label=jobLabelWithQuote(job);
-        options.push(`<option value="${Core.esc(job.id||'')}">${Core.esc(label)}</option>`);
-      });
-    }
-
     const html=options.join('');
-    paymentJob.innerHTML=html;
     expenseJob.innerHTML=html;
   }
 
@@ -202,7 +160,6 @@
     financeItems=Array.isArray(financeData&&financeData.items)?financeData.items:[];
 
     renderWorkerHeader();
-    renderSummary(todayData||{});
     renderJobSelect();
     renderFinanceTables();
     renderPayrollWeek();
@@ -235,6 +192,10 @@
         jobsDays:45,
         financeDays:45,
         financeLimit:120,
+        includeToday:true,
+        includeJobs:true,
+        includeFinance:true,
+        includeAvailability:false,
         allowStale:true,
       });
       if(cached&&cached.snapshot){
@@ -252,6 +213,10 @@
         jobsDays:45,
         financeDays:45,
         financeLimit:120,
+        includeToday:true,
+        includeJobs:true,
+        includeFinance:true,
+        includeAvailability:false,
       });
       applySnapshot(live&&live.snapshot?live.snapshot:null);
       await refreshPayrollWeek();
@@ -267,47 +232,6 @@
       else setGlobalStatus(msg,true);
     }finally{
       if(!hadCached) setValueLoadingState(false);
-    }
-  }
-
-  async function savePaymentEntry(){
-    const amountVal=Number(document.getElementById('wp-amount')?.value||0);
-    const amountCents=Number.isFinite(amountVal)&&amountVal>0?Math.round(amountVal*100):0;
-    const expenseDate=(document.getElementById('wp-date')?.value||'').trim()||Core.isoDateToday();
-    const jobId=(document.getElementById('wp-job')?.value||'').trim();
-    const method=(document.getElementById('wp-method')?.value||'').trim();
-    const note=(document.getElementById('wp-note')?.value||'').trim();
-
-    if(amountCents<=0){
-      setPaymentStatus('Amount must be greater than $0.00.',true);
-      return;
-    }
-
-    const btn=document.getElementById('wp-save-btn');
-    if(btn) btn.disabled=true;
-    setPaymentStatus('Saving payment...',false);
-    try{
-      await Core.createFinanceEntry(workerToken,{
-        entryType:'income',
-        amountCents,
-        expenseDate,
-        jobId,
-        category:method,
-        vendor:method,
-        note,
-      });
-
-      const setValue=(id,val)=>{ const el=document.getElementById(id); if(el) el.value=val; };
-      setValue('wp-amount','');
-      setValue('wp-method','');
-      setValue('wp-note','');
-
-      setPaymentStatus('Payment saved.',false);
-      await refreshAll({preferCache:false});
-    }catch(err){
-      setPaymentStatus(String(err&&err.message||'Could not save payment'),true);
-    }finally{
-      if(btn) btn.disabled=false;
     }
   }
 
@@ -363,10 +287,11 @@
   }
 
   async function loginWorker(){
-    const workerId=(document.getElementById('worker-id')?.value||'').trim();
-    const pin=(document.getElementById('worker-pin')?.value||'').trim();
-    if(!workerId||!/^\d{4,12}$/.test(pin)){
-      setAuthStatus('Worker ID and a 4-12 digit PIN are required.',true);
+    const workerId=(document.getElementById('worker-id')?.value||'');
+    const pin=(document.getElementById('worker-pin')?.value||'');
+    const creds=Core.validateWorkerCredentials(workerId,pin);
+    if(!creds.ok){
+      setAuthStatus(creds.error||'Worker ID and a 4-12 digit PIN are required.',true);
       return;
     }
 
@@ -374,31 +299,28 @@
     if(btn) btn.disabled=true;
     setAuthStatus('Signing in...',false);
     try{
-      const data=await Core.login(workerId,pin);
-      workerToken=String(data&&data.token||'').trim();
-      workerProfile=data&&data.worker?data.worker:null;
-      if(!workerToken) throw new Error('Login response did not include a token');
-      Core.storeToken(workerToken);
+      const session=await Core.loginWithStoredSession(creds.workerId,creds.pin);
+      workerToken=String(session&&session.token||'').trim();
+      workerProfile=session&&session.worker?session.worker:null;
       showApp();
       setAuthStatus(`Signed in as ${workerProfile&&workerProfile.fullName?workerProfile.fullName:'worker'}.`,false);
       await refreshAll({preferCache:true});
     }catch(err){
       const msg=String(err&&err.message||'Could not sign in');
-      setAuthStatus(msg==='UNAUTHORIZED'?'Invalid worker credentials.':msg,true);
+      setAuthStatus(msg==='UNAUTHORIZED'||msg==='INVALID_CREDENTIAL_FORMAT'?'Invalid worker credentials.':msg,true);
     }finally{
       if(btn) btn.disabled=false;
     }
   }
 
   async function logoutWorker(isSilent){
-    try{ await Core.logout(workerToken); }catch(_e){}
+    await Core.logoutAndClear(workerToken);
     workerToken='';
     workerProfile=null;
     myJobs=[];
     availableJobs=[];
     financeItems=[];
     expenseReceiptDataUrl='';
-    Core.storeToken('');
     showLogin();
     if(!isSilent){
       setAuthStatus('Signed out.',false);
@@ -408,7 +330,6 @@
 
   document.getElementById('worker-login-btn')?.addEventListener('click',loginWorker);
   document.getElementById('worker-refresh-btn')?.addEventListener('click',()=>{ refreshAll({preferCache:false}); });
-  document.getElementById('wp-save-btn')?.addEventListener('click',savePaymentEntry);
   document.getElementById('we-save-btn')?.addEventListener('click',saveExpenseEntry);
   logoutBtn?.addEventListener('click',()=>{ logoutWorker(false); });
 
@@ -436,8 +357,6 @@
     }
   });
 
-  const wpDate=document.getElementById('wp-date');
-  if(wpDate && !wpDate.value) wpDate.value=Core.isoDateToday();
   const weDate=document.getElementById('we-date');
   if(weDate && !weDate.value) weDate.value=Core.isoDateToday();
 

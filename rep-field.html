@@ -337,27 +337,9 @@
         </div>
       </div>
 
-      <details class="rep-kpi-dropdown" open>
-        <summary>Rep Metrics</summary>
-        <div class="rep-kpi-wrap">
-          <div class="rep-kpis">
-            <div class="rep-kpi"><div class="rep-k">Doors</div><div class="rep-v" id="k-doors">0</div></div>
-            <div class="rep-kpi"><div class="rep-k">Interested</div><div class="rep-v" id="k-interested">0</div></div>
-            <div class="rep-kpi"><div class="rep-k">On-Door Booked</div><div class="rep-v" id="k-ondoor">0</div></div>
-            <div class="rep-kpi"><div class="rep-k">Attributed Bookings</div><div class="rep-v" id="k-attrib">0</div></div>
-            <div class="rep-kpi"><div class="rep-k">Open Follow-ups</div><div class="rep-v" id="k-open">0</div></div>
-            <div class="rep-kpi"><div class="rep-k">Overdue Follow-ups</div><div class="rep-v" id="k-overdue">0</div></div>
-          </div>
-        </div>
-      </details>
-
       <div class="rep-grid rep-map-layout" style="margin-top:12px">
         <div class="rep-card">
           <div class="section-title">Map Quick Log</div>
-          <details class="rep-help-dropdown">
-            <summary>Map Instructions</summary>
-            <p>Tap and hold on the map to place a pin, choose outcome in the white popup, then complete event details in that same popup card.</p>
-          </details>
           <div id="rep-map" class="rep-map" aria-label="Rep route map"></div>
           <div class="rep-map-meta">
             <div class="rep-chip" id="map-pin-label">No pin selected</div>
@@ -367,8 +349,6 @@
             </div>
           </div>
           <div class="rep-status" id="map-status">Map ready. Press and hold to drop a pin.</div>
-          <div class="rep-note" id="map-history-status">Map activity not loaded yet.</div>
-          <div class="rep-legend" id="map-legend"></div>
           <details class="rep-map-log-dropdown" id="map-log-panel" hidden>
             <summary>Door Event Logger</summary>
             <div class="rep-map-log-body">
@@ -435,16 +415,6 @@
                 </div>
               </div>
 
-              <div class="rep-photo-upload">
-                <div>
-                  <label for="de-vehicle-photo">Vehicle Photo (agreed detail)</label>
-                  <input id="de-vehicle-photo" class="inp" type="file" accept="image/*" capture="environment"/>
-                </div>
-                <div class="rep-photo-preview" id="de-vehicle-photo-preview">
-                  <span class="rep-note" id="de-vehicle-photo-meta">No photo selected</span>
-                </div>
-              </div>
-
               <div class="rep-actions" style="margin-top:10px">
                 <button class="button" id="de-save-btn" type="button">Save Door Event</button>
               </div>
@@ -468,9 +438,6 @@
             <div>
               <label for="sched-days">Window</label>
               <select id="sched-days" class="sel">
-                <option value="3">Next 3 Days</option>
-                <option value="7">Next 7 Days</option>
-                <option value="14">Next 14 Days</option>
                 <option value="30" selected>Next 30 Days (Month View)</option>
               </select>
             </div>
@@ -1002,6 +969,11 @@
   function setVal(id, value){
     const el=document.getElementById(id);
     if(el&&typeof el.value==='string') el.value=value||'';
+  }
+
+  function setNodeText(id, value){
+    const el=document.getElementById(id);
+    if(el) el.textContent=String(value);
   }
 
   function stripVehiclePhotoTag(text){
@@ -2027,12 +1999,12 @@
 
   function renderKpis(summary){
     const s=summary||{};
-    document.getElementById('k-doors').textContent=String(Number(s.doors||0));
-    document.getElementById('k-interested').textContent=String(Number(s.interested||0));
-    document.getElementById('k-ondoor').textContent=String(Number(s.onDoorBooked||0));
-    document.getElementById('k-attrib').textContent=String(Number(s.attributedBookings||0));
-    document.getElementById('k-open').textContent=String(Number(s.openFollowups||0));
-    document.getElementById('k-overdue').textContent=String(Number(s.overdueFollowups||0));
+    setNodeText('k-doors',Number(s.doors||0));
+    setNodeText('k-interested',Number(s.interested||0));
+    setNodeText('k-ondoor',Number(s.onDoorBooked||0));
+    setNodeText('k-attrib',Number(s.attributedBookings||0));
+    setNodeText('k-open',Number(s.openFollowups||0));
+    setNodeText('k-overdue',Number(s.overdueFollowups||0));
   }
 
   function pickField(obj, keys){
@@ -3037,10 +3009,6 @@
       setMapStatus('Choose an outcome first.', true);
       return;
     }
-    if(payload.outcome==='not_interested' && !payload.outcomeDetail){
-      setMapStatus('Please add why they were not interested.', true);
-      return;
-    }
     if(payload.outcome==='interested_callback' && !payload.lead.firstName){
       setMapStatus('Add contact name for interested follow-up.', true);
       return;
@@ -3627,7 +3595,7 @@
       }else if(googleMapsKey){
         setMapStatus('Map ready (Google unavailable, using OpenStreetMap). Blue dot shows your location when allowed. Press and hold to drop a pin.', false);
       }else{
-        setMapStatus('Map ready (OpenStreetMap). To enable Google map view, set window.GOOGLE_MAPS_API_KEY or sud_google_maps_api_key in storage.', false);
+        setMapStatus('Map ready.', false);
       }
 
       if(getToken()) await refreshMapHistory().catch(()=>null);

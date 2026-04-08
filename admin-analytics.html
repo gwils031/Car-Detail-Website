@@ -40,20 +40,23 @@
     .analytics-refresh-btn{min-height:30px;height:30px;width:30px;padding:0;border-radius:7px;font-size:.95rem;line-height:1;font-weight:800}
     .value-loading{position:relative;color:transparent !important;text-shadow:none !important;user-select:none}
     .value-loading::after{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);height:.72em;width:min(78%,160px);border-radius:999px;background:linear-gradient(90deg,rgba(0,0,0,.05) 0%,rgba(0,0,0,.16) 45%,rgba(0,0,0,.05) 100%);background-size:220% 100%;animation:value-shimmer 1.25s ease-in-out infinite;pointer-events:none}
-    .funnel-rate.value-loading::after{height:.58em;width:min(65%,140px)}
-    .context-pill.value-loading::after{height:.55em;width:min(62%,120px)}
     @keyframes value-shimmer{0%{background-position:180% 0}100%{background-position:-40% 0}}
     @media (prefers-reduced-motion: reduce){
       .value-loading::after{animation:none;background-position:50% 0}
     }
     .status{margin-top:10px;font-size:.85rem;color:var(--tx2)}
-    .context-strip{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    .context-pill{font-size:.75rem;color:var(--tx2);border:1px solid var(--bdr);background:var(--srf2);border-radius:999px;padding:7px 10px}
     .admin-tabs{display:flex;gap:8px;overflow:auto;padding-bottom:4px;margin-top:16px}
     .tab-btn{border:1px solid var(--bdr);background:var(--srf);color:var(--tx2);border-radius:999px;padding:8px 12px;font-size:.8rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;white-space:nowrap}
     .tab-btn.active{background:linear-gradient(135deg,rgba(225,55,55,.18),rgba(225,55,55,.06));border-color:rgba(225,55,55,.6);color:var(--tx)}
     .tab-panel{margin-top:14px}
     .admin-panel{background:var(--srf);border:1px solid var(--bdr);border-radius:var(--r);padding:14px}
+    .section-toggle-header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .section-toggle-header .section-title{margin-bottom:0}
+    .section-toggle-btn{border:1px solid var(--bdr);background:var(--srf2);color:var(--tx2);border-radius:999px;padding:5px 10px;font-size:.68rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;cursor:pointer}
+    .section-toggle-btn:hover{background:var(--srf3)}
+    .section-toggle-btn:focus-visible{outline:2px solid var(--bdrhi);outline-offset:2px}
+    .section-content{margin-top:10px}
+    .admin-panel.is-collapsed .section-content{display:none}
     .admin-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
     .admin-card{background:var(--srf);border:1px solid var(--bdr);border-radius:var(--rsm);padding:14px;min-height:102px}
     .admin-k{font-size:.67rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--tx3);margin-bottom:8px}
@@ -63,23 +66,11 @@
     .admin-v.bad{color:#991b1b}
     .admin-v.good{color:#166534}
     .split-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .funnel-track{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:12px}
-    .funnel-stage{border:1px solid var(--bdr);background:linear-gradient(180deg,var(--srf),rgba(255,255,255,.01));border-radius:12px;padding:11px}
-    .funnel-label{font-size:.7rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em}
-    .funnel-value{font-size:1.35rem;font-weight:800;color:var(--tx);margin-top:6px}
-    .funnel-rate{font-size:.78rem;color:var(--tx2);margin-top:4px}
     .admin-table{width:100%;border-collapse:collapse}
     .admin-table th,.admin-table td{padding:9px 10px;border-bottom:1px solid var(--bdr);text-align:left;font-size:.84rem}
     .admin-table th{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3)}
     .section-title{font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);font-weight:800;margin-bottom:8px}
     .mini-note{font-size:.78rem;color:var(--tx2);margin-top:7px}
-    .chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
-    .chart-wrap{border:1px solid var(--bdr);border-radius:10px;background:var(--srf2);padding:8px}
-    .chart-svg{width:100%;height:auto;display:block}
-    .chart-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-    .legend-item{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--bdr);border-radius:999px;font-size:.74rem;color:var(--tx2)}
-    .legend-dot{width:8px;height:8px;border-radius:50%}
-    .chart-axis-note{font-size:.74rem;color:var(--tx2);margin-top:6px}
     .admin-nav-menu{display:flex;align-items:center;gap:8px}
     .admin-nav-menu .tab-btn{padding:7px 11px}
     .admin-nav-menu .admin-signout{margin-left:6px}
@@ -123,6 +114,9 @@
     .ops-pill.unpaid{color:#991b1b;border-color:#fca5a5;background:#fee2e2}
     .ops-pill.partial{color:#92400e;border-color:#fcd34d;background:#fef3c7}
     .ops-pill.paid{color:#166534;border-color:#86efac;background:#dcfce7}
+    .ops-pill.pay_eligible{color:#166534;border-color:#86efac;background:#dcfce7}
+    .ops-pill.awaiting_settlement{color:#92400e;border-color:#fcd34d;background:#fef3c7}
+    .ops-pill.not_eligible{color:#475569;border-color:#cbd5e1;background:#f1f5f9}
     .ops-profit-positive{color:#166534}
     .ops-profit-negative{color:#991b1b}
     .ops-row-actions{display:flex;flex-wrap:wrap;gap:6px}
@@ -149,8 +143,6 @@
       .admin-controls{grid-template-columns:1fr 1fr}
       .admin-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
       .split-2{grid-template-columns:1fr}
-      .chart-grid{grid-template-columns:1fr}
-      .funnel-track{grid-template-columns:1fr 1fr}
       .ops-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
       .ops-simple-grid{grid-template-columns:1fr}
       .ops-tracker-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -167,51 +159,13 @@
     @media(max-width:640px){
       .admin-controls{grid-template-columns:1fr}
       .admin-grid{grid-template-columns:1fr}
-      .funnel-track{grid-template-columns:1fr}
       .ops-grid{grid-template-columns:1fr}
       .ops-tracker-grid{grid-template-columns:1fr}
       .ops-form-grid{grid-template-columns:1fr}
       .ops-filter-bar{grid-template-columns:1fr}
       .ops-filter-bar .button{grid-column:auto}
     }
-    /* Field sales map styles */
-    .field-map-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:12px}
-    #field-map{position:relative;z-index:120;width:100%;height:420px;border-radius:12px;border:1px solid var(--bdr);overflow:hidden;background:#e5e7eb}
-    #field-map .leaflet-container{height:100%;width:100%;border-radius:12px;background:#e5e7eb}
-    #field-map .leaflet-popup-pane{z-index:1890!important}
-    #field-map .leaflet-control-container{z-index:1750}
-    .rep-dot-dialog{width:min(92vw,640px);max-width:100%;box-sizing:border-box;overflow:hidden;overflow-wrap:anywhere;color:#0f172a;line-height:1.4;color-scheme:light}
-    #field-map .leaflet-popup-content-wrapper{max-width:min(95vw,680px);max-height:min(74dvh,720px);overflow:hidden;background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);border:1px solid #dbe5f1;border-radius:18px;box-shadow:0 18px 40px rgba(15,23,42,.2)}
-    #field-map .leaflet-popup-content{width:min(92vw,640px)!important;max-width:100%!important;max-height:min(66dvh,620px);overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:calc(8px + env(safe-area-inset-bottom));margin:12px 14px!important;box-sizing:border-box}
-    #field-map .leaflet-popup-tip{background:#f8fafc;box-shadow:none}
-    .rep-dot-title{font-size:1rem;font-weight:800;letter-spacing:.01em;line-height:1.2}
-    .rep-dot-meta{margin-top:3px;font-size:.8rem;color:#475569;font-weight:600}
-    .rep-dot-address{margin-top:8px;font-size:.86rem;color:#0f172a;font-weight:600}
-    .rep-dot-sub{margin-top:6px;font-size:.79rem;color:#475569}
-    .rep-dot-sub strong{color:#0f172a;font-weight:700}
-    .rep-dot-detail{margin-top:8px;padding:8px 10px;border-radius:10px;border:1px solid #e2e8f0;background:#f8fafc;font-size:.8rem;color:#334155}
-    #leads-list{overflow:auto;max-height:420px;padding:7px;background:var(--srf2);border-radius:10px;border:1px solid var(--bdr)}
-    .lead-row{padding:10px;border:1px solid var(--bdr);border-radius:10px;background:var(--srf);cursor:pointer;transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease}
-    .lead-row + .lead-row{margin-top:8px}
-    .lead-row:hover{border-color:#4b5563;transform:translateY(-1px);box-shadow:0 8px 16px rgba(0,0,0,.14)}
-    .lead-row:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(59,130,246,.26)}
-    .lead-row-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
-    .lead-row-name{font-weight:800;color:var(--tx)}
-    .lead-outcome-pill{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;font-size:.66rem;font-weight:800;letter-spacing:.02em;text-transform:uppercase;border:1px solid color-mix(in srgb, var(--pill-color, #94a3b8) 55%, white 45%);background:color-mix(in srgb, var(--pill-color, #94a3b8) 18%, transparent 82%);color:color-mix(in srgb, var(--pill-color, #94a3b8) 72%, white 28%)}
-    .lead-row-sub{margin-top:4px;font-size:.79rem;color:var(--tx2);line-height:1.4}
-    .lead-row-meta{margin-top:4px;font-size:.74rem;color:var(--tx3);line-height:1.35}
-    @media(max-width:980px){
-      .field-map-layout{grid-template-columns:1fr}
-      #field-map{height:380px}
-      #leads-list{max-height:280px}
-    }
-    @media(max-width:640px){
-      #field-map{height:340px}
-    }
   </style>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="https://unpkg.com/leaflet.gridlayer.googlemutant@0.14.0/Leaflet.GoogleMutant.js" crossorigin=""></script>
 </head>
 <body>
 <header class="header" id="site-header">
@@ -226,6 +180,7 @@
       <button class="tab-btn active" id="tab-health-btn" role="tab" aria-selected="true" aria-controls="tab-health" data-tab-target="health" type="button">Website Health</button>
         <button class="tab-btn" id="tab-sales-btn" role="tab" aria-selected="false" aria-controls="tab-sales" data-tab-target="sales" type="button">Sales Reps</button>
         <button class="tab-btn" id="tab-jobs-btn" role="tab" aria-selected="false" aria-controls="tab-jobs" data-tab-target="jobs" type="button">Jobs &amp; Profit</button>
+        <button class="tab-btn" id="tab-payroll-btn" role="tab" aria-selected="false" aria-controls="tab-payroll" data-tab-target="payroll" type="button">Payroll</button>
         <button class="tab-btn" id="tab-workers-btn" role="tab" aria-selected="false" aria-controls="tab-workers" data-tab-target="workers" type="button">Workers</button>
         <button class="button outline admin-signout" id="signout-btn" type="button">Sign Out</button>
     </nav>
@@ -245,13 +200,6 @@
       <button id="refresh-btn" class="button analytics-refresh-btn" type="button" aria-label="Refresh analytics" title="Refresh analytics">↻</button>
     </div>
     <div class="status" id="status">Loading analytics…</div>
-    <div class="context-strip">
-      <span class="context-pill" id="ctx-window">Window: --</span>
-      <span class="context-pill" id="ctx-traffic">Traffic quality: --</span>
-      <span class="context-pill" id="ctx-close">Close rate: --</span>
-      <span class="context-pill" id="ctx-risk">Operational risk: --</span>
-    </div>
-
     <section class="tab-panel" id="tab-health" role="tabpanel" aria-labelledby="tab-health-btn" data-tab-panel="health">
       <div class="admin-grid">
         <div class="admin-card">
@@ -286,91 +234,6 @@
         </div>
       </div>
 
-      <div class="admin-panel" style="margin-top:12px">
-        <div class="section-title">Top Services In This Window</div>
-        <table class="admin-table">
-          <thead><tr><th>Service</th><th>Events</th></tr></thead>
-          <tbody id="tbl-services-overview"></tbody>
-        </table>
-        <p class="mini-note">Use this to prioritize packages and staffing during peak days.</p>
-      </div>
-
-      <div class="admin-panel">
-        <div class="section-title">Booking Funnel Health</div>
-        <div class="funnel-track">
-          <div class="funnel-stage">
-            <div class="funnel-label">Visitors</div>
-            <div class="funnel-value" id="f-visitors">0</div>
-            <div class="funnel-rate">Baseline stage</div>
-          </div>
-          <div class="funnel-stage">
-            <div class="funnel-label">Intent (CTA Click)</div>
-            <div class="funnel-value" id="f-intent">0</div>
-            <div class="funnel-rate" id="f-intent-rate">0% of visitors</div>
-          </div>
-          <div class="funnel-stage">
-            <div class="funnel-label">Submit</div>
-            <div class="funnel-value" id="f-submit">0</div>
-            <div class="funnel-rate" id="f-submit-rate">0% of intent</div>
-          </div>
-          <div class="funnel-stage">
-            <div class="funnel-label">Confirmed</div>
-            <div class="funnel-value" id="f-confirmed">0</div>
-            <div class="funnel-rate" id="f-confirmed-rate">0% of submit</div>
-          </div>
-        </div>
-        <p class="mini-note" id="funnel-summary">No funnel context yet.</p>
-      </div>
-
-      <div class="chart-grid">
-        <div class="admin-panel">
-          <div class="section-title">Daily Volume Trend</div>
-          <div class="chart-wrap">
-            <svg id="chart-volume" class="chart-svg" viewBox="0 0 640 220" role="img" aria-label="Daily visitor, intent, submit, and confirmed trend"></svg>
-          </div>
-          <div class="chart-legend" id="chart-volume-legend"></div>
-          <p class="chart-axis-note">Line chart highlights traffic volume and booking completion progression.</p>
-        </div>
-        <div class="admin-panel">
-          <div class="section-title">Daily Rate Trend</div>
-          <div class="chart-wrap">
-            <svg id="chart-rate" class="chart-svg" viewBox="0 0 640 220" role="img" aria-label="Daily conversion and failure rate trend"></svg>
-          </div>
-          <div class="chart-legend" id="chart-rate-legend"></div>
-          <p class="chart-axis-note">Percent trend makes drops in intent or close rate easy to spot quickly.</p>
-        </div>
-      </div>
-
-      <div class="admin-panel" style="margin-top:12px">
-        <div class="section-title">Daily Conversion Trend</div>
-        <table class="admin-table">
-          <thead>
-            <tr><th>Date</th><th>Visitors</th><th>Intent</th><th>Submits</th><th>Confirmed</th><th>Close Rate</th></tr>
-          </thead>
-          <tbody id="tbl-trend"></tbody>
-        </table>
-      </div>
-
-      <div class="split-2" style="margin-top:12px">
-        <div class="admin-panel">
-          <div class="section-title">Top CTA Drivers</div>
-          <table class="admin-table">
-            <thead><tr><th>CTA</th><th>Clicks</th></tr></thead>
-            <tbody id="tbl-ctas"></tbody>
-          </table>
-        </div>
-        <div class="admin-panel">
-          <div class="section-title">Top Selected Services</div>
-          <table class="admin-table">
-            <thead><tr><th>Service</th><th>Events</th></tr></thead>
-            <tbody id="tbl-services"></tbody>
-          </table>
-        </div>
-      </div>
-      <div class="admin-panel" style="margin-top:12px">
-        <div class="section-title">Acquisition Readout</div>
-        <p class="admin-muted" id="acq-readout">No data yet.</p>
-      </div>
 
       <div class="admin-grid" style="grid-template-columns:repeat(3,minmax(0,1fr))">
         <div class="admin-card">
@@ -390,14 +253,6 @@
         </div>
       </div>
 
-      <div class="admin-panel" style="margin-top:12px">
-        <div class="section-title">Reliability Graph</div>
-        <div class="chart-wrap">
-          <svg id="chart-reliability" class="chart-svg" viewBox="0 0 640 220" role="img" aria-label="Daily submit and failure counts trend"></svg>
-        </div>
-        <div class="chart-legend" id="chart-reliability-legend"></div>
-        <p class="chart-axis-note">Use this graph to detect sudden spikes in booking failures or submit volatility.</p>
-      </div>
 
       <div class="split-2" style="margin-top:12px">
         <div class="admin-panel">
@@ -418,93 +273,6 @@
     </section>
 
     <section class="tab-panel" id="tab-sales" role="tabpanel" aria-labelledby="tab-sales-btn" data-tab-panel="sales" hidden>
-      <div class="admin-grid" style="grid-template-columns:repeat(7,minmax(0,1fr))">
-        <div class="admin-card">
-          <div class="admin-k">Doors Knocked</div>
-          <div class="admin-v" id="fs-doors">0</div>
-          <div class="admin-sub">Total door events in window</div>
-        </div>
-        <div class="admin-card">
-          <div class="admin-k">Interested</div>
-          <div class="admin-v" id="fs-interested">0</div>
-          <div class="admin-sub">Callbacks, quotes, and on-door books</div>
-        </div>
-        <div class="admin-card">
-          <div class="admin-k">Interest Rate</div>
-          <div class="admin-v" id="fs-interest-rate">0%</div>
-          <div class="admin-sub">Interested divided by doors</div>
-        </div>
-        <div class="admin-card">
-          <div class="admin-k">On-Door Booked</div>
-          <div class="admin-v" id="fs-ondoor">0</div>
-          <div class="admin-sub">Closed immediately at the door</div>
-        </div>
-        <div class="admin-card">
-          <div class="admin-k">Attributed Bookings</div>
-          <div class="admin-v" id="fs-attrib">0</div>
-          <div class="admin-sub">Bookings tied to rep and lead metadata</div>
-        </div>
-        <div class="admin-card">
-          <div class="admin-k">Pay-Eligible Sales</div>
-          <div class="admin-v" id="fs-pay-eligible">0</div>
-          <div class="admin-sub">Service completed and payment received</div>
-        </div>
-        <div class="admin-card">
-          <div class="admin-k">Overdue Follow-ups</div>
-          <div class="admin-v" id="fs-overdue">0</div>
-          <div class="admin-sub">Open items past scheduled time</div>
-        </div>
-      </div>
-
-      <div class="split-2" style="margin-top:12px">
-        <div class="admin-panel">
-          <div class="section-title">Top Reps</div>
-          <table class="admin-table">
-            <thead><tr><th>Rep</th><th>Doors</th><th>Interested</th><th>Bookings</th><th>Pay-Eligible</th><th>Rate</th></tr></thead>
-            <tbody id="tbl-field-reps"></tbody>
-          </table>
-        </div>
-        <div class="admin-panel">
-          <div class="section-title">Daily Field Trend</div>
-          <table class="admin-table">
-            <thead><tr><th>Date</th><th>Doors</th><th>On-Door</th><th>Attributed</th><th>Pay-Eligible</th></tr></thead>
-            <tbody id="tbl-field-trend"></tbody>
-          </table>
-        </div>
-
-        <div class="admin-panel" style="margin-top:12px">
-          <div class="section-title">Rep Conversion Ladder</div>
-          <p class="mini-note" id="fs-rep-ladder-status">Tracks conversion quality and payout capture by rep to drive coaching and follow-up focus.</p>
-          <table class="admin-table">
-            <thead><tr><th>Rep</th><th>Doors</th><th>Interest</th><th>Booking/Doors</th><th>Pay-Eligible/Bookings</th><th>Signal</th></tr></thead>
-            <tbody id="tbl-field-rep-ladder"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="admin-grid" style="margin-top:12px;grid-template-columns:repeat(4,minmax(0,1fr))">
-        <div class="admin-card">
-          <div class="admin-k">Critical Actions</div>
-          <div class="admin-v bad" id="fs-queue-critical">0</div>
-          <div class="admin-sub">Highest priority owner follow-up</div>
-        </div>
-        <div class="admin-card">
-          <div class="admin-k">Overdue Follow-ups</div>
-          <div class="admin-v warn" id="fs-queue-overdue">0</div>
-          <div class="admin-sub">Map leads past follow-up due date</div>
-        </div>
-        <div class="admin-card">
-          <div class="admin-k">Unpaid Completed</div>
-          <div class="admin-v" id="fs-queue-unpaid">0</div>
-          <div class="admin-sub">Completed jobs missing payment closeout</div>
-        </div>
-        <div class="admin-card">
-          <div class="admin-k">Coaching Flags</div>
-          <div class="admin-v" id="fs-queue-coaching">0</div>
-          <div class="admin-sub">Low conversion reps with volume</div>
-        </div>
-      </div>
-
       <div class="admin-panel" style="margin-top:12px">
         <div class="section-title">Sales Action Queue</div>
         <p class="mini-note" id="fs-action-queue-status">Exception-first queue based on follow-up, settlement, and rep conversion health.</p>
@@ -514,47 +282,11 @@
         </table>
       </div>
 
-      <div class="split-2" style="margin-top:12px">
-        <div class="admin-panel">
-          <div class="section-title">Sales Queue SLA Aging</div>
-          <div class="admin-grid" style="grid-template-columns:repeat(4,minmax(0,1fr))">
-            <div class="admin-card">
-              <div class="admin-k">Past 24h</div>
-              <div class="admin-v warn" id="fs-sla-24h">0</div>
-              <div class="admin-sub">Action items older than 24 hours</div>
-            </div>
-            <div class="admin-card">
-              <div class="admin-k">Past 72h</div>
-              <div class="admin-v bad" id="fs-sla-72h">0</div>
-              <div class="admin-sub">Aged items needing escalation</div>
-            </div>
-            <div class="admin-card">
-              <div class="admin-k">Past 7 Days</div>
-              <div class="admin-v bad" id="fs-sla-7d">0</div>
-              <div class="admin-sub">Stale pipeline risk</div>
-            </div>
-            <div class="admin-card">
-              <div class="admin-k">No Due Time</div>
-              <div class="admin-v" id="fs-sla-nodue">0</div>
-              <div class="admin-sub">Needs explicit next-touch date</div>
-            </div>
-          </div>
-        </div>
-        <div class="admin-panel">
-          <div class="section-title">Action Ownership Drilldown</div>
-          <p class="mini-note" id="fs-owner-status">Grouped by action owner for queue balancing.</p>
-          <table class="admin-table">
-            <thead><tr><th>Owner</th><th>Total</th><th>Critical</th><th>High</th><th>Oldest Item</th></tr></thead>
-            <tbody id="tbl-field-owner-workload"></tbody>
-          </table>
-        </div>
-      </div>
-
       <div class="admin-panel" style="margin-top:12px">
         <div class="section-title">Booking Settlement Tracker</div>
-        <p class="mini-note" id="fs-bookings-status">Tracks each client, selected service, service completion, and payment state.</p>
+        <p class="mini-note" id="fs-bookings-status">Read-only sync of booking lifecycle from worker service completion and payment tracking.</p>
         <table class="admin-table">
-          <thead><tr><th>Date</th><th>Rep</th><th>Client</th><th>Service</th><th>Quoted $</th><th>Service Status</th><th>Payment Status</th><th>Paid $</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Date</th><th>Rep</th><th>Client</th><th>Service</th><th>Payment Status</th><th>Paid $</th><th>Rep Payout $</th></tr></thead>
           <tbody id="tbl-field-bookings"></tbody>
         </table>
       </div>
@@ -592,20 +324,6 @@
         </table>
       </div>
 
-      <div class="admin-panel" style="margin-top:12px">
-        <div class="section-title">Leads Map</div>
-        <div class="field-map-layout">
-          <div id="field-map"></div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <div style="display:flex;align-items:center;justify-content:space-between">
-              <div class="section-title" style="margin-bottom:6px">Leads</div>
-              <div id="field-map-status" class="mini-note" style="margin-left:8px">Map: unknown</div>
-            </div>
-            <div id="leads-list"></div>
-          </div>
-        </div>
-        <p class="mini-note">Click a lead to view metadata: who set the lead and door event history.</p>
-      </div>
     </section>
 
     <section class="tab-panel" id="tab-jobs" role="tabpanel" aria-labelledby="tab-jobs-btn" data-tab-panel="jobs" hidden>
@@ -622,63 +340,6 @@
         </div>
       </div>
       <p class="mini-note ops-simple-note" id="ops-simple-note">Simple financial view for the selected window.</p>
-
-      <div class="admin-panel" style="margin-top:12px">
-        <div class="section-title">Setup Exceptions</div>
-        <div class="ops-tracker-grid">
-          <div class="admin-card">
-            <div class="admin-k">Need Worker</div>
-            <div class="admin-v bad" id="ops-track-needs-worker">0</div>
-            <div class="admin-sub">Jobs missing worker assignment</div>
-          </div>
-          <div class="admin-card">
-            <div class="admin-k">Need Rep</div>
-            <div class="admin-v warn" id="ops-track-needs-rep">0</div>
-            <div class="admin-sub">Jobs missing attribution owner</div>
-          </div>
-          <div class="admin-card">
-            <div class="admin-k">Need Comp Plan</div>
-            <div class="admin-v warn" id="ops-track-needs-comp">0</div>
-            <div class="admin-sub">Attributed reps missing commission plan</div>
-          </div>
-          <div class="admin-card">
-            <div class="admin-k">Ready To Close</div>
-            <div class="admin-v good" id="ops-track-ready">0</div>
-            <div class="admin-sub">Operationally ready for completion</div>
-          </div>
-          <div class="admin-card">
-            <div class="admin-k">Completed</div>
-            <div class="admin-v" id="ops-track-completed">0</div>
-            <div class="admin-sub">Finished jobs in loaded window</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="admin-panel" style="margin-top:12px">
-        <div class="section-title">Job SLA Aging Board</div>
-        <div class="admin-grid" style="grid-template-columns:repeat(4,minmax(0,1fr))">
-          <div class="admin-card">
-            <div class="admin-k">Scheduled > 24h</div>
-            <div class="admin-v warn" id="ops-sla-scheduled">0</div>
-            <div class="admin-sub">Still waiting to start</div>
-          </div>
-          <div class="admin-card">
-            <div class="admin-k">In Progress > 8h</div>
-            <div class="admin-v bad" id="ops-sla-inprogress">0</div>
-            <div class="admin-sub">Likely blocked or stale clock</div>
-          </div>
-          <div class="admin-card">
-            <div class="admin-k">Completed Unpaid > 48h</div>
-            <div class="admin-v bad" id="ops-sla-unpaid">0</div>
-            <div class="admin-sub">Collections follow-up needed</div>
-          </div>
-          <div class="admin-card">
-            <div class="admin-k">Negative Margin</div>
-            <div class="admin-v warn" id="ops-sla-margin">0</div>
-            <div class="admin-sub">Jobs below cost baseline</div>
-          </div>
-        </div>
-      </div>
 
       <div class="admin-panel" style="margin-top:12px">
         <div class="section-title">Jobs List</div>
@@ -710,109 +371,38 @@
         </div>
       </div>
 
-      <div class="split-2" style="margin-top:12px">
-        <div class="admin-panel">
-          <div class="section-title">Rep Ownership Load</div>
-          <table class="admin-table">
-            <thead><tr><th>Rep</th><th>Jobs</th><th>Needs Comp</th><th>Profit</th></tr></thead>
-            <tbody id="tbl-ops-owner-reps"></tbody>
-          </table>
-        </div>
-        <div class="admin-panel">
-          <div class="section-title">Worker Ownership Load</div>
-          <table class="admin-table">
-            <thead><tr><th>Worker</th><th>Jobs</th><th>Open</th><th>Profit</th></tr></thead>
-            <tbody id="tbl-ops-owner-workers"></tbody>
-          </table>
-        </div>
-
-        <div class="admin-panel" style="margin-top:12px">
-          <div class="section-title">Profit Leakage Queue</div>
-          <p class="mini-note" id="ops-profit-risk-status">Prioritizes margin leakage, stale execution, and unpaid completion exposure.</p>
-          <table class="admin-table">
-            <thead><tr><th>Priority</th><th>Job</th><th>Owner</th><th>Risk</th><th>Exposure</th><th>Recommended Action</th></tr></thead>
-            <tbody id="tbl-ops-profit-risks"></tbody>
-          </table>
-        </div>
-      </div>
-
       <div class="admin-panel" style="margin-top:12px">
-        <div class="section-title">Operating Expenses</div>
-        <div class="ops-form-grid">
-          <input class="inp" id="ops-expense-date" type="date"/>
-          <input class="inp" id="ops-expense-category" type="text" placeholder="Category (supplies, fuel, etc.)"/>
-          <input class="inp" id="ops-expense-vendor" type="text" placeholder="Vendor"/>
-          <input class="inp" id="ops-expense-amount" type="number" step="0.01" min="0" value="0" placeholder="Amount ($)"/>
-          <input class="inp full" id="ops-expense-description" type="text" placeholder="Description"/>
-        </div>
-        <div class="ops-actions" style="margin-top:10px">
-          <button class="button" id="ops-save-expense-btn" type="button">Add Expense</button>
-        </div>
-        <p class="mini-note" id="ops-expenses-status">Track fixed and variable operating costs used in profit calculations.</p>
-        <table class="admin-table" style="margin-top:10px">
-          <thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th><th>Actions</th></tr></thead>
-          <tbody id="tbl-ops-expenses"></tbody>
+        <div class="section-title">Profit Leakage Queue</div>
+        <p class="mini-note" id="ops-profit-risk-status">Prioritizes margin leakage, stale execution, and unpaid completion exposure.</p>
+        <table class="admin-table">
+          <thead><tr><th>Priority</th><th>Job</th><th>Owner</th><th>Risk</th><th>Exposure</th><th>Recommended Action</th></tr></thead>
+          <tbody id="tbl-ops-profit-risks"></tbody>
         </table>
       </div>
+
     </section>
 
-    <section class="tab-panel" id="tab-workers" role="tabpanel" aria-labelledby="tab-workers-btn" data-tab-panel="workers" hidden>
-      <div class="ops-grid">
-        <div class="admin-card">
-          <div class="admin-k">Workers</div>
-          <div class="admin-v" id="ops-workers-dash-total">0</div>
-          <div class="admin-sub">Total worker profiles</div>
-        </div>
-        <div class="admin-card">
-          <div class="admin-k">Active Workers</div>
-          <div class="admin-v" id="ops-workers-dash-active">0</div>
-          <div class="admin-sub">Enabled for assignments</div>
-        </div>
-        <div class="admin-card">
-          <div class="admin-k">Workers With Login</div>
-          <div class="admin-v" id="ops-workers-dash-login">0</div>
-          <div class="admin-sub">PIN configured</div>
-        </div>
-        <div class="admin-card">
-          <div class="admin-k">Active Sessions</div>
-          <div class="admin-v" id="ops-workers-dash-sessions">0</div>
-          <div class="admin-sub">Clocked in right now</div>
-        </div>
-        <div class="admin-card">
-          <div class="admin-k">Hours Worked</div>
-          <div class="admin-v" id="ops-workers-dash-hours">0.0</div>
-          <div class="admin-sub">In selected window</div>
-        </div>
-        <div class="admin-card">
-          <div class="admin-k">Labor Cost</div>
-          <div class="admin-v" id="ops-workers-dash-labor">$0.00</div>
-          <div class="admin-sub">From labor entries</div>
-        </div>
-      </div>
-
-      <div class="ops-grid" style="margin-top:12px">
-        <div class="admin-card">
-          <div class="admin-k">Worker Expenses</div>
-          <div class="admin-v" id="ops-workers-dash-expense">$0.00</div>
-          <div class="admin-sub">Receipt-backed entries</div>
-        </div>
-        <div class="admin-card">
-          <div class="admin-k">Worker Income Logs</div>
-          <div class="admin-v" id="ops-workers-dash-income">$0.00</div>
-          <div class="admin-sub">Collected in field</div>
-        </div>
-        <div class="admin-card">
-          <div class="admin-k">Photos Logged</div>
-          <div class="admin-v" id="ops-workers-dash-photos">0</div>
-          <div class="admin-sub">Before + after uploads</div>
-        </div>
-      </div>
-
+    <section class="tab-panel" id="tab-payroll" role="tabpanel" aria-labelledby="tab-payroll-btn" data-tab-panel="payroll" hidden>
       <div class="admin-panel" style="margin-top:12px">
         <div class="section-title">Weekly Payroll Center</div>
         <div class="ops-actions" style="justify-content:space-between;align-items:center">
           <p class="mini-note" id="ops-payroll-week-label">Current week payroll accruals.</p>
-          <button class="button" id="ops-payroll-close-btn" type="button">Mark Current Week Paid</button>
+          <button class="button" id="ops-payroll-close-btn" type="button">Mark Full Week Paid</button>
+        </div>
+        <div class="ops-form-grid" style="margin-top:10px">
+          <input class="inp" id="ops-payroll-paid-by" type="text" placeholder="Paid by (ex: Peter Johnson)"/>
+          <select class="sel" id="ops-payroll-payment-method">
+            <option value="">Payment method (optional)</option>
+            <option value="ach">ACH</option>
+            <option value="check">Check</option>
+            <option value="cash">Cash</option>
+            <option value="zelle">Zelle</option>
+            <option value="venmo">Venmo</option>
+            <option value="card">Card</option>
+            <option value="other">Other</option>
+          </select>
+          <input class="inp" id="ops-payroll-payment-reference" type="text" placeholder="Reference # (check/txn id)"/>
+          <input class="inp" id="ops-payroll-payment-note" type="text" placeholder="Tax memo / note (optional)"/>
         </div>
         <div class="admin-grid" style="grid-template-columns:repeat(4,minmax(0,1fr));margin-top:10px">
           <div class="admin-card">
@@ -840,19 +430,57 @@
           <div>
             <div class="section-title" style="margin-bottom:6px">Workers</div>
             <table class="admin-table">
-              <thead><tr><th>Worker</th><th>Accrued</th><th>Paid</th><th>Total</th></tr></thead>
+              <thead><tr><th>Worker</th><th>Accrued</th><th>Paid</th><th>Total</th><th>Profile</th></tr></thead>
               <tbody id="tbl-ops-payroll-workers"></tbody>
             </table>
           </div>
           <div>
             <div class="section-title" style="margin-bottom:6px">Sales Reps</div>
             <table class="admin-table">
-              <thead><tr><th>Rep</th><th>Accrued</th><th>Paid</th><th>Total</th></tr></thead>
+              <thead><tr><th>Rep</th><th>Accrued</th><th>Paid</th><th>Total</th><th>Profile</th></tr></thead>
               <tbody id="tbl-ops-payroll-reps"></tbody>
             </table>
           </div>
         </div>
+        <div style="margin-top:10px">
+          <div class="section-title" style="margin-bottom:6px">Worker Payout Profiles</div>
+          <div class="ops-grid" id="ops-payroll-worker-profiles" style="grid-template-columns:repeat(3,minmax(0,1fr))"></div>
+        </div>
+        <div style="margin-top:10px">
+          <div class="section-title" style="margin-bottom:6px">Rep Payout Profiles</div>
+          <div class="ops-grid" id="ops-payroll-rep-profiles" style="grid-template-columns:repeat(3,minmax(0,1fr))"></div>
+        </div>
+        <div style="margin-top:10px">
+          <div class="ops-actions" style="justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div class="section-title" style="margin-bottom:0">Payout Audit Log</div>
+            <button class="button outline" id="ops-payroll-export-csv-btn" type="button" disabled>Export CSV</button>
+          </div>
+          <table class="admin-table">
+            <thead><tr><th>Closed At</th><th>Week Start</th><th>Scope</th><th>Payee</th><th>Amount</th><th>Paid By</th><th>Method/Ref</th><th>Memo</th></tr></thead>
+            <tbody id="tbl-ops-payroll-history"></tbody>
+          </table>
+        </div>
         <p class="mini-note" id="ops-payroll-status">Weekly payroll summary is loading.</p>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="tab-workers" role="tabpanel" aria-labelledby="tab-workers-btn" data-tab-panel="workers" hidden>
+      <div class="ops-grid" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+        <div class="admin-card">
+          <div class="admin-k">Active Workers</div>
+          <div class="admin-v" id="ops-workers-dash-active">0</div>
+          <div class="admin-sub">Enabled for assignments</div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-k">Hours Worked</div>
+          <div class="admin-v" id="ops-workers-dash-hours">0.0</div>
+          <div class="admin-sub">In selected window</div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-k">Labor Cost</div>
+          <div class="admin-v" id="ops-workers-dash-labor">$0.00</div>
+          <div class="admin-sub">From labor entries</div>
+        </div>
       </div>
 
       <div class="admin-panel" style="margin-top:12px">
@@ -879,86 +507,8 @@
         <div class="section-title">Worker Performance</div>
         <p class="mini-note" id="ops-workers-dashboard-status">Loading worker dashboard...</p>
         <table class="admin-table">
-          <thead><tr><th>Worker</th><th>Login</th><th>Jobs Taken</th><th>Active Sessions</th><th>Worked</th><th>Labor Cost</th><th>Expenses</th><th>Income</th><th>Photos</th></tr></thead>
+          <thead><tr><th>Worker</th><th>Login</th><th>Jobs Taken</th><th>Active Sessions</th><th>Worked</th><th>Labor Cost</th></tr></thead>
           <tbody id="tbl-ops-workers-dashboard"></tbody>
-        </table>
-      </div>
-
-      <div class="split-2" style="margin-top:12px">
-        <div class="admin-panel">
-          <div class="section-title">Worker Alert Queue</div>
-          <table class="admin-table">
-            <thead><tr><th>Priority</th><th>Worker</th><th>Issue</th><th>Recommended Action</th></tr></thead>
-            <tbody id="tbl-ops-worker-alerts"></tbody>
-          </table>
-        </div>
-        <div class="admin-panel">
-          <div class="section-title">Utilization Snapshot</div>
-          <table class="admin-table">
-            <thead><tr><th>Worker</th><th>Jobs</th><th>Hours</th><th>Jobs/Hr</th><th>Expense Ratio</th></tr></thead>
-            <tbody id="tbl-ops-worker-utilization"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="admin-panel" style="margin-top:12px">
-        <div class="section-title">Daily Operations Trend (7 Days)</div>
-        <p class="mini-note" id="ops-workers-trend-status">Comparing current 7-day worker activity against the previous 7-day period.</p>
-        <table class="admin-table">
-          <thead><tr><th>Date</th><th>Hours</th><th>Sessions</th><th>Income</th><th>Expenses</th><th>Photos</th></tr></thead>
-          <tbody id="tbl-ops-worker-daily-trend"></tbody>
-        </table>
-      </div>
-
-      <div class="admin-panel" style="margin-top:12px">
-        <div class="section-title">Comparative Delta Board (7d vs prior 7d)</div>
-        <p class="mini-note" id="ops-workers-delta-status">Highlights acceleration or slowdown in throughput and field economics.</p>
-        <div class="ops-grid">
-          <div class="admin-card">
-            <div class="admin-k">Hours Delta</div>
-            <div class="admin-v" id="ops-workers-delta-hours">0.0%</div>
-            <div class="admin-sub">Total hours worked vs prior period</div>
-          </div>
-          <div class="admin-card">
-            <div class="admin-k">Sessions Delta</div>
-            <div class="admin-v" id="ops-workers-delta-sessions">0.0%</div>
-            <div class="admin-sub">Clock session count change</div>
-          </div>
-          <div class="admin-card">
-            <div class="admin-k">Income Delta</div>
-            <div class="admin-v" id="ops-workers-delta-income">0.0%</div>
-            <div class="admin-sub">Worker logged income change</div>
-          </div>
-          <div class="admin-card">
-            <div class="admin-k">Expense Ratio Delta</div>
-            <div class="admin-v" id="ops-workers-delta-expense">0.0%</div>
-            <div class="admin-sub">Expense to income ratio shift</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="split-2" style="margin-top:12px">
-        <div class="admin-panel">
-          <div class="section-title">Recent Clock Sessions</div>
-          <table class="admin-table">
-            <thead><tr><th>When</th><th>Worker</th><th>Job</th><th>Minutes</th></tr></thead>
-            <tbody id="tbl-ops-worker-sessions"></tbody>
-          </table>
-        </div>
-        <div class="admin-panel">
-          <div class="section-title">Recent Finance Entries</div>
-          <table class="admin-table">
-            <thead><tr><th>Date</th><th>Worker</th><th>Type</th><th>Amount</th><th>Job</th></tr></thead>
-            <tbody id="tbl-ops-worker-finance"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="admin-panel" style="margin-top:12px">
-        <div class="section-title">Recent Before/After Photos</div>
-        <table class="admin-table">
-          <thead><tr><th>When</th><th>Worker</th><th>Job</th><th>Type</th><th>Preview</th></tr></thead>
-          <tbody id="tbl-ops-worker-photos"></tbody>
         </table>
       </div>
     </section>
@@ -972,7 +522,6 @@
 
   const API_BASE='https://calcom-proxy.southernutahdetail.workers.dev';
   const TOKEN_KEY='sud_admin_analytics_token';
-  const GOOGLE_MAPS_KEY_STORAGE='sud_google_maps_api_key';
 
   const daysInput=document.getElementById('admin-days');
   const refreshBtn=document.getElementById('refresh-btn');
@@ -985,12 +534,11 @@
   const createRepStatus=document.getElementById('fs-create-rep-status');
   const fieldBookingsStatus=document.getElementById('fs-bookings-status');
   const opsJobsStatus=document.getElementById('ops-jobs-status');
-  const opsExpensesStatus=document.getElementById('ops-expenses-status');
-  const saveOpsExpenseBtn=document.getElementById('ops-save-expense-btn');
   const opsWorkersStatus=document.getElementById('ops-workers-status');
   const opsWorkersDashboardStatus=document.getElementById('ops-workers-dashboard-status');
   const opsPayrollStatus=document.getElementById('ops-payroll-status');
   const opsPayrollCloseBtn=document.getElementById('ops-payroll-close-btn');
+  const opsPayrollExportCsvBtn=document.getElementById('ops-payroll-export-csv-btn');
   const opsCompStatus=document.getElementById('ops-comp-status');
   const saveWorkerBtn=document.getElementById('ops-save-worker-btn');
   const saveCompBtn=document.getElementById('ops-save-comp-btn');
@@ -1001,18 +549,16 @@
   const opsJobFilterResetBtn=document.getElementById('ops-job-filter-reset-btn');
   const tabButtons=Array.from(document.querySelectorAll('[data-tab-target]'));
   const tabPanels=Array.from(document.querySelectorAll('[data-tab-panel]'));
-  const loadingValueEls=Array.from(document.querySelectorAll('.admin-v, .funnel-value, .funnel-rate, .context-pill'));
+  const loadingValueEls=Array.from(document.querySelectorAll('.admin-v'));
   let opsWorkers=[];
   let opsWorkersById={};
   let opsCompPlansByRep={};
   let opsReps=[];
   let opsPayrollPayload=null;
+  let opsPayrollHistoryItems=[];
   let opsJobsPayload=null;
   let opsJobsById={};
   let opsJobWorkerSelections={};
-  let googleMapsJsPromise=null;
-  let googleMapsApiKeyCache='';
-  let googleMapsApiKeyPromise=null;
   let pageLoadingDepth=0;
 
   const setText=(id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=String(val); };
@@ -1043,73 +589,6 @@
 
   function getToken(){
     try{return String(sessionStorage.getItem(TOKEN_KEY)||'').trim();}catch(_e){return '';}
-  }
-
-  async function getGoogleMapsApiKey(){
-    const direct=String(window.GOOGLE_MAPS_API_KEY||'').trim();
-    if(direct){
-      googleMapsApiKeyCache=direct;
-      return direct;
-    }
-    try{
-      const stored=String(sessionStorage.getItem(GOOGLE_MAPS_KEY_STORAGE)||localStorage.getItem(GOOGLE_MAPS_KEY_STORAGE)||'').trim();
-      if(stored){
-        googleMapsApiKeyCache=stored;
-        return stored;
-      }
-    }catch(_e){
-      // ignore and continue to worker config
-    }
-
-    if(googleMapsApiKeyCache) return googleMapsApiKeyCache;
-    if(googleMapsApiKeyPromise) return googleMapsApiKeyPromise;
-
-    googleMapsApiKeyPromise=(async()=>{
-      const endpoints=[
-        `${API_BASE}/public/maps-config`,
-        `${API_BASE}/api/public/maps-config`
-      ];
-      for(const ep of endpoints){
-        try{
-          const res=await fetch(ep,{method:'GET'});
-          if(!res.ok) continue;
-          const data=await res.json().catch(()=>null);
-          const key=String(data&&data.googleMapsApiKey||'').trim();
-          if(key){
-            googleMapsApiKeyCache=key;
-            return key;
-          }
-        }catch(_e){}
-      }
-      return '';
-    })().finally(()=>{ googleMapsApiKeyPromise=null; });
-
-    return googleMapsApiKeyPromise;
-  }
-
-  function loadGoogleMapsJs(key){
-    if(window.google&&window.google.maps) return Promise.resolve(true);
-    if(!key) return Promise.resolve(false);
-    if(googleMapsJsPromise) return googleMapsJsPromise;
-
-    googleMapsJsPromise=new Promise((resolve)=>{
-      const existing=document.querySelector('script[data-google-maps-api="1"]');
-      if(existing){
-        existing.addEventListener('load',()=>resolve(Boolean(window.google&&window.google.maps)),{once:true});
-        existing.addEventListener('error',()=>resolve(false),{once:true});
-        return;
-      }
-      const script=document.createElement('script');
-      script.src=`https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&v=weekly`;
-      script.async=true;
-      script.defer=true;
-      script.setAttribute('data-google-maps-api','1');
-      script.onload=()=>resolve(Boolean(window.google&&window.google.maps));
-      script.onerror=()=>resolve(false);
-      document.head.appendChild(script);
-    });
-
-    return googleMapsJsPromise;
   }
 
   function endpointPair(path, params){
@@ -1152,6 +631,58 @@
     document.body.removeAttribute('aria-busy');
   }
 
+  function setPanelCollapsed(panel, collapsed){
+    const content=panel.querySelector(':scope > .section-content');
+    const btn=panel.querySelector(':scope > .section-toggle-header .section-toggle-btn');
+    if(!content||!btn) return;
+
+    const isCollapsed=!!collapsed;
+    panel.classList.toggle('is-collapsed',isCollapsed);
+    content.hidden=isCollapsed;
+    btn.setAttribute('aria-expanded',isCollapsed?'false':'true');
+    btn.textContent=isCollapsed?'Expand':'Collapse';
+  }
+
+  function buildCollapsiblePanel(panel, index){
+    if(!panel||panel.dataset.collapsibleReady==='1') return;
+    const title=panel.querySelector(':scope > .section-title');
+    if(!title) return;
+
+    const content=document.createElement('div');
+    content.className='section-content';
+    content.id=`section-content-${index}`;
+
+    while(title.nextSibling){
+      content.appendChild(title.nextSibling);
+    }
+
+    const header=document.createElement('div');
+    header.className='section-toggle-header';
+
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='section-toggle-btn';
+    btn.setAttribute('aria-controls',content.id);
+
+    header.appendChild(title);
+    header.appendChild(btn);
+
+    panel.insertBefore(header,panel.firstChild);
+    panel.appendChild(content);
+    panel.dataset.collapsibleReady='1';
+
+    btn.addEventListener('click',()=>{
+      setPanelCollapsed(panel,!panel.classList.contains('is-collapsed'));
+    });
+
+    setPanelCollapsed(panel,true);
+  }
+
+  function setupSectionCollapsibles(){
+    const panels=Array.from(document.querySelectorAll('.tab-panel .admin-panel'));
+    panels.forEach((panel,idx)=>buildCollapsiblePanel(panel,idx+1));
+  }
+
   function activateTab(name){
     tabButtons.forEach((btn)=>{
       const active=btn.dataset.tabTarget===name;
@@ -1161,19 +692,6 @@
     tabPanels.forEach((panel)=>{
       panel.hidden=panel.dataset.tabPanel!==name;
     });
-    // If the Sales Reps tab is shown, ensure the Leaflet map is initialized and resized
-    if(name === 'sales'){
-      setTimeout(()=>{
-        try{
-          if(typeof fieldMap !== 'undefined' && fieldMap && typeof fieldMap.invalidateSize === 'function'){
-            fieldMap.invalidateSize(true);
-          } else {
-            // Try to initialize and render field map if it wasn't inited yet
-            try{ updateFieldMap(null); }catch(_e){}
-          }
-        }catch(_e){}
-      }, 220);
-    }
   }
 
   function setMenuOpen(open){
@@ -1207,63 +725,6 @@
       else tone=' warn';
     }
     setClass(id,base + tone);
-  }
-
-  function shortDateLabel(isoDate){
-    const d=new Date(`${isoDate}T00:00:00`);
-    if(!Number.isFinite(d.getTime())) return String(isoDate||'');
-    return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-  }
-
-  function renderMultiLineChart(svgId, legendId, labels, datasets, options){
-    const svg=document.getElementById(svgId);
-    const legend=document.getElementById(legendId);
-    if(!svg||!legend) return;
-
-    if(!labels.length||!datasets.length){
-      svg.innerHTML='<rect x="0" y="0" width="640" height="220" fill="transparent"></rect><text x="320" y="115" text-anchor="middle" fill="var(--tx2)" font-size="14">No trend data yet</text>';
-      legend.innerHTML='';
-      return;
-    }
-
-    const width=640;
-    const height=220;
-    const pad={l:44,r:12,t:12,b:28};
-    const steps=Math.max(labels.length-1,1);
-    const maxFromData=datasets.reduce((m,ds)=>Math.max(m,...ds.values.map((n)=>Number(n)||0)),0);
-    const maxY=Math.max(1,options&&options.maxY?Number(options.maxY):maxFromData);
-
-    const xAt=(i)=>pad.l+((width-pad.l-pad.r)*(i/steps));
-    const yAt=(v)=>{
-      const ratio=Math.max(0,Math.min(1,(Number(v)||0)/maxY));
-      return pad.t+((height-pad.t-pad.b)*(1-ratio));
-    };
-
-    let out='<rect x="0" y="0" width="640" height="220" fill="transparent"></rect>';
-
-    for(let i=0;i<=4;i++){
-      const y=pad.t+((height-pad.t-pad.b)*(i/4));
-      const value=maxY*(1-(i/4));
-      const label=(options&&options.percent)?`${value.toFixed(0)}%`:fmtNum(Math.round(value));
-      out += `<line x1="${pad.l}" y1="${y}" x2="${width-pad.r}" y2="${y}" stroke="rgba(255,255,255,.08)" stroke-width="1"></line>`;
-      out += `<text x="${pad.l-6}" y="${y+4}" text-anchor="end" fill="var(--tx3)" font-size="10">${label}</text>`;
-    }
-
-    const xLabelIdx=[0,Math.floor((labels.length-1)/2),labels.length-1].filter((v,i,a)=>a.indexOf(v)===i);
-    xLabelIdx.forEach((idx)=>{
-      out += `<text x="${xAt(idx)}" y="${height-8}" text-anchor="middle" fill="var(--tx3)" font-size="10">${escapeHtml(labels[idx])}</text>`;
-    });
-
-    datasets.forEach((ds)=>{
-      if(!ds.values.length) return;
-      const points=ds.values.map((v,i)=>`${xAt(i)},${yAt(v)}`).join(' ');
-      out += `<polyline points="${points}" fill="none" stroke="${ds.color}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"></polyline>`;
-      const lastIdx=ds.values.length-1;
-      out += `<circle cx="${xAt(lastIdx)}" cy="${yAt(ds.values[lastIdx])}" r="3.3" fill="${ds.color}"></circle>`;
-    });
-
-    svg.innerHTML=out;
-    legend.innerHTML=datasets.map((ds)=>`<span class="legend-item"><span class="legend-dot" style="background:${ds.color}"></span>${escapeHtml(ds.name)}</span>`).join('');
   }
 
   async function fetchJsonWithFallback(endpoints, token){
@@ -1382,39 +843,15 @@
     return {data};
   }
 
-  async function deleteJsonWithFallback(endpoints, token){
-    let res=null;
-    for(const ep of endpoints){
-      try{
-        const r=await fetch(ep,{method:'DELETE',headers:{'x-admin-token':token}});
-        if(r.status===404) continue;
-        res=r;
-        break;
-      }catch(_e){}
-    }
-
-    if(!res) return {error:'Could not reach delete endpoint.'};
-    if(res.status===401||res.status===403) return {authExpired:true};
-    if(!res.ok){
-      let text='';
-      try{text=await res.text();}catch(_e){}
-      return {error:`Delete failed (${res.status}): ${String(text).slice(0,180)}`};
-    }
-
-    const data=await res.json().catch(()=>null);
-    return {data};
+  function isNotDeployed404(errorMessage){
+    const msg=String(errorMessage||'');
+    return msg.includes('Endpoint not deployed (404)');
   }
 
   function setOpsJobsStatus(msg,isErr){
     if(!opsJobsStatus) return;
     opsJobsStatus.textContent=msg;
     opsJobsStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
-  }
-
-  function setOpsExpensesStatus(msg,isErr){
-    if(!opsExpensesStatus) return;
-    opsExpensesStatus.textContent=msg;
-    opsExpensesStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
   }
 
   function setOpsWorkersStatus(msg,isErr){
@@ -1545,33 +982,6 @@
     return haystack.includes(search);
   }
 
-  function renderOpsTrackingSummary(items){
-    const stats={
-      needsWorker:0,
-      needsRep:0,
-      needsComp:0,
-      ready:0,
-      completed:0,
-    };
-
-    items.forEach((job)=>{
-      const state=jobTrackingState(job);
-      if(state.isOpen){
-        if(!state.hasWorker) stats.needsWorker += 1;
-        if(!state.hasAttribution) stats.needsRep += 1;
-        if(state.hasAttribution && !state.hasCompPlan) stats.needsComp += 1;
-        if(state.isReadyForCompletion) stats.ready += 1;
-      }
-      if(state.isCompleted) stats.completed += 1;
-    });
-
-    setText('ops-track-needs-worker',fmtNum(stats.needsWorker));
-    setText('ops-track-needs-rep',fmtNum(stats.needsRep));
-    setText('ops-track-needs-comp',fmtNum(stats.needsComp));
-    setText('ops-track-ready',fmtNum(stats.ready));
-    setText('ops-track-completed',fmtNum(stats.completed));
-  }
-
   function opsJobSortOrder(job){
     const status=String(job&&job.jobStatus||'').trim();
     if(status==='in_progress') return 0;
@@ -1616,79 +1026,6 @@
     const base=parseMaybeDate(job&&job.scheduledFor||job&&job.createdAt||'');
     if(!base) return -1;
     return Math.max(0,Math.floor((Date.now()-base.getTime())/(60*60*1000)));
-  }
-
-  function renderOpsSlaAging(items){
-    const jobs=Array.isArray(items)?items:[];
-    let scheduledAged=0;
-    let inProgressAged=0;
-    let completedUnpaidAged=0;
-    let negativeMargin=0;
-    jobs.forEach((job)=>{
-      const status=String(job&&job.jobStatus||'').trim();
-      const paid=String(job&&job.paidStatus||'').trim();
-      const age=jobAgeHours(job);
-      const profit=Number(job&&job.profitCents||0);
-      if(status==='scheduled' && age>=24) scheduledAged += 1;
-      if(status==='in_progress' && age>=8) inProgressAged += 1;
-      if(status==='completed' && paid!=='paid' && age>=48) completedUnpaidAged += 1;
-      if(profit<0) negativeMargin += 1;
-    });
-    setText('ops-sla-scheduled',fmtNum(scheduledAged));
-    setText('ops-sla-inprogress',fmtNum(inProgressAged));
-    setText('ops-sla-unpaid',fmtNum(completedUnpaidAged));
-    setText('ops-sla-margin',fmtNum(negativeMargin));
-  }
-
-  function renderOpsOwnershipDrilldown(items){
-    const repsTb=document.getElementById('tbl-ops-owner-reps');
-    const workersTb=document.getElementById('tbl-ops-owner-workers');
-    if(!repsTb||!workersTb) return;
-
-    const jobs=Array.isArray(items)?items:[];
-    if(!jobs.length){
-      repsTb.innerHTML='<tr><td colspan="4">No rep ownership data in this window.</td></tr>';
-      workersTb.innerHTML='<tr><td colspan="4">No worker ownership data in this window.</td></tr>';
-      return;
-    }
-
-    const repsByKey={};
-    const workersByKey={};
-    jobs.forEach((job)=>{
-      const repLabel=String(job&&job.attributedRepName||job&&job.attributedRepId||'Unattributed').trim() || 'Unattributed';
-      const repKey=repLabel.toLowerCase();
-      if(!repsByKey[repKey]) repsByKey[repKey]={ label:repLabel, jobs:0, needsComp:0, profitCents:0 };
-      const repRow=repsByKey[repKey];
-      repRow.jobs += 1;
-      repRow.profitCents += Number(job&&job.profitCents||0);
-      const state=jobTrackingState(job);
-      if(state.hasAttribution && !state.hasCompPlan) repRow.needsComp += 1;
-
-      const workerLabel=String(job&&job.assignedWorkerName||job&&job.assignedWorkerId||'Unassigned').trim() || 'Unassigned';
-      const workerKey=workerLabel.toLowerCase();
-      if(!workersByKey[workerKey]) workersByKey[workerKey]={ label:workerLabel, jobs:0, open:0, profitCents:0 };
-      const workerRow=workersByKey[workerKey];
-      workerRow.jobs += 1;
-      workerRow.profitCents += Number(job&&job.profitCents||0);
-      if(isJobOpenStatus(job&&job.jobStatus)) workerRow.open += 1;
-    });
-
-    const repRows=Object.values(repsByKey).sort((a,b)=>b.jobs-a.jobs);
-    const workerRows=Object.values(workersByKey).sort((a,b)=>b.jobs-a.jobs);
-
-    repsTb.innerHTML=repRows.map((row)=>`<tr>
-      <td>${escapeHtml(row.label)}</td>
-      <td>${fmtNum(row.jobs)}</td>
-      <td>${fmtNum(row.needsComp)}</td>
-      <td class="${row.profitCents>=0?'ops-profit-positive':'ops-profit-negative'}">${fmtMoneyCents(row.profitCents)}</td>
-    </tr>`).join('');
-
-    workersTb.innerHTML=workerRows.map((row)=>`<tr>
-      <td>${escapeHtml(row.label)}</td>
-      <td>${fmtNum(row.jobs)}</td>
-      <td>${fmtNum(row.open)}</td>
-      <td class="${row.profitCents>=0?'ops-profit-positive':'ops-profit-negative'}">${fmtMoneyCents(row.profitCents)}</td>
-    </tr>`).join('');
   }
 
   function buildOpsProfitRiskQueue(items){
@@ -1793,168 +1130,6 @@
     }
   }
 
-  function localDateKey(value){
-    const dt=parseMaybeDate(value);
-    if(!dt) return '';
-    const local=new Date(dt.getTime()-dt.getTimezoneOffset()*60*1000);
-    return local.toISOString().slice(0,10);
-  }
-
-  function rollingDateKeys(days){
-    const total=Math.max(1,Number(days||1));
-    const out=[];
-    const base=new Date();
-    base.setHours(0,0,0,0);
-    for(let i=total-1;i>=0;i--){
-      const d=new Date(base);
-      d.setDate(base.getDate()-i);
-      out.push(d.toISOString().slice(0,10));
-    }
-    return out;
-  }
-
-  function pctDelta(current,previous){
-    const cur=Number(current||0);
-    const prev=Number(previous||0);
-    if(prev<=0){
-      if(cur<=0) return '0.0%';
-      return '+100.0%';
-    }
-    const pct=((cur-prev)/prev)*100;
-    return `${pct>=0?'+':''}${pct.toFixed(1)}%`;
-  }
-
-  function pctChangeRaw(current,previous){
-    const cur=Number(current||0);
-    const prev=Number(previous||0);
-    if(prev<=0){
-      if(cur<=0) return 0;
-      return 100;
-    }
-    return ((cur-prev)/prev)*100;
-  }
-
-  function deltaToneFromPct(changePct,invert){
-    const value=Number(changePct||0);
-    if(invert){
-      if(value<=-10) return 'good';
-      if(value>=10) return 'bad';
-      return 'warn';
-    }
-    if(value>=10) return 'good';
-    if(value<=-10) return 'bad';
-    return 'warn';
-  }
-
-  function setDeltaMetricVisual(id,label,tone){
-    const el=document.getElementById(id);
-    if(!el) return;
-    el.textContent=String(label||'0.0%');
-    el.classList.remove('good','warn','bad');
-    if(['good','warn','bad'].includes(String(tone||''))) el.classList.add(tone);
-  }
-
-  function renderOpsWorkerDeltaBoard(summary){
-    const status=document.getElementById('ops-workers-delta-status');
-    if(!summary||typeof summary!=='object'){
-      setDeltaMetricVisual('ops-workers-delta-hours','0.0%','warn');
-      setDeltaMetricVisual('ops-workers-delta-sessions','0.0%','warn');
-      setDeltaMetricVisual('ops-workers-delta-income','0.0%','warn');
-      setDeltaMetricVisual('ops-workers-delta-expense','0.0%','warn');
-      if(status) status.textContent='Comparative delta board is waiting for enough trend data.';
-      return;
-    }
-
-    const hoursPct=pctChangeRaw(summary.currentMinutes, summary.previousMinutes);
-    const sessionsPct=pctChangeRaw(summary.currentSessions, summary.previousSessions);
-    const incomePct=pctChangeRaw(summary.currentIncomeCents, summary.previousIncomeCents);
-    const expenseRatioPct=pctChangeRaw(summary.currentExpenseRatio, summary.previousExpenseRatio);
-
-    setDeltaMetricVisual('ops-workers-delta-hours', `${hoursPct>=0?'+':''}${hoursPct.toFixed(1)}%`, deltaToneFromPct(hoursPct,false));
-    setDeltaMetricVisual('ops-workers-delta-sessions', `${sessionsPct>=0?'+':''}${sessionsPct.toFixed(1)}%`, deltaToneFromPct(sessionsPct,false));
-    setDeltaMetricVisual('ops-workers-delta-income', `${incomePct>=0?'+':''}${incomePct.toFixed(1)}%`, deltaToneFromPct(incomePct,false));
-    setDeltaMetricVisual('ops-workers-delta-expense', `${expenseRatioPct>=0?'+':''}${expenseRatioPct.toFixed(1)}%`, deltaToneFromPct(expenseRatioPct,true));
-
-    if(status){
-      status.textContent=`Current expense ratio: ${summary.currentExpenseRatio.toFixed(1)}% · Prior: ${summary.previousExpenseRatio.toFixed(1)}% · Hours ${pctDelta(summary.currentMinutes,summary.previousMinutes)}.`;
-    }
-  }
-
-  function renderOpsWorkerDailyTrend(recentSessions,recentFinance,recentPhotos){
-    const tb=document.getElementById('tbl-ops-worker-daily-trend');
-    const status=document.getElementById('ops-workers-trend-status');
-    if(!tb) return;
-
-    const keys14=rollingDateKeys(14);
-    const prevKeys=keys14.slice(0,7);
-    const currKeys=keys14.slice(7);
-    const buckets={};
-    keys14.forEach((k)=>{ buckets[k]={ minutes:0, sessions:0, incomeCents:0, expenseCents:0, photos:0 }; });
-
-    (Array.isArray(recentSessions)?recentSessions:[]).forEach((it)=>{
-      const key=localDateKey(it&&it.endedAt||it&&it.startedAt||'');
-      if(!buckets[key]) return;
-      buckets[key].sessions += 1;
-      buckets[key].minutes += Number(it&&it.minutesWorked||0);
-    });
-
-    (Array.isArray(recentFinance)?recentFinance:[]).forEach((it)=>{
-      const key=localDateKey(it&&it.expenseDate||it&&it.createdAt||'');
-      if(!buckets[key]) return;
-      const amount=Number(it&&it.amountCents||0);
-      const kind=String(it&&it.entryType||'expense').trim().toLowerCase();
-      if(kind.includes('income')) buckets[key].incomeCents += amount;
-      else buckets[key].expenseCents += amount;
-    });
-
-    (Array.isArray(recentPhotos)?recentPhotos:[]).forEach((it)=>{
-      const key=localDateKey(it&&it.createdAt||'');
-      if(!buckets[key]) return;
-      buckets[key].photos += 1;
-    });
-
-    tb.innerHTML=currKeys.map((key)=>{
-      const row=buckets[key]||{ minutes:0, sessions:0, incomeCents:0, expenseCents:0, photos:0 };
-      const label=new Date(`${key}T00:00:00`).toLocaleDateString('en-US',{month:'short',day:'numeric'});
-      return `<tr>
-        <td>${escapeHtml(label)}</td>
-        <td>${fmtHoursFromMinutes(row.minutes)}</td>
-        <td>${fmtNum(row.sessions)}</td>
-        <td>${fmtMoneyCents(row.incomeCents)}</td>
-        <td>${fmtMoneyCents(row.expenseCents)}</td>
-        <td>${fmtNum(row.photos)}</td>
-      </tr>`;
-    }).join('');
-
-    const sumFor=(keys,selector)=>keys.reduce((acc,key)=>acc+Number(selector(buckets[key]||{})||0),0);
-    const currentMinutes=sumFor(currKeys,(r)=>r.minutes);
-    const previousMinutes=sumFor(prevKeys,(r)=>r.minutes);
-    const currentSessions=sumFor(currKeys,(r)=>r.sessions);
-    const previousSessions=sumFor(prevKeys,(r)=>r.sessions);
-    const currentIncomeCents=sumFor(currKeys,(r)=>r.incomeCents);
-    const previousIncomeCents=sumFor(prevKeys,(r)=>r.incomeCents);
-    const currentExpenseCents=sumFor(currKeys,(r)=>r.expenseCents);
-    const previousExpenseCents=sumFor(prevKeys,(r)=>r.expenseCents);
-    const currentPhotos=sumFor(currKeys,(r)=>r.photos);
-    const previousPhotos=sumFor(prevKeys,(r)=>r.photos);
-    const currentExpenseRatio=currentIncomeCents>0?((currentExpenseCents/currentIncomeCents)*100):0;
-    const previousExpenseRatio=previousIncomeCents>0?((previousExpenseCents/previousIncomeCents)*100):0;
-    renderOpsWorkerDeltaBoard({
-      currentMinutes,
-      previousMinutes,
-      currentSessions,
-      previousSessions,
-      currentIncomeCents,
-      previousIncomeCents,
-      currentExpenseRatio,
-      previousExpenseRatio
-    });
-
-    if(status){
-      status.textContent=`Hours ${pctDelta(currentMinutes,previousMinutes)} vs prior 7 days · Sessions ${pctDelta(currentSessions,previousSessions)} · Income ${pctDelta(currentIncomeCents,previousIncomeCents)} · Photos ${pctDelta(currentPhotos,previousPhotos)}.`;
-    }
-  }
-
   function workerSelectOptions(selectedId){
     const selected=String(selectedId||'');
     const options=['<option value="">Select worker</option>'];
@@ -1992,7 +1167,7 @@
       return;
     }
 
-    createRepBtn.disabled=true;
+    if(createRepBtn) createRepBtn.disabled=true;
     setCreateRepStatus('Saving rep...',false);
     try{
       const res=await fetch(`${API_BASE}/admin/field/reps`,{
@@ -2018,7 +1193,7 @@
     }catch(err){
       setCreateRepStatus(String(err&&err.message?err.message:'Save failed'),true);
     } finally {
-      createRepBtn.disabled=false;
+      if(createRepBtn) createRepBtn.disabled=false;
     }
   }
 
@@ -2044,13 +1219,13 @@
       const mapEndpoints=endpointPair('/admin/field/map-events',{ day, days, limit:'1000' });
       const opsOverviewEndpoints=endpointPair('/admin/ops/overview',{ day, days:'30', upcomingDays:'14' });
       const opsJobsEndpoints=endpointPair('/admin/ops/jobs',{ day, days:'45', limit:'250' });
-      const opsExpensesEndpoints=endpointPair('/admin/ops/expenses',{ day, days:'90', limit:'250' });
       const opsPayrollEndpoints=endpointPair('/admin/ops/payroll/weekly');
+      const opsPayrollHistoryEndpoints=endpointPair('/admin/ops/payroll/weekly/history',{ limit:'24' });
       const workersEndpoints=endpointPair('/admin/ops/workers');
       const workersDashboardEndpoints=endpointPair('/admin/ops/workers/dashboard',{ day, days:'30', limit:'120' });
       const compPlansEndpoints=endpointPair('/admin/ops/comp-plans');
 
-      const [analyticsRes, fieldRes, repsRes, bookingsRes, mapRes, opsOverviewRes, opsJobsRes, opsExpensesRes, opsPayrollRes, workersRes, workersDashboardRes, compPlansRes]=await Promise.all([
+      const [analyticsRes, fieldRes, repsRes, bookingsRes, mapRes, opsOverviewRes, opsJobsRes, opsPayrollRes, opsPayrollHistoryRes, workersRes, workersDashboardRes, compPlansRes]=await Promise.all([
         fetchJsonWithFallback(endpoints, token),
         fetchJsonWithFallback(fieldEndpoints, token),
         fetchJsonWithFallback(fieldRepsEndpoints, token),
@@ -2058,8 +1233,8 @@
         fetchJsonWithFallback(mapEndpoints, token),
         fetchJsonWithFallback(opsOverviewEndpoints, token),
         fetchJsonWithFallback(opsJobsEndpoints, token),
-        fetchJsonWithFallback(opsExpensesEndpoints, token),
         fetchJsonWithFallback(opsPayrollEndpoints, token),
+        fetchJsonWithFallback(opsPayrollHistoryEndpoints, token),
         fetchJsonWithFallback(workersEndpoints, token),
         fetchJsonWithFallback(workersDashboardEndpoints, token),
         fetchJsonWithFallback(compPlansEndpoints, token)
@@ -2067,22 +1242,11 @@
 
       if(
         analyticsRes.authExpired||fieldRes.authExpired||repsRes.authExpired||bookingsRes.authExpired||mapRes.authExpired
-        ||opsOverviewRes.authExpired||opsJobsRes.authExpired||opsExpensesRes.authExpired||opsPayrollRes.authExpired||workersRes.authExpired||workersDashboardRes.authExpired||compPlansRes.authExpired
+        ||opsOverviewRes.authExpired||opsJobsRes.authExpired||opsPayrollRes.authExpired||opsPayrollHistoryRes.authExpired||workersRes.authExpired||workersDashboardRes.authExpired||compPlansRes.authExpired
       ){
         try{ sessionStorage.removeItem(TOKEN_KEY); }catch(_e){}
         redirectToSignIn('session-expired');
         return;
-      }
-
-      // Map endpoint errors are shown independently so the rest of the dashboard still loads
-      if(mapRes && mapRes.error){
-        console.warn('Map fetch error', mapRes.error);
-        setFieldMapStatus(`Map error: ${mapRes.error}`, true);
-      } else if(mapRes && mapRes.data){
-        const cnt = Array.isArray(mapRes.data.items) ? mapRes.data.items.length : (Array.isArray(mapRes.data.leads) ? mapRes.data.leads.length : 0);
-        setFieldMapStatus(cnt?`Loaded ${cnt} events`:'No events in window', false);
-      } else {
-        setFieldMapStatus('No map data', false);
       }
 
       const analyticsFallback={
@@ -2092,26 +1256,26 @@
       };
       const analyticsData=(analyticsRes && analyticsRes.data && typeof analyticsRes.data==='object') ? analyticsRes.data : analyticsFallback;
       render(analyticsData, day, Number(days));
-      renderFieldSales(fieldRes.data || null);
-      renderFieldBookings(bookingsRes.data || null, bookingsRes.error || '');
       renderOpsOverview(opsOverviewRes.data || null, opsOverviewRes.error || '');
       renderOpsWorkers(workersRes.data || null, workersRes.error || '');
       renderOpsWorkersDashboard(workersDashboardRes.data || null, workersDashboardRes.error || '');
+      const payrollHistoryIsOptionalMissing=isNotDeployed404(opsPayrollHistoryRes.error);
+      const payrollHistoryErrorForDashboard=payrollHistoryIsOptionalMissing?'':(opsPayrollHistoryRes.error||'');
+
       renderOpsWeeklyPayroll(opsPayrollRes.data || null, opsPayrollRes.error || '');
+      renderOpsPayrollHistory(opsPayrollHistoryRes.data || null, opsPayrollHistoryRes.error || '');
       renderOpsCompPlans(compPlansRes.data || null, compPlansRes.error || '', repsRes.data || null);
+      renderFieldBookings(bookingsRes.data || null, bookingsRes.error || '');
       renderOpsJobs(opsJobsRes.data || null, opsJobsRes.error || '');
-      renderOpsExpenses(opsExpensesRes.data || null, opsExpensesRes.error || '');
       renderFieldActionQueue(fieldRes.data || null, bookingsRes.data || null, mapRes.data || null);
-      // Render authoritative map events for admin (no sample data fallback)
-      try{ updateFieldMap(mapRes.data || null); }catch(_e){ console.warn('Map render failed', _e); }
       const opsErrors=[
         fieldRes.error,
         repsRes.error,
         bookingsRes.error,
         opsOverviewRes.error,
         opsJobsRes.error,
-        opsExpensesRes.error,
         opsPayrollRes.error,
+        payrollHistoryErrorForDashboard,
         workersRes.error,
         workersDashboardRes.error,
         compPlansRes.error
@@ -2139,26 +1303,6 @@
     tb.innerHTML=rows.map(r=>`<tr><td>${escapeHtml(r.key||'')}</td><td>${fmtNum(r.count||0)}</td></tr>`).join('');
   }
 
-  function renderTrend(rows){
-    const tb=document.getElementById('tbl-trend');
-    if(!tb) return;
-    if(!rows||!rows.length){
-      tb.innerHTML='<tr><td colspan="6">No trend data yet</td></tr>';
-      return;
-    }
-    tb.innerHTML=rows.map(r=>{
-      const rate=(r.submits||0)>0?((r.confirmed||0)/(r.submits||1)*100):0;
-      return `<tr>
-        <td>${escapeHtml(r.date||'')}</td>
-        <td>${fmtNum(r.pageViews||0)}</td>
-        <td>${fmtNum(r.ctaClicks||0)}</td>
-        <td>${fmtNum(r.submits||0)}</td>
-        <td>${fmtNum(r.confirmed||0)}</td>
-        <td>${rate.toFixed(1)}%</td>
-      </tr>`;
-    }).join('');
-  }
-
   function renderReliabilityTrend(rows){
     const tb=document.getElementById('tbl-reliability-trend');
     if(!tb) return;
@@ -2175,142 +1319,6 @@
         <td>${rate.toFixed(1)}%</td>
       </tr>`;
     }).join('');
-  }
-
-  function renderFieldSales(data){
-    if(!data||typeof data!=='object'){
-      setText('fs-doors',0);
-      setText('fs-interested',0);
-      setText('fs-interest-rate','0%');
-      setText('fs-ondoor',0);
-      setText('fs-attrib',0);
-      setText('fs-pay-eligible',0);
-      setText('fs-overdue',0);
-      renderFieldRepRows([]);
-      renderFieldTrendRows([]);
-      renderFieldRepLadder([]);
-      return;
-    }
-
-    const s=data.summary||{};
-    setText('fs-doors',fmtNum(s.doors||0));
-    setText('fs-interested',fmtNum(s.interested||0));
-    setText('fs-interest-rate',`${Number(s.interestRate||0).toFixed(1)}%`);
-    setText('fs-ondoor',fmtNum(s.onDoorBooked||0));
-    setText('fs-attrib',fmtNum(s.attributedBookings||0));
-    setText('fs-pay-eligible',fmtNum(s.payEligibleSales||0));
-    setText('fs-overdue',fmtNum(s.overdueFollowups||0));
-
-    renderFieldRepRows(Array.isArray(data.topReps)?data.topReps:[]);
-    renderFieldTrendRows(Array.isArray(data.trend)?data.trend:[]);
-    renderFieldRepLadder(Array.isArray(data.topReps)?data.topReps:[]);
-  }
-
-  function renderFieldRepRows(rows){
-    const tb=document.getElementById('tbl-field-reps');
-    if(!tb) return;
-    if(!rows.length){
-      tb.innerHTML='<tr><td colspan="6">No field rep data yet</td></tr>';
-      return;
-    }
-    tb.innerHTML=rows.map((r)=>`<tr>
-      <td>${escapeHtml(r.displayName||r.id||'Rep')}</td>
-      <td>${fmtNum(r.doors||0)}</td>
-      <td>${fmtNum(r.interested||0)}</td>
-      <td>${fmtNum(r.attributedBookings||0)}</td>
-      <td>${fmtNum(r.payEligibleSales||0)}</td>
-      <td>${Number(r.interestRate||0).toFixed(1)}%</td>
-    </tr>`).join('');
-  }
-
-  function renderFieldTrendRows(rows){
-    const tb=document.getElementById('tbl-field-trend');
-    if(!tb) return;
-    if(!rows.length){
-      tb.innerHTML='<tr><td colspan="5">No field trend data yet</td></tr>';
-      return;
-    }
-    tb.innerHTML=rows.map((r)=>`<tr>
-      <td>${escapeHtml(r.date||'')}</td>
-      <td>${fmtNum(r.doors||0)}</td>
-      <td>${fmtNum(r.onDoorBooked||0)}</td>
-      <td>${fmtNum(r.attributedBookings||0)}</td>
-      <td>${fmtNum(r.payableSales||0)}</td>
-    </tr>`).join('');
-  }
-
-  function signalPill(tone,label){
-    const safeTone=['good','warn','bad','watch'].includes(String(tone||''))?String(tone):'watch';
-    return `<span class="signal-pill ${safeTone}">${escapeHtml(label||'Watch')}</span>`;
-  }
-
-  function repSignalForRow(rep){
-    const doors=Number(rep&&rep.doors||0);
-    const interested=Number(rep&&rep.interested||0);
-    const attributed=Number(rep&&rep.attributedBookings||0);
-    const payEligible=Number(rep&&rep.payEligibleSales||0);
-    const interestRate=pct(interested,doors);
-    const bookingRate=pct(attributed,doors);
-    const captureRate=pct(payEligible,attributed);
-
-    if(doors>=20 && interestRate<8) return { tone:'bad', label:'Coach' };
-    if(attributed>=3 && captureRate<65) return { tone:'warn', label:'Settle Faster' };
-    if(doors>=10 && bookingRate>=8 && captureRate>=80) return { tone:'good', label:'Strong' };
-    return { tone:'watch', label:'Watch' };
-  }
-
-  function renderFieldRepLadder(rows){
-    const tb=document.getElementById('tbl-field-rep-ladder');
-    const status=document.getElementById('fs-rep-ladder-status');
-    if(!tb) return;
-
-    const reps=Array.isArray(rows)?rows:[];
-    if(!reps.length){
-      tb.innerHTML='<tr><td colspan="6">No rep ladder data in this window.</td></tr>';
-      if(status) status.textContent='No rep conversion quality signals available yet.';
-      return;
-    }
-
-    let strong=0;
-    let coach=0;
-    let settle=0;
-    const normalized=reps.map((rep)=>{
-      const doors=Number(rep&&rep.doors||0);
-      const interested=Number(rep&&rep.interested||0);
-      const attributed=Number(rep&&rep.attributedBookings||0);
-      const payEligible=Number(rep&&rep.payEligibleSales||0);
-      const interestRate=pct(interested,doors);
-      const bookingRate=pct(attributed,doors);
-      const captureRate=pct(payEligible,attributed);
-      const signal=repSignalForRow(rep);
-      if(signal.label==='Strong') strong += 1;
-      if(signal.label==='Coach') coach += 1;
-      if(signal.label==='Settle Faster') settle += 1;
-      return {
-        name:String(rep&&rep.displayName||rep&&rep.id||'Rep').trim() || 'Rep',
-        doors,
-        interestRate,
-        bookingRate,
-        captureRate,
-        signal
-      };
-    }).sort((a,b)=>{
-      if(b.bookingRate!==a.bookingRate) return b.bookingRate-a.bookingRate;
-      return b.doors-a.doors;
-    });
-
-    tb.innerHTML=normalized.map((row)=>`<tr>
-      <td>${escapeHtml(row.name)}</td>
-      <td>${fmtNum(row.doors)}</td>
-      <td>${row.interestRate.toFixed(1)}%</td>
-      <td>${row.bookingRate.toFixed(1)}%</td>
-      <td>${row.captureRate.toFixed(1)}%</td>
-      <td>${signalPill(row.signal.tone,row.signal.label)}</td>
-    </tr>`).join('');
-
-    if(status){
-      status.textContent=`Strong reps: ${fmtNum(strong)} · Coaching needed: ${fmtNum(coach)} · Settlement follow-up: ${fmtNum(settle)}.`;
-    }
   }
 
   function priorityPill(priority){
@@ -2344,89 +1352,6 @@
     if(p==='high') return 3;
     if(p==='medium') return 2;
     return 1;
-  }
-
-  function itemAgeHours(sortTs){
-    const ts=Number(sortTs||0);
-    if(!Number.isFinite(ts)||ts<=0) return -1;
-    return Math.max(0,Math.floor((Date.now()-ts)/(60*60*1000)));
-  }
-
-  function itemAgeLabel(sortTs){
-    const hours=itemAgeHours(sortTs);
-    if(hours<0) return 'No due time';
-    if(hours<24) return `${hours}h`;
-    const days=Math.floor(hours/24);
-    if(days<14) return `${days}d`;
-    return `${(days/7).toFixed(1)}w`;
-  }
-
-  function renderFieldSlaAging(queue){
-    const items=Array.isArray(queue)?queue:[];
-    let past24=0;
-    let past72=0;
-    let past7d=0;
-    let noDue=0;
-    items.forEach((item)=>{
-      const ageHours=itemAgeHours(item&&item.sortTs||0);
-      if(ageHours<0){
-        noDue += 1;
-        return;
-      }
-      if(ageHours>=24) past24 += 1;
-      if(ageHours>=72) past72 += 1;
-      if(ageHours>=168) past7d += 1;
-    });
-    setText('fs-sla-24h',fmtNum(past24));
-    setText('fs-sla-72h',fmtNum(past72));
-    setText('fs-sla-7d',fmtNum(past7d));
-    setText('fs-sla-nodue',fmtNum(noDue));
-  }
-
-  function renderFieldOwnerWorkload(queue){
-    const tb=document.getElementById('tbl-field-owner-workload');
-    const status=document.getElementById('fs-owner-status');
-    if(!tb) return;
-
-    const items=Array.isArray(queue)?queue:[];
-    if(!items.length){
-      tb.innerHTML='<tr><td colspan="5">No owner workload items in this window.</td></tr>';
-      if(status) status.textContent='No active workload to balance.';
-      return;
-    }
-
-    const byOwner={};
-    items.forEach((item)=>{
-      const owner=String(item&&item.owner||'Unassigned').trim() || 'Unassigned';
-      const key=owner.toLowerCase();
-      if(!byOwner[key]) byOwner[key]={ owner, total:0, critical:0, high:0, oldestTs:0 };
-      const row=byOwner[key];
-      row.total += 1;
-      const priority=String(item&&item.priority||'').trim();
-      if(priority==='critical') row.critical += 1;
-      if(priority==='high') row.high += 1;
-      const ts=Number(item&&item.sortTs||0);
-      if(ts>0 && (!row.oldestTs || ts<row.oldestTs)) row.oldestTs=ts;
-    });
-
-    const rows=Object.values(byOwner).sort((a,b)=>{
-      if(b.critical!==a.critical) return b.critical-a.critical;
-      if(b.high!==a.high) return b.high-a.high;
-      return b.total-a.total;
-    });
-
-    tb.innerHTML=rows.map((row)=>`<tr>
-      <td>${escapeHtml(row.owner)}</td>
-      <td>${fmtNum(row.total)}</td>
-      <td>${fmtNum(row.critical)}</td>
-      <td>${fmtNum(row.high)}</td>
-      <td>${escapeHtml(itemAgeLabel(row.oldestTs||0))}</td>
-    </tr>`).join('');
-
-    if(status){
-      const heavy=rows[0];
-      status.textContent=`${fmtNum(rows.length)} owner(s) with active queue. Highest load: ${heavy?`${heavy.owner} (${fmtNum(heavy.total)} item${heavy.total===1?'':'s'})`:'none'}.`;
-    }
   }
 
   function mapQueueLeadFromEvent(item){
@@ -2539,17 +1464,6 @@
     if(!tb) return;
 
     const queue=buildFieldActionQueue(fieldData, bookingsData, mapData);
-    const critical=queue.filter((it)=>it.priority==='critical').length;
-    const overdue=queue.filter((it)=>String(it.issue).toLowerCase().includes('overdue')).length;
-    const unpaid=queue.filter((it)=>String(it.issue).toLowerCase().includes('not marked paid')).length;
-    const coaching=queue.filter((it)=>String(it.issue).toLowerCase().includes('low interest conversion')).length;
-
-    setText('fs-queue-critical',fmtNum(critical));
-    setText('fs-queue-overdue',fmtNum(overdue));
-    setText('fs-queue-unpaid',fmtNum(unpaid));
-    setText('fs-queue-coaching',fmtNum(coaching));
-    renderFieldSlaAging(queue);
-    renderFieldOwnerWorkload(queue);
 
     if(!queue.length){
       tb.innerHTML='<tr><td colspan="5">No active sales exceptions. Pipeline is clear in this window.</td></tr>';
@@ -2576,33 +1490,32 @@
     fieldBookingsStatus.style.color=isErr?'#ff7b7b':'var(--tx2)';
   }
 
-  function setFieldMapStatus(msg,isErr){
-    const el=document.getElementById('field-map-status');
-    if(!el) return;
-    el.textContent = msg || '';
-    el.style.color = isErr ? '#ff7b7b' : 'var(--tx2)';
+  function formatBookingStatusLabel(value){
+    const key=String(value||'').trim().toLowerCase();
+    if(!key) return 'Unknown';
+    return key.replaceAll('_',' ');
   }
 
-  function bookingServiceStatusOptions(selected){
-    const current=String(selected||'').trim().toLowerCase();
-    const options=[
-      ['scheduled','Scheduled'],
-      ['completed','Completed'],
-      ['no_show','No Show'],
-      ['cancelled','Cancelled']
-    ];
-    return options.map(([value,label])=>`<option value="${value}"${value===current?' selected':''}>${label}</option>`).join('');
-  }
+  function repPayoutCentsForBooking(item){
+    const repId=String(item&&item.repId||'').trim();
+    const paymentStatus=String(item&&item.paymentStatus||'').trim().toLowerCase();
+    if(paymentStatus!=='paid') return 0;
 
-  function bookingPaymentStatusOptions(selected){
-    const current=String(selected||'').trim().toLowerCase();
-    const options=[
-      ['unpaid','Unpaid'],
-      ['paid','Paid'],
-      ['refunded','Refunded'],
-      ['disputed','Disputed']
-    ];
-    return options.map(([value,label])=>`<option value="${value}"${value===current?' selected':''}>${label}</option>`).join('');
+    const plan=opsCompPlansByRep[repId];
+    if(!plan || !plan.active) return 0;
+
+    const model=String(plan.model||'').trim().toLowerCase();
+    if(model==='flat_per_completed_job'){
+      return Math.max(0,Math.round(Number(plan.flatAmountCents||0)));
+    }
+
+    if(model==='percent_of_job_income'){
+      const basisPoints=Math.max(0,Number(plan.percentBasisPoints||0));
+      const paidCents=Math.max(0,Math.round(Number(item&&item.paidAmountCents||0)));
+      return Math.round((paidCents*basisPoints)/10000);
+    }
+
+    return 0;
   }
 
   function renderFieldBookings(data,errorMessage){
@@ -2610,7 +1523,7 @@
     if(!tb) return;
 
     if(errorMessage){
-      tb.innerHTML='<tr><td colspan="9">Could not load booking settlement data.</td></tr>';
+      tb.innerHTML='<tr><td colspan="7">Could not load booking settlement data.</td></tr>';
       setFieldBookingsStatus(errorMessage,true);
       return;
     }
@@ -2618,89 +1531,44 @@
     const items=Array.isArray(data&&data.items)?data.items:[];
     const summary=(data&&data.summary&&typeof data.summary==='object')?data.summary:{};
     if(!items.length){
-      tb.innerHTML='<tr><td colspan="9">No bookings found in selected window.</td></tr>';
+      tb.innerHTML='<tr><td colspan="7">No bookings found in selected window.</td></tr>';
       setFieldBookingsStatus('No bookings in this window yet.',false);
       return;
     }
 
-    const quotedTotalCents=items.reduce((acc,item)=>acc+Math.max(0,Number(item&&item.quotedPriceCents||0)),0);
+    let payoutEligibleCount=0;
+    let payoutTotalCents=0;
 
     tb.innerHTML=items.map((item)=>{
-      const id=String(item.id||'');
       const dateLabel=item.startAt?new Date(item.startAt).toLocaleString('en-US'):'-';
       const client=[item.leadName||'Client', item.leadPhone||item.leadEmail||''].filter(Boolean).join(' · ');
-      const paidDollars=Number(item.paidAmountCents||0)/100;
-      const quotedCents=Math.max(0,Number(item.quotedPriceCents||0));
-      const quotedLabel=quotedCents>0?fmtMoneyCents(quotedCents):'-';
+      const paymentStatus=String(item&&item.paymentStatus||'unpaid').trim().toLowerCase();
+      const paidCents=Math.max(0,Number(item.paidAmountCents||0));
+      const paidDollars=paidCents/100;
+      const payoutCents=repPayoutCentsForBooking(item);
+      if(paymentStatus==='paid') payoutEligibleCount += 1;
+      payoutTotalCents += payoutCents;
       return `<tr>
         <td>${escapeHtml(dateLabel)}</td>
         <td>${escapeHtml(item.repName||item.repId||'Rep')}</td>
         <td>${escapeHtml(client)}</td>
         <td>${escapeHtml(String(item.eventTypeSlug||'').replaceAll('-',' '))}</td>
-        <td>${escapeHtml(quotedLabel)}</td>
-        <td><select class="sel fs-booking-service-status" data-booking-id="${escapeHtml(id)}">${bookingServiceStatusOptions(item.serviceStatus)}</select></td>
-        <td><select class="sel fs-booking-payment-status" data-booking-id="${escapeHtml(id)}">${bookingPaymentStatusOptions(item.paymentStatus)}</select></td>
-        <td><input class="inp fs-booking-paid-amount" data-booking-id="${escapeHtml(id)}" type="number" min="0" step="0.01" value="${Number.isFinite(paidDollars)?paidDollars.toFixed(2):'0.00'}"/></td>
-        <td><button class="button outline fs-booking-save" type="button" data-booking-id="${escapeHtml(id)}">Save</button></td>
+        <td>${opsPill(formatBookingStatusLabel(paymentStatus))}</td>
+        <td>${escapeHtml(Number.isFinite(paidDollars)?paidDollars.toFixed(2):'0.00')}</td>
+        <td>${escapeHtml((payoutCents/100).toFixed(2))}</td>
       </tr>`;
     }).join('');
 
     setFieldBookingsStatus(
-      `Loaded ${fmtNum(summary.total||items.length)} bookings. Quoted: ${fmtMoneyCents(quotedTotalCents)} · Completed: ${fmtNum(summary.completed||0)} · Paid: ${fmtNum(summary.paid||0)} · Pay-Eligible: ${fmtNum(summary.payEligible||0)}.`,
+      `Loaded ${fmtNum(summary.total||items.length)} bookings from worker tracking sync. Paid: ${fmtNum(summary.paid||0)} · Eligible: ${fmtNum(payoutEligibleCount)} · Rep payout total: ${fmtMoneyCents(payoutTotalCents)}.`,
       false
     );
   }
 
-  async function saveFieldBookingLifecycle(bookingId){
-    const id=String(bookingId||'').trim();
-    if(!id) return;
-
-    const token=getToken();
-    if(!token){
-      redirectToSignIn('auth-required');
-      return;
-    }
-
-    const serviceSel=document.querySelector(`.fs-booking-service-status[data-booking-id="${id}"]`);
-    const paymentSel=document.querySelector(`.fs-booking-payment-status[data-booking-id="${id}"]`);
-    const paidInput=document.querySelector(`.fs-booking-paid-amount[data-booking-id="${id}"]`);
-    const saveBtn=document.querySelector(`.fs-booking-save[data-booking-id="${id}"]`);
-    if(!serviceSel||!paymentSel||!paidInput||!saveBtn) return;
-
-    const paidRaw=Number(paidInput.value||0);
-    const paidAmountCents=Number.isFinite(paidRaw)&&paidRaw>0?Math.round(paidRaw*100):0;
-    const body={
-      serviceStatus:String(serviceSel.value||'scheduled'),
-      paymentStatus:String(paymentSel.value||'unpaid'),
-      paidAmountCents
-    };
-
-    saveBtn.disabled=true;
-    setFieldBookingsStatus('Saving booking lifecycle update...',false);
-    try{
-      const endpoints=endpointPair(`/admin/field/bookings/${encodeURIComponent(id)}`);
-      const res=await patchJsonWithFallback(endpoints, token, body);
-      if(res.authExpired){
-        try{ sessionStorage.removeItem(TOKEN_KEY); }catch(_e){}
-        redirectToSignIn('session-expired');
-        return;
-      }
-      if(res.error){
-        setFieldBookingsStatus(res.error,true);
-        return;
-      }
-      setFieldBookingsStatus('Booking lifecycle updated.',false);
-      await fetchAnalytics();
-    }catch(err){
-      setFieldBookingsStatus(String(err&&err.message?err.message:'Update failed'),true);
-    } finally {
-      saveBtn.disabled=false;
-    }
-  }
-
-  function opsPill(value){
-    const key=String(value||'').trim().toLowerCase() || 'unknown';
-    return `<span class="ops-pill ${escapeHtml(key)}">${escapeHtml(key.replaceAll('_',' '))}</span>`;
+  function opsPill(value,labelText){
+    const safeKey=String(value||'unknown').trim().toLowerCase() || 'unknown';
+    const label=String(labelText||safeKey).trim() || 'unknown';
+    return `<span class="ops-pill ${escapeHtml(safeKey)}">${escapeHtml(label.replaceAll('_',' '))}</span>`;
   }
 
   function renderOpsOverview(data,errorMessage){
@@ -2744,9 +1612,6 @@
     if(errorMessage){
       tb.innerHTML='<tr><td class="ops-empty-row" colspan="6">Could not load jobs.</td></tr>';
       setOpsJobsStatus(errorMessage,true);
-      renderOpsTrackingSummary([]);
-      renderOpsSlaAging([]);
-      renderOpsOwnershipDrilldown([]);
       renderOpsProfitRiskQueue([]);
       return;
     }
@@ -2759,9 +1624,6 @@
       if(opsJobsById[key]) acc[key]=opsJobWorkerSelections[key];
       return acc;
     },{});
-    renderOpsTrackingSummary(items);
-    renderOpsSlaAging(items);
-    renderOpsOwnershipDrilldown(items);
     renderOpsProfitRiskQueue(items);
 
     const visibleItems=items.filter((job)=>isJobVisibleByFilters(job));
@@ -2879,53 +1741,28 @@
 
   function renderOpsWorkersDashboard(data,errorMessage){
     const workersBody=document.getElementById('tbl-ops-workers-dashboard');
-    const sessionsBody=document.getElementById('tbl-ops-worker-sessions');
-    const financeBody=document.getElementById('tbl-ops-worker-finance');
-    const photosBody=document.getElementById('tbl-ops-worker-photos');
-    const alertsBody=document.getElementById('tbl-ops-worker-alerts');
-    const utilizationBody=document.getElementById('tbl-ops-worker-utilization');
-    const trendBody=document.getElementById('tbl-ops-worker-daily-trend');
-    const trendStatus=document.getElementById('ops-workers-trend-status');
-    if(!workersBody||!sessionsBody||!financeBody||!photosBody||!alertsBody||!utilizationBody||!trendBody||!trendStatus) return;
+    if(!workersBody) return;
 
     const setSummary=(summary)=>{
-      setText('ops-workers-dash-total', fmtNum(summary.totalWorkers||0));
       setText('ops-workers-dash-active', fmtNum(summary.activeWorkers||0));
-      setText('ops-workers-dash-login', fmtNum(summary.workersWithLogin||0));
-      setText('ops-workers-dash-sessions', fmtNum(summary.activeSessions||0));
       setText('ops-workers-dash-hours', fmtHoursFromMinutes(summary.minutesWorked||0));
       setText('ops-workers-dash-labor', fmtMoneyCents(summary.laborCostCents||0));
-      setText('ops-workers-dash-expense', fmtMoneyCents(summary.expenseCents||0));
-      setText('ops-workers-dash-income', fmtMoneyCents(summary.incomeCents||0));
-      setText('ops-workers-dash-photos', fmtNum(summary.photoCount||0));
     };
 
     if(errorMessage){
       setSummary({});
-      workersBody.innerHTML='<tr><td colspan="9">Could not load worker dashboard.</td></tr>';
-      sessionsBody.innerHTML='<tr><td colspan="4">Could not load session data.</td></tr>';
-      financeBody.innerHTML='<tr><td colspan="5">Could not load finance data.</td></tr>';
-      photosBody.innerHTML='<tr><td colspan="5">Could not load photos.</td></tr>';
-      alertsBody.innerHTML='<tr><td colspan="4">Could not load worker alerts.</td></tr>';
-      utilizationBody.innerHTML='<tr><td colspan="5">Could not load utilization data.</td></tr>';
-      trendBody.innerHTML='<tr><td colspan="6">Could not load worker trend.</td></tr>';
-      trendStatus.textContent='Worker trend is unavailable while dashboard data is failing to load.';
-      renderOpsWorkerDeltaBoard(null);
+      workersBody.innerHTML='<tr><td colspan="6">Could not load worker dashboard.</td></tr>';
       setOpsWorkersDashboardStatus(errorMessage,true);
       return;
     }
 
     const summary=(data&&data.summary&&typeof data.summary==='object')?data.summary:{};
     const workers=Array.isArray(data&&data.workers)?data.workers:[];
-    const recentSessions=Array.isArray(data&&data.recentSessions)?data.recentSessions:[];
-    const recentFinance=Array.isArray(data&&data.recentFinance)?data.recentFinance:[];
-    const recentPhotos=Array.isArray(data&&data.recentPhotos)?data.recentPhotos:[];
-    renderOpsWorkerDailyTrend(recentSessions,recentFinance,recentPhotos);
 
     setSummary(summary);
 
     if(!workers.length){
-      workersBody.innerHTML='<tr><td colspan="9">No workers in dashboard window.</td></tr>';
+      workersBody.innerHTML='<tr><td colspan="6">No workers in dashboard window.</td></tr>';
     } else {
       workersBody.innerHTML=workers.map((it)=>`<tr>
         <td>${escapeHtml(it.fullName||it.id||'Worker')}</td>
@@ -2934,123 +1771,11 @@
         <td>${fmtNum(it.activeSessions||0)}</td>
         <td>${fmtHoursFromMinutes(it.minutesWorked||0)} hrs</td>
         <td>${fmtMoneyCents(it.laborCostCents||0)}</td>
-        <td>${fmtMoneyCents(it.expenseCents||0)}</td>
-        <td>${fmtMoneyCents(it.incomeCents||0)}</td>
-        <td>${fmtNum(it.photoCount||0)}</td>
       </tr>`).join('');
     }
 
-    if(!recentSessions.length){
-      sessionsBody.innerHTML='<tr><td colspan="4">No session logs in this window.</td></tr>';
-    } else {
-      sessionsBody.innerHTML=recentSessions.map((it)=>{
-        const when=it.endedAt||it.startedAt;
-        const whenLabel=when?new Date(when).toLocaleString('en-US'):'-';
-        const jobLabel=[it.serviceName||'',it.customerName||''].filter(Boolean).join(' · ')||it.jobId||'-';
-        return `<tr>
-          <td>${escapeHtml(whenLabel)}</td>
-          <td>${escapeHtml(it.workerName||it.workerId||'Worker')}</td>
-          <td>${escapeHtml(jobLabel)}</td>
-          <td>${fmtNum(it.minutesWorked||0)}</td>
-        </tr>`;
-      }).join('');
-    }
-
-    if(!recentFinance.length){
-      financeBody.innerHTML='<tr><td colspan="5">No finance entries in this window.</td></tr>';
-    } else {
-      financeBody.innerHTML=recentFinance.map((it)=>{
-        const kind=String(it.entryType||'').replaceAll('_',' ');
-        const jobLabel=[it.serviceName||'',it.customerName||''].filter(Boolean).join(' · ')||it.jobId||'-';
-        return `<tr>
-          <td>${escapeHtml(it.expenseDate||'-')}</td>
-          <td>${escapeHtml(it.workerName||it.workerId||'Worker')}</td>
-          <td>${escapeHtml(kind||'entry')}</td>
-          <td>${fmtMoneyCents(it.amountCents||0)}</td>
-          <td>${escapeHtml(jobLabel)}</td>
-        </tr>`;
-      }).join('');
-    }
-
-    if(!recentPhotos.length){
-      photosBody.innerHTML='<tr><td colspan="5">No photo uploads in this window.</td></tr>';
-    } else {
-      photosBody.innerHTML=recentPhotos.map((it)=>{
-        const createdAt=it.createdAt?new Date(it.createdAt).toLocaleString('en-US'):'-';
-        const jobLabel=[it.serviceName||'',it.customerName||''].filter(Boolean).join(' · ')||it.jobId||'-';
-        const typeLabel=String(it.photoType||'').replaceAll('_',' ');
-        const preview=it.imageDataUrl
-          ? `<img src="${escapeHtml(it.imageDataUrl)}" alt="${escapeHtml(typeLabel||'worker photo')}" style="width:52px;height:52px;object-fit:cover;border-radius:8px;border:1px solid var(--bdr)"/>`
-          : '<span class="mini-note">No image</span>';
-        return `<tr>
-          <td>${escapeHtml(createdAt)}</td>
-          <td>${escapeHtml(it.workerName||it.workerId||'Worker')}</td>
-          <td>${escapeHtml(jobLabel)}</td>
-          <td>${escapeHtml(typeLabel||'photo')}</td>
-          <td>${preview}</td>
-        </tr>`;
-      }).join('');
-    }
-
-    let alertCount=0;
-    if(!workers.length){
-      alertsBody.innerHTML='<tr><td colspan="4">No worker alerts in this window.</td></tr>';
-      utilizationBody.innerHTML='<tr><td colspan="5">No worker utilization data in this window.</td></tr>';
-    } else {
-      const alerts=[];
-      workers.forEach((worker)=>{
-        const name=String(worker&&worker.fullName||worker&&worker.id||'Worker').trim() || 'Worker';
-        const jobsTaken=Number(worker&&worker.jobsTaken||0);
-        const minutesWorked=Number(worker&&worker.minutesWorked||0);
-        const incomeCents=Number(worker&&worker.incomeCents||0);
-        const expenseCents=Number(worker&&worker.expenseCents||0);
-        const photos=Number(worker&&worker.photoCount||0);
-        if(!worker.hasPin){
-          alerts.push({ priority:'critical', worker:name, issue:'Missing login PIN', action:'Set a worker PIN so assignments can be accepted.' });
-        }
-        if(jobsTaken>0 && photos===0){
-          alerts.push({ priority:'high', worker:name, issue:'No before/after photos logged', action:'Require photo capture at start and completion.' });
-        }
-        if(incomeCents>0 && expenseCents>incomeCents){
-          alerts.push({ priority:'high', worker:name, issue:'Expense total exceeds logged income', action:'Audit receipts and validate charge coding.' });
-        }
-        if(jobsTaken===0 && minutesWorked===0){
-          alerts.push({ priority:'medium', worker:name, issue:'No activity in selected window', action:'Confirm schedule, availability, and assignment routing.' });
-        }
-      });
-
-      alerts.sort((a,b)=>fieldQueuePriorityRank(b.priority)-fieldQueuePriorityRank(a.priority));
-      alertCount=alerts.length;
-      if(!alerts.length){
-        alertsBody.innerHTML='<tr><td colspan="4">No worker alerts. Team is operating within expected thresholds.</td></tr>';
-      } else {
-        alertsBody.innerHTML=alerts.slice(0,16).map((row)=>`<tr>
-          <td>${priorityPill(row.priority)}</td>
-          <td>${escapeHtml(row.worker)}</td>
-          <td>${escapeHtml(row.issue)}</td>
-          <td>${escapeHtml(row.action)}</td>
-        </tr>`).join('');
-      }
-
-      utilizationBody.innerHTML=workers.map((worker)=>{
-        const jobsTaken=Number(worker&&worker.jobsTaken||0);
-        const hoursWorked=Number(worker&&worker.minutesWorked||0)/60;
-        const jobsPerHour=hoursWorked>0?(jobsTaken/hoursWorked):0;
-        const incomeCents=Number(worker&&worker.incomeCents||0);
-        const expenseCents=Number(worker&&worker.expenseCents||0);
-        const ratio=incomeCents>0?((expenseCents/incomeCents)*100):0;
-        return `<tr>
-          <td>${escapeHtml(worker&&worker.fullName||worker&&worker.id||'Worker')}</td>
-          <td>${fmtNum(jobsTaken)}</td>
-          <td>${fmtHoursFromMinutes(worker&&worker.minutesWorked||0)}</td>
-          <td>${jobsPerHour.toFixed(2)}</td>
-          <td>${incomeCents>0?`${ratio.toFixed(1)}%`:'n/a'}</td>
-        </tr>`;
-      }).join('');
-    }
-
     setOpsWorkersDashboardStatus(
-      `Loaded ${fmtNum(workers.length)} workers, ${fmtNum(recentSessions.length)} sessions, ${fmtNum(recentFinance.length)} finance entries, ${fmtNum(recentPhotos.length)} photos, and ${fmtNum(alertCount)} alert(s).`,
+      `Loaded ${fmtNum(workers.length)} worker performance rows.`,
       false
     );
   }
@@ -3058,8 +1783,10 @@
   function renderOpsWeeklyPayroll(data,errorMessage){
     const workersBody=document.getElementById('tbl-ops-payroll-workers');
     const repsBody=document.getElementById('tbl-ops-payroll-reps');
+    const workerProfiles=document.getElementById('ops-payroll-worker-profiles');
+    const repProfiles=document.getElementById('ops-payroll-rep-profiles');
     const weekLabel=document.getElementById('ops-payroll-week-label');
-    if(!workersBody||!repsBody||!weekLabel) return;
+    if(!workersBody||!repsBody||!workerProfiles||!repProfiles||!weekLabel) return;
 
     opsPayrollPayload=data&&typeof data==='object'?data:null;
 
@@ -3068,8 +1795,10 @@
       setText('ops-payroll-reps-accrued',fmtMoneyCents(0));
       setText('ops-payroll-workers-paid',fmtMoneyCents(0));
       setText('ops-payroll-reps-paid',fmtMoneyCents(0));
-      workersBody.innerHTML='<tr><td colspan="4">Could not load worker payroll data.</td></tr>';
-      repsBody.innerHTML='<tr><td colspan="4">Could not load rep payroll data.</td></tr>';
+      workersBody.innerHTML='<tr><td colspan="5">Could not load worker payroll data.</td></tr>';
+      repsBody.innerHTML='<tr><td colspan="5">Could not load rep payroll data.</td></tr>';
+      workerProfiles.innerHTML='<div class="admin-card"><div class="admin-sub">Worker payout profiles are unavailable right now.</div></div>';
+      repProfiles.innerHTML='<div class="admin-card"><div class="admin-sub">Rep payout profiles are unavailable right now.</div></div>';
       setOpsPayrollStatus(errorMessage,true);
       return;
     }
@@ -3088,31 +1817,243 @@
       : 'Current week payroll accruals.';
 
     if(!workers.length){
-      workersBody.innerHTML='<tr><td colspan="4">No worker payroll entries for this week.</td></tr>';
+      workersBody.innerHTML='<tr><td colspan="5">No worker payroll entries for this week.</td></tr>';
+      workerProfiles.innerHTML='<div class="admin-card"><div class="admin-sub">No worker payroll profiles in this week yet.</div></div>';
     }else{
       workersBody.innerHTML=workers.map((row)=>`<tr>
         <td>${escapeHtml(row.workerName||row.workerId||'Worker')}</td>
         <td>${fmtMoneyCents(row.accruedCents||0)}</td>
         <td>${fmtMoneyCents(row.paidCents||0)}</td>
         <td>${fmtMoneyCents(row.totalCents||0)}</td>
+        <td><button class="button outline ops-payroll-worker-close-btn" type="button" data-worker-id="${escapeHtml(row.workerId||'')}" ${(Number(row.accruedCents||0)>0&&row.workerId)?'':'disabled'}>Pay Worker</button></td>
       </tr>`).join('');
+
+      workerProfiles.innerHTML=workers.map((row)=>{
+        const workerId=String(row&&row.workerId||'').trim();
+        const workerName=String(row&&row.workerName||workerId||'Worker').trim()||'Worker';
+        const accrued=Number(row&&row.accruedCents||0);
+        const paid=Number(row&&row.paidCents||0);
+        const total=Number(row&&row.totalCents||0);
+        const entries=Number(row&&row.entries||0);
+        const canPay=accrued>0 && !!workerId;
+        return `<div class="admin-card">
+          <div class="admin-k">${escapeHtml(workerName)}</div>
+          <div class="admin-sub">ID ${escapeHtml(workerId||'N/A')}</div>
+          <div class="admin-sub" style="margin-top:8px">Accrued ${fmtMoneyCents(accrued)}</div>
+          <div class="admin-sub">Paid ${fmtMoneyCents(paid)} · Total ${fmtMoneyCents(total)}</div>
+          <div class="admin-sub">Ledger entries ${fmtNum(entries)}</div>
+          <div class="ops-actions" style="margin-top:8px">
+            <button class="button outline ops-payroll-worker-close-btn" type="button" data-worker-id="${escapeHtml(workerId)}" ${canPay?'':'disabled'}>Mark ${escapeHtml(workerName)} Paid</button>
+          </div>
+        </div>`;
+      }).join('');
     }
 
     if(!reps.length){
-      repsBody.innerHTML='<tr><td colspan="4">No rep payroll entries for this week.</td></tr>';
+      repsBody.innerHTML='<tr><td colspan="5">No rep payroll entries for this week.</td></tr>';
+      repProfiles.innerHTML='<div class="admin-card"><div class="admin-sub">No rep payroll profiles in this week yet.</div></div>';
     }else{
       repsBody.innerHTML=reps.map((row)=>`<tr>
         <td>${escapeHtml(row.repName||row.repId||'Rep')}</td>
         <td>${fmtMoneyCents(row.accruedCents||0)}</td>
         <td>${fmtMoneyCents(row.paidCents||0)}</td>
         <td>${fmtMoneyCents(row.totalCents||0)}</td>
+        <td><button class="button outline ops-payroll-rep-close-btn" type="button" data-rep-id="${escapeHtml(row.repId||'')}" ${(Number(row.accruedCents||0)>0&&row.repId)?'':'disabled'}>Pay Rep</button></td>
       </tr>`).join('');
+
+      repProfiles.innerHTML=reps.map((row)=>{
+        const repId=String(row&&row.repId||'').trim();
+        const repName=String(row&&row.repName||repId||'Rep').trim()||'Rep';
+        const accrued=Number(row&&row.accruedCents||0);
+        const paid=Number(row&&row.paidCents||0);
+        const total=Number(row&&row.totalCents||0);
+        const entries=Number(row&&row.entries||0);
+        const canPay=accrued>0 && !!repId;
+        return `<div class="admin-card">
+          <div class="admin-k">${escapeHtml(repName)}</div>
+          <div class="admin-sub">ID ${escapeHtml(repId||'N/A')}</div>
+          <div class="admin-sub" style="margin-top:8px">Accrued ${fmtMoneyCents(accrued)}</div>
+          <div class="admin-sub">Paid ${fmtMoneyCents(paid)} · Total ${fmtMoneyCents(total)}</div>
+          <div class="admin-sub">Ledger entries ${fmtNum(entries)}</div>
+          <div class="ops-actions" style="margin-top:8px">
+            <button class="button outline ops-payroll-rep-close-btn" type="button" data-rep-id="${escapeHtml(repId)}" ${canPay?'':'disabled'}>Mark ${escapeHtml(repName)} Paid</button>
+          </div>
+        </div>`;
+      }).join('');
     }
 
     setOpsPayrollStatus(
       `Loaded weekly payroll: Workers accrued ${fmtMoneyCents(summary.workerAccruedCents||0)} · Reps accrued ${fmtMoneyCents(summary.repAccruedCents||0)}.`,
       false
     );
+  }
+
+  function renderOpsPayrollHistory(data,errorMessage){
+    const tb=document.getElementById('tbl-ops-payroll-history');
+    if(!tb) return;
+    opsPayrollHistoryItems=[];
+    if(opsPayrollExportCsvBtn) opsPayrollExportCsvBtn.disabled=true;
+
+    if(errorMessage){
+      if(isNotDeployed404(errorMessage)){
+        tb.innerHTML='<tr><td colspan="8">Payout audit history will appear after the latest API deploy.</td></tr>';
+        return;
+      }
+      tb.innerHTML='<tr><td colspan="8">Could not load payout audit history.</td></tr>';
+      return;
+    }
+
+    const items=Array.isArray(data&&data.items)?data.items:[];
+    if(!items.length){
+      tb.innerHTML='<tr><td colspan="8">No payroll payout events logged yet.</td></tr>';
+      return;
+    }
+
+    opsPayrollHistoryItems=items;
+    if(opsPayrollExportCsvBtn) opsPayrollExportCsvBtn.disabled=false;
+
+    tb.innerHTML=items.map((item)=>{
+      const closedAt=item&&item.createdAt?new Date(item.createdAt).toLocaleString('en-US'):'-';
+      const weekStart=String(item&&item.payPeriod||'').trim()||'-';
+      const workerAmountCents=Number(item&&item.workerAmountCents||0);
+      const repAmountCents=Number(item&&item.repAmountCents||0);
+      const workerPaid=fmtMoneyCents(workerAmountCents);
+      const repPaid=fmtMoneyCents(repAmountCents);
+      const closeScope=String(item&&item.closeScope||'weekly').trim()||'weekly';
+      const payeeType=String(item&&item.payeeType||'').trim();
+      const payeeName=String(item&&item.payeeName||'').trim();
+      const payeeId=String(item&&item.payeeId||'').trim();
+      const paidBy=String(item&&item.closedBy||'admin').trim()||'admin';
+      const method=String(item&&item.paymentMethod||'').trim();
+      const paymentReference=String(item&&item.paymentReference||'').trim();
+      const paymentNote=String(item&&item.paymentNote||item&&item.note||'').trim();
+
+      const scopeLabel=closeScope.replaceAll('_',' ');
+      let payeeLabel='Weekly payroll batch';
+      if(payeeType==='worker' || payeeType==='rep'){
+        payeeLabel=payeeName||payeeId||payeeType;
+      }else if(payeeName){
+        payeeLabel=payeeName;
+      }
+
+      let amountLabel=`${workerPaid} worker / ${repPaid} rep`;
+      if(payeeType==='worker') amountLabel=workerPaid;
+      if(payeeType==='rep') amountLabel=repPaid;
+
+      let methodRef='-';
+      if(method||paymentReference){
+        const methodLabel=method?method.toUpperCase():'UNSPECIFIED';
+        methodRef=paymentReference?`${methodLabel} / ${paymentReference}`:methodLabel;
+      }
+
+      return `<tr>
+        <td>${escapeHtml(closedAt)}</td>
+        <td>${escapeHtml(weekStart)}</td>
+        <td>${escapeHtml(scopeLabel)}</td>
+        <td>${escapeHtml(payeeLabel)}</td>
+        <td>${escapeHtml(amountLabel)}</td>
+        <td>${escapeHtml(paidBy)}</td>
+        <td>${escapeHtml(methodRef)}</td>
+        <td>${escapeHtml(paymentNote||'-')}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function csvEscape(value){
+    const s=String(value==null?'':value);
+    if(/[",\n\r]/.test(s)) return `"${s.replaceAll('"','""')}"`;
+    return s;
+  }
+
+  function exportOpsPayrollAuditCsv(){
+    const items=Array.isArray(opsPayrollHistoryItems)?opsPayrollHistoryItems:[];
+    if(!items.length){
+      setOpsPayrollStatus('No payout audit rows available to export yet.',true);
+      return;
+    }
+
+    const headers=[
+      'closed_at_iso',
+      'week_start',
+      'close_scope',
+      'payee_type',
+      'payee_id',
+      'payee_name',
+      'payout_amount_cents',
+      'payout_amount_usd',
+      'worker_amount_cents',
+      'rep_amount_cents',
+      'worker_entries',
+      'rep_entries',
+      'paid_by',
+      'payment_method',
+      'payment_reference',
+      'payment_note',
+      'close_note',
+      'close_log_id'
+    ];
+
+    const lines=[headers.map(csvEscape).join(',')];
+    items.forEach((item)=>{
+      const payeeType=String(item&&item.payeeType||'').trim();
+      const workerAmountCents=Math.round(Number(item&&item.workerAmountCents||0));
+      const repAmountCents=Math.round(Number(item&&item.repAmountCents||0));
+      const payoutAmountCents=payeeType==='worker'
+        ? workerAmountCents
+        : (payeeType==='rep' ? repAmountCents : (workerAmountCents+repAmountCents));
+      const payoutAmountUsd=(payoutAmountCents/100).toFixed(2);
+      const paymentNote=String(item&&item.paymentNote||item&&item.note||'').trim();
+
+      const row=[
+        String(item&&item.createdAt||''),
+        String(item&&item.payPeriod||''),
+        String(item&&item.closeScope||'weekly'),
+        payeeType,
+        String(item&&item.payeeId||''),
+        String(item&&item.payeeName||''),
+        payoutAmountCents,
+        payoutAmountUsd,
+        workerAmountCents,
+        repAmountCents,
+        Number(item&&item.workerEntries||0),
+        Number(item&&item.repEntries||0),
+        String(item&&item.closedBy||''),
+        String(item&&item.paymentMethod||''),
+        String(item&&item.paymentReference||''),
+        paymentNote,
+        String(item&&item.note||''),
+        String(item&&item.id||'')
+      ];
+      lines.push(row.map(csvEscape).join(','));
+    });
+
+    const csv=`${lines.join('\r\n')}\r\n`;
+    const dateStamp=new Date().toISOString().slice(0,10);
+    const filename=`payroll-payout-audit-${dateStamp}.csv`;
+    const blob=new Blob([csv],{ type:'text/csv;charset=utf-8;' });
+    const url=URL.createObjectURL(blob);
+    const link=document.createElement('a');
+    link.href=url;
+    link.download=filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+
+    setOpsPayrollStatus(`Exported ${fmtNum(items.length)} payout audit row(s) to ${filename}.`,false);
+  }
+
+  function getOpsPayrollCloseMeta(){
+    const paidBy=String(document.getElementById('ops-payroll-paid-by')?.value||'').trim();
+    const paymentMethod=String(document.getElementById('ops-payroll-payment-method')?.value||'').trim();
+    const paymentReference=String(document.getElementById('ops-payroll-payment-reference')?.value||'').trim();
+    const paymentNote=String(document.getElementById('ops-payroll-payment-note')?.value||'').trim();
+    const payload={};
+    if(paidBy) payload.paidBy=paidBy;
+    if(paymentMethod) payload.paymentMethod=paymentMethod;
+    if(paymentReference) payload.paymentReference=paymentReference;
+    if(paymentNote) payload.paymentNote=paymentNote;
+    return payload;
   }
 
   async function closeOpsWeeklyPayroll(){
@@ -3123,7 +2064,8 @@
     }
 
     const weekStart=String(opsPayrollPayload&&opsPayrollPayload.weekStart||'').trim();
-    const payload=weekStart?{weekStart}:{ };
+  const closeMeta=getOpsPayrollCloseMeta();
+  const payload=weekStart?{weekStart,...closeMeta}:{...closeMeta};
     if(opsPayrollCloseBtn) opsPayrollCloseBtn.disabled=true;
     setOpsPayrollStatus('Closing weekly payroll...',false);
     try{
@@ -3138,12 +2080,92 @@
         setOpsPayrollStatus(res.error,true);
         return;
       }
-      setOpsPayrollStatus('Weekly payroll marked as paid.',false);
+      const workerPaid=fmtMoneyCents(res&&res.data&&res.data.worker&&res.data.worker.amountCents||0);
+      const repPaid=fmtMoneyCents(res&&res.data&&res.data.reps&&res.data.reps.amountCents||0);
+      setOpsPayrollStatus(`Weekly payroll marked paid. Accrued tallies reset for this week. Closed amounts: Workers ${workerPaid} · Reps ${repPaid}.`,false);
       await fetchAnalytics();
     }catch(err){
       setOpsPayrollStatus(String(err&&err.message?err.message:'Could not close payroll week'),true);
     } finally {
       if(opsPayrollCloseBtn) opsPayrollCloseBtn.disabled=false;
+    }
+  }
+
+  async function closeOpsPayrollWorker(workerId){
+    const token=getToken();
+    if(!token){
+      redirectToSignIn('auth-required');
+      return;
+    }
+
+    const id=String(workerId||'').trim();
+    if(!id){
+      setOpsPayrollStatus('Worker id is required for individual payout.',true);
+      return;
+    }
+
+    const weekStart=String(opsPayrollPayload&&opsPayrollPayload.weekStart||'').trim();
+  const closeMeta=getOpsPayrollCloseMeta();
+  const payload=weekStart?{weekStart,...closeMeta}:{...closeMeta};
+    setOpsPayrollStatus(`Closing payroll for worker ${id}...`,false);
+    try{
+      const endpoints=endpointPair(`/admin/ops/payroll/weekly/workers/${encodeURIComponent(id)}/close`);
+      const res=await postJsonWithFallback(endpoints, token, payload);
+      if(res.authExpired){
+        try{ sessionStorage.removeItem(TOKEN_KEY); }catch(_e){}
+        redirectToSignIn('session-expired');
+        return;
+      }
+      if(res.error){
+        setOpsPayrollStatus(res.error,true);
+        return;
+      }
+
+      const workerName=String(res&&res.data&&res.data.worker&&res.data.worker.workerName||id);
+      const amount=fmtMoneyCents(res&&res.data&&res.data.worker&&res.data.worker.amountCents||0);
+      setOpsPayrollStatus(`Paid ${workerName}: ${amount}. Weekly totals refreshed.`,false);
+      await fetchAnalytics();
+    }catch(err){
+      setOpsPayrollStatus(String(err&&err.message?err.message:'Could not close worker payroll'),true);
+    }
+  }
+
+  async function closeOpsPayrollRep(repId){
+    const token=getToken();
+    if(!token){
+      redirectToSignIn('auth-required');
+      return;
+    }
+
+    const id=String(repId||'').trim();
+    if(!id){
+      setOpsPayrollStatus('Rep id is required for individual payout.',true);
+      return;
+    }
+
+    const weekStart=String(opsPayrollPayload&&opsPayrollPayload.weekStart||'').trim();
+    const closeMeta=getOpsPayrollCloseMeta();
+    const payload=weekStart?{weekStart,...closeMeta}:{...closeMeta};
+    setOpsPayrollStatus(`Closing payroll for rep ${id}...`,false);
+    try{
+      const endpoints=endpointPair(`/admin/ops/payroll/weekly/reps/${encodeURIComponent(id)}/close`);
+      const res=await postJsonWithFallback(endpoints, token, payload);
+      if(res.authExpired){
+        try{ sessionStorage.removeItem(TOKEN_KEY); }catch(_e){}
+        redirectToSignIn('session-expired');
+        return;
+      }
+      if(res.error){
+        setOpsPayrollStatus(res.error,true);
+        return;
+      }
+
+      const repName=String(res&&res.data&&res.data.rep&&res.data.rep.repName||id);
+      const amount=fmtMoneyCents(res&&res.data&&res.data.rep&&res.data.rep.amountCents||0);
+      setOpsPayrollStatus(`Paid ${repName}: ${amount}. Weekly totals refreshed.`,false);
+      await fetchAnalytics();
+    }catch(err){
+      setOpsPayrollStatus(String(err&&err.message?err.message:'Could not close rep payroll'),true);
     }
   }
 
@@ -3474,412 +2496,6 @@
     }
   }
 
-  function renderOpsExpenses(data,errorMessage){
-    const tb=document.getElementById('tbl-ops-expenses');
-    if(!tb) return;
-
-    if(errorMessage){
-      tb.innerHTML='<tr><td colspan="5">Could not load expenses.</td></tr>';
-      setOpsExpensesStatus(errorMessage,true);
-      return;
-    }
-
-    const items=Array.isArray(data&&data.items)?data.items:[];
-    if(!items.length){
-      tb.innerHTML='<tr><td colspan="5">No expenses in this window.</td></tr>';
-      setOpsExpensesStatus('No expenses in selected window.',false);
-      return;
-    }
-
-    tb.innerHTML=items.map((it)=>`<tr>
-      <td>${escapeHtml(it.expenseDate||'')}</td>
-      <td>${escapeHtml(it.category||'operations')}</td>
-      <td>${escapeHtml(it.description||'')}</td>
-      <td>${fmtMoneyCents(it.amountCents||0)}</td>
-      <td><button class="button outline ops-expense-delete" type="button" data-expense-id="${escapeHtml(String(it.id||''))}">Delete</button></td>
-    </tr>`).join('');
-
-    const summary=(data&&data.summary&&typeof data.summary==='object')?data.summary:{};
-    setOpsExpensesStatus(`Loaded ${fmtNum(summary.total||items.length)} expenses · Total: ${fmtMoneyCents(summary.amountCents||0)}`,false);
-  }
-
-  async function saveOpsExpense(){
-    const token=getToken();
-    if(!token){
-      redirectToSignIn('auth-required');
-      return;
-    }
-
-    const expenseDate=(document.getElementById('ops-expense-date')?.value||'').trim();
-    const amount=toCentsFromDollarInput(document.getElementById('ops-expense-amount')?.value);
-    if(!expenseDate || amount<=0){
-      setOpsExpensesStatus('Expense date and amount are required.',true);
-      return;
-    }
-
-    const payload={
-      expenseDate,
-      amountCents: amount,
-      category:(document.getElementById('ops-expense-category')?.value||'').trim(),
-      vendor:(document.getElementById('ops-expense-vendor')?.value||'').trim(),
-      description:(document.getElementById('ops-expense-description')?.value||'').trim()
-    };
-
-    if(saveOpsExpenseBtn) saveOpsExpenseBtn.disabled=true;
-    setOpsExpensesStatus('Saving expense...',false);
-    try{
-      const endpoints=endpointPair('/admin/ops/expenses');
-      const res=await postJsonWithFallback(endpoints, token, payload);
-      if(res.authExpired){
-        try{ sessionStorage.removeItem(TOKEN_KEY); }catch(_e){}
-        redirectToSignIn('session-expired');
-        return;
-      }
-      if(res.error){
-        setOpsExpensesStatus(res.error,true);
-        return;
-      }
-
-      const setValue=(id,val)=>{ const el=document.getElementById(id); if(el) el.value=val; };
-      setValue('ops-expense-category','');
-      setValue('ops-expense-vendor','');
-      setValue('ops-expense-amount','0');
-      setValue('ops-expense-description','');
-      setOpsExpensesStatus('Expense added.',false);
-      await fetchAnalytics();
-    }catch(err){
-      setOpsExpensesStatus(String(err&&err.message?err.message:'Could not save expense'),true);
-    } finally {
-      if(saveOpsExpenseBtn) saveOpsExpenseBtn.disabled=false;
-    }
-  }
-
-  async function deleteOpsExpense(expenseId){
-    const id=String(expenseId||'').trim();
-    if(!id) return;
-    const token=getToken();
-    if(!token){
-      redirectToSignIn('auth-required');
-      return;
-    }
-
-    const endpoints=endpointPair(`/admin/ops/expenses/${encodeURIComponent(id)}`);
-
-    setOpsExpensesStatus('Deleting expense...',false);
-    try{
-      const res=await deleteJsonWithFallback(endpoints, token);
-      if(res.authExpired){
-        try{ sessionStorage.removeItem(TOKEN_KEY); }catch(_e){}
-        redirectToSignIn('session-expired');
-        return;
-      }
-      if(res.error){
-        setOpsExpensesStatus(res.error,true);
-        return;
-      }
-
-      setOpsExpensesStatus('Expense removed.',false);
-      await fetchAnalytics();
-    }catch(err){
-      setOpsExpensesStatus(String(err&&err.message?err.message:'Could not delete expense'),true);
-    }
-  }
-
-  // Field sales map integration
-  const FIELD_DEFAULT_CENTER = [37.6775, -113.0619];
-  const FIELD_DEFAULT_ZOOM = 12;
-  let fieldMap = null;
-  let fieldMapInitPromise = null;
-  let fieldMarkerLayer = null;
-  let fieldMarkers = new Map();
-  let leadsIndex = {};
-  const FIELD_OUTCOME_MAP_META={
-    no_answer:{label:'Not Home',color:'#64748b'},
-    not_interested:{label:'Not Interested',color:'#ef4444'},
-    interested_callback:{label:'Call Back',color:'#f59e0b'},
-    quote_requested:{label:'Quote Requested',color:'#0ea5e9'},
-    booked_on_door:{label:'Sale Made',color:'#22c55e'},
-    bad_address:{label:'Bad Address',color:'#8b5cf6'}
-  };
-
-  function findLeadRepId(lead){
-    return lead.repId || lead.rep_id || lead.created_by_rep_id || lead.created_by || lead.created_by_id || null;
-  }
-
-  function normalizeSlugLabel(value){
-    return String(value||'')
-      .trim()
-      .replaceAll('_',' ')
-      .replaceAll('-',' ')
-      .replace(/\s+/g,' ');
-  }
-
-  function titleCaseLabel(value){
-    return normalizeSlugLabel(value).replace(/\b\w/g,(c)=>c.toUpperCase());
-  }
-
-  function outcomeMeta(outcome){
-    const key=String(outcome||'').trim();
-    return FIELD_OUTCOME_MAP_META[key] || { label:titleCaseLabel(key)||'Unknown', color:'#94a3b8' };
-  }
-
-  function formatMapDateTime(value){
-    if(!value) return 'Unknown time';
-    const dt=new Date(String(value));
-    if(Number.isNaN(dt.getTime())) return 'Unknown time';
-    return dt.toLocaleString('en-US');
-  }
-
-  function mapAddress(lead){
-    return [
-      lead.addressLine1 || lead.address_line1 || lead.address || '',
-      lead.city || '',
-      lead.state || '',
-      lead.postalCode || lead.postal_code || ''
-    ].filter(Boolean).join(', ');
-  }
-
-  function buildPersonLabel(name, id, fallback){
-    const cleanName=String(name||'').trim();
-    const cleanId=String(id||'').trim();
-    if(cleanName && cleanId && cleanName.toLowerCase() !== cleanId.toLowerCase()){
-      return `${cleanName} (${cleanId})`;
-    }
-    return cleanName || cleanId || fallback || 'Unknown';
-  }
-
-  function popupInfoLine(label, value){
-    const lineValue=String(value||'').trim();
-    if(!lineValue) return '';
-    return `<div class="rep-dot-sub"><strong>${escapeHtml(label)}:</strong> ${escapeHtml(lineValue)}</div>`;
-  }
-
-  function getLeadContactSummary(lead){
-    const fullName=[
-      lead.first_name || lead.firstName || lead.leadFirstName || '',
-      lead.last_name || lead.lastName || lead.leadLastName || ''
-    ].filter(Boolean).join(' ').trim();
-    return [fullName, lead.phone || lead.leadPhone || '', lead.email || lead.leadEmail || ''].filter(Boolean).join(' · ');
-  }
-
-  function getLeadDisplayName(lead){
-    if(lead.name) return lead.name;
-    if(lead.first_name) return `${lead.first_name}${lead.last_name?(' '+lead.last_name):''}`;
-    if(lead.firstName) return `${lead.firstName}${lead.lastName?(' '+lead.lastName):''}`;
-    if(lead.leadFirstName) return `${lead.leadFirstName}${lead.leadLastName?(' '+lead.leadLastName):''}`;
-    if(lead.phone) return lead.phone;
-    if(lead.email) return lead.email;
-    return 'Lead';
-  }
-
-  async function initFieldMap(){
-    if(typeof L === 'undefined') return;
-    if(fieldMap) return;
-    if(fieldMapInitPromise) return fieldMapInitPromise;
-
-    fieldMapInitPromise=(async()=>{
-      const googleMapsKey=await getGoogleMapsApiKey();
-      const googleLoaded=await loadGoogleMapsJs(googleMapsKey).catch(()=>false);
-      try{
-        fieldMap = L.map('field-map', { scrollWheelZoom: true, attributionControl: false }).setView(FIELD_DEFAULT_CENTER, FIELD_DEFAULT_ZOOM);
-        let usingGoogle=false;
-        if(googleLoaded && L.gridLayer && typeof L.gridLayer.googleMutant === 'function'){
-          L.gridLayer.googleMutant({ type: 'roadmap' }).addTo(fieldMap);
-          usingGoogle=true;
-        } else {
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; OpenStreetMap contributors'
-          }).addTo(fieldMap);
-        }
-        fieldMarkerLayer = L.layerGroup().addTo(fieldMap);
-        if(usingGoogle){
-          setFieldMapStatus('Map: Google road map', false);
-        }else if(googleMapsKey){
-          setFieldMapStatus('Map: Google unavailable, using OpenStreetMap', false);
-        }else{
-          setFieldMapStatus('Map: OpenStreetMap (set Google key to enable Google map view)', false);
-        }
-      }catch(_e){ console.warn('Leaflet init failed', _e); }
-    })().finally(()=>{ fieldMapInitPromise=null; });
-
-    return fieldMapInitPromise;
-  }
-
-  function clearFieldMarkers(){
-    if(fieldMarkerLayer) fieldMarkerLayer.clearLayers();
-    fieldMarkers = new Map();
-    leadsIndex = {};
-    const list = document.getElementById('leads-list');
-    if(list) list.innerHTML = '';
-  }
-
-  function addLeadMarker(lead, rep){
-    if(!fieldMap || !lead) return;
-    const lat = Number(lead.lat||lead.latitude||lead.lat);
-    const lng = Number(lead.lng||lead.longitude||lead.lon||lead.lng);
-    if(!Number.isFinite(lat) || !Number.isFinite(lng)) return;
-    const key = String(lead.id || lead.eventId || `${lat}-${lng}`);
-    const repId = rep && (rep.id||rep.rep_id) || findLeadRepId(lead);
-    const repName = (rep && (rep.display_name||rep.displayName||rep.name)) || lead.repName || '';
-    const meta = outcomeMeta(lead.outcome);
-    const marker = L.circleMarker([lat,lng], { radius:7.5, fillColor:meta.color, color:'#0f172a', weight:1.2, opacity:1, fillOpacity:0.92 });
-
-    const leadName=getLeadDisplayName(lead);
-    const contactSummary=getLeadContactSummary(lead);
-    const happenedAtLabel=formatMapDateTime(lead.happenedAt || lead.happened_at || lead.createdAt || lead.created_at);
-    const addressLabel=mapAddress(lead) || 'No address';
-    const setterDisplay=buildPersonLabel(lead.leadCreatedByName, lead.leadCreatedBy || lead.created_by_rep_id || lead.created_by, 'Unknown');
-    const knockedByDisplay=buildPersonLabel(repName, repId, 'Unknown');
-    const serviceLabel=titleCaseLabel(lead.serviceInterestSlug || lead.service_interest_slug || lead.service || '');
-    const followupRaw=lead.followupDueAt || lead.followup_due_at || '';
-    const followupLabel=followupRaw ? formatMapDateTime(followupRaw) : '';
-    const detailText=String(lead.outcomeDetail || lead.notes || lead.note || '').trim();
-    const leadIdLabel=String(lead.leadId || lead.lead_id || '').trim();
-    const eventIdLabel=String(lead.eventId || lead.id || '').trim();
-
-    const popupHtml = `<div class="rep-dot-dialog">
-      <div class="rep-dot-title" style="color:${meta.color}">${escapeHtml(meta.label)}</div>
-      <div class="rep-dot-meta">${escapeHtml(happenedAtLabel)}</div>
-      <div class="rep-dot-address">${escapeHtml(addressLabel)}</div>
-      ${popupInfoLine('Lead', leadName)}
-      ${contactSummary && contactSummary !== leadName ? popupInfoLine('Contact', contactSummary) : ''}
-      ${popupInfoLine('Set By', setterDisplay)}
-      ${popupInfoLine('Knocked By', knockedByDisplay)}
-      ${serviceLabel ? popupInfoLine('Service', serviceLabel) : ''}
-      ${followupLabel ? popupInfoLine('Follow-up', followupLabel) : ''}
-      ${leadIdLabel ? popupInfoLine('Lead ID', leadIdLabel) : ''}
-      ${eventIdLabel ? popupInfoLine('Event ID', eventIdLabel) : ''}
-      ${detailText ? `<div class="rep-dot-detail">${escapeHtml(detailText)}</div>` : ''}
-    </div>`;
-
-    marker.bindPopup(popupHtml);
-    marker.addTo(fieldMarkerLayer);
-    fieldMarkers.set(key, marker);
-    leadsIndex[key] = { lead, rep, marker };
-    return key;
-  }
-
-  function buildLeadsList(leads){
-    const wrap = document.getElementById('leads-list');
-    if(!wrap) return;
-    if(!leads||!leads.length){ wrap.innerHTML = '<div class="mini-note">No leads available</div>'; return; }
-    wrap.innerHTML = leads.map((lead, idx)=>{
-      const displayName=(lead && (lead.name || lead.displayName)) ? (lead.name || lead.displayName) : getLeadDisplayName(lead);
-      const name = escapeHtml(displayName);
-      const addr = escapeHtml(mapAddress(lead) || 'No address');
-      const when = escapeHtml(formatMapDateTime(lead.happenedAt || lead.happened_at || lead.createdAt || lead.created_at));
-      const setter = escapeHtml(buildPersonLabel(lead.leadCreatedByName, lead.leadCreatedBy || lead.created_by_rep_id || lead.created_by, 'Unknown'));
-      const knockedBy = escapeHtml(buildPersonLabel(lead.repName, lead.repId || findLeadRepId(lead), 'Unknown'));
-      const meta = outcomeMeta(lead.outcome);
-      const id = String(lead.id || `${lead.lat||lead.latitude}-${lead.lng||lead.longitude}` || `lead-${idx}`);
-      return `<div class="lead-row" data-lead-id="${escapeHtml(id)}" role="button" tabindex="0">
-        <div class="lead-row-head">
-          <div class="lead-row-name">${name}</div>
-          <span class="lead-outcome-pill" style="--pill-color:${meta.color}">${escapeHtml(meta.label)}</span>
-        </div>
-        <div class="lead-row-sub">${addr}</div>
-        <div class="lead-row-meta">Set by ${setter}</div>
-        <div class="lead-row-meta">Knocked by ${knockedBy}</div>
-        <div class="lead-row-meta">${when}</div>
-      </div>`;
-    }).join('');
-    wrap.querySelectorAll('.lead-row').forEach(el=>{
-      el.addEventListener('click',()=>{
-        const id = el.dataset.leadId;
-        const info = leadsIndex[id];
-        if(info && info.marker){
-          info.marker.openPopup();
-          try{ fieldMap.setView(info.marker.getLatLng(), Math.max(fieldMap.getZoom(), 15), { animate:true }); }catch(_e){}
-        }
-      });
-      el.addEventListener('keydown',(e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); el.click(); } });
-    });
-  }
-
-  async function updateFieldMap(fieldData){
-    try{
-      await initFieldMap();
-      clearFieldMarkers();
-      const data = fieldData || null;
-      if(!data){
-        // No authoritative data available: leave map empty
-        return;
-      }
-
-      // Case A: admin map-events format (items)
-      if(Array.isArray(data.items)){
-        const items = data.items;
-        const mapLeads = items.map((it, idx)=>{
-          const leadLike = {
-            id: String(it.id || (`event-${idx}`)),
-            eventId: String(it.id || (`event-${idx}`)),
-            leadId: it.leadId || null,
-            first_name: it.leadFirstName || '',
-            last_name: it.leadLastName || '',
-            phone: it.leadPhone || '',
-            email: it.leadEmail || '',
-            addressLine1: it.addressLine1 || '',
-            city: it.city || '',
-            state: it.state || '',
-            postalCode: it.postalCode || '',
-            lat: it.lat,
-            lng: it.lng,
-            happenedAt: it.happenedAt || '',
-            notes: it.outcomeDetail || '',
-            outcomeDetail: it.outcomeDetail || '',
-            outcome: it.outcome || '',
-            serviceInterestSlug: it.serviceInterestSlug || '',
-            wantsFollowup: Boolean(it.wantsFollowup),
-            followupDueAt: it.followupDueAt || '',
-            leadCreatedBy: it.leadCreatedBy || null,
-            leadCreatedByName: it.leadCreatedByName || null,
-            repId: it.repId || null,
-            repName: it.repName || ''
-          };
-          const repObj = { id: leadLike.repId, displayName: leadLike.repName };
-          addLeadMarker(leadLike, repObj);
-          return leadLike;
-        });
-        buildLeadsList(mapLeads);
-      } else {
-        // Case B: legacy reps/leads payload
-        const repsById = {};
-        if(Array.isArray(data.reps)) data.reps.forEach(r=>{ repsById[r.id] = r; if(r.id && (r.display_name && !r.displayName)) { r.displayName = r.display_name; } });
-        const leads = Array.isArray(data.leads) ? data.leads : (Array.isArray(data.leadList) ? data.leadList : []);
-        leads.forEach((lead, idx)=>{
-          if(!lead.id) lead.id = `lead-${idx}`;
-          if(Array.isArray(data.door_events)){
-            lead.doorEvents = data.door_events.filter(de => String(de.lead_id) === String(lead.id) || String(de.leadId) === String(lead.id));
-          }
-          const repId = findLeadRepId(lead);
-          const repObj = repsById[repId] || null;
-          if(repObj){
-            lead.repId = lead.repId || repObj.id || null;
-            lead.repName = lead.repName || repObj.displayName || repObj.display_name || repObj.name || '';
-          }
-          addLeadMarker(lead, repObj);
-        });
-        buildLeadsList(leads);
-      }
-      const pts = Array.from(fieldMarkers.values()).map(m=>m.getLatLng()).filter(Boolean);
-      if(pts.length){
-        const bounds = L.latLngBounds(pts);
-        fieldMap.fitBounds(bounds.pad(0.2), { maxZoom: 14 });
-        setTimeout(()=>{ try{ fieldMap.invalidateSize(true); }catch(_e){} }, 250);
-      } else {
-        // No markers: default to Cedar City at a sensible zoom
-        try{ fieldMap.setView(FIELD_DEFAULT_CENTER, FIELD_DEFAULT_ZOOM); fieldMap.invalidateSize(true); }catch(_e){}
-      }
-    }catch(_e){ console.warn('Field map error', _e); }
-  }
-
-  function riskLabel(metrics){
-    if(metrics.failureRate >= 20 || metrics.closeRate < 50) return 'High';
-    if(metrics.failureRate >= 10 || metrics.closeRate < 60) return 'Moderate';
-    return 'Low';
-  }
-
   function render(data, day, days){
     const trend=Array.isArray(data.trend)?data.trend:[];
     const totals=sumTrend(trend);
@@ -3888,11 +2504,6 @@
     const closeRate=pct(totals.confirmed, totals.submits);
     const failureRate=pct(totals.failures, totals.submits);
     const metrics={ intentRate, submitFromIntentRate, closeRate, failureRate };
-
-    setText('ctx-window', `Window: Last ${days} days`);
-    setText('ctx-traffic', `Traffic quality: ${intentRate.toFixed(1)}% intent`);
-    setText('ctx-close', `Close rate: ${closeRate.toFixed(1)}%`);
-    setText('ctx-risk', `Operational risk: ${riskLabel(metrics)}`);
 
     setText('k-pageviews',fmtNum(totals.pageViews));
     setText('k-ctaclicks',fmtNum(totals.ctaClicks));
@@ -3904,48 +2515,13 @@
     renderMetricTone('k-intent',intentRate,5,2,false);
     renderMetricTone('k-rate',closeRate,60,45,false);
 
-    setText('f-visitors',fmtNum(totals.pageViews));
-    setText('f-intent',fmtNum(totals.ctaClicks));
-    setText('f-submit',fmtNum(totals.submits));
-    setText('f-confirmed',fmtNum(totals.confirmed));
-    setText('f-intent-rate',`${intentRate.toFixed(1)}% of visitors`);
-    setText('f-submit-rate',`${submitFromIntentRate.toFixed(1)}% of intent`);
-    setText('f-confirmed-rate',`${closeRate.toFixed(1)}% of submit`);
-    setText('funnel-summary', `From ${fmtNum(totals.pageViews)} visitors, ${fmtNum(totals.confirmed)} converted to confirmed bookings in this window.`);
-
     setText('r-failures',fmtNum(totals.failures));
     setText('r-failure-rate',`${failureRate.toFixed(1)}%`);
     setText('r-risk',fmtNum(Math.max(0, totals.submits - totals.confirmed)));
     renderMetricTone('r-failure-rate',failureRate,5,15,true);
 
-    const acqReadout=document.getElementById('acq-readout');
-    if(acqReadout){
-      acqReadout.textContent=`In the selected window, ${fmtNum(totals.ctaClicks)} users clicked CTAs from ${fmtNum(totals.pageViews)} views (${intentRate.toFixed(1)}% intent rate). Focus on top CTA variants and top-selected services to improve upstream quality.`;
-    }
-
-    renderRows('tbl-ctas', data.top&&data.top.ctas ? data.top.ctas : [], 'No CTA data yet');
-    renderRows('tbl-services', data.top&&data.top.services ? data.top.services : [], 'No service data yet');
-    renderRows('tbl-services-overview', data.top&&data.top.services ? data.top.services : [], 'No service data yet');
     renderRows('tbl-failures', data.top&&data.top.failureReasons ? data.top.failureReasons : [], 'No failure reasons yet');
 
-    const labels=trend.map((r)=>shortDateLabel(r.date||''));
-    renderMultiLineChart('chart-volume','chart-volume-legend',labels,[
-      { name:'Visitors', color:'#83b6ff', values:trend.map((r)=>Number(r.pageViews||0)) },
-      { name:'Intent Clicks', color:'#ffce7a', values:trend.map((r)=>Number(r.ctaClicks||0)) },
-      { name:'Submits', color:'#7fe6a8', values:trend.map((r)=>Number(r.submits||0)) },
-      { name:'Confirmed', color:'#ff7b7b', values:trend.map((r)=>Number(r.confirmed||0)) }
-    ]);
-    renderMultiLineChart('chart-rate','chart-rate-legend',labels,[
-      { name:'Intent Rate', color:'#83b6ff', values:trend.map((r)=>pct(Number(r.ctaClicks||0),Number(r.pageViews||0))) },
-      { name:'Close Rate', color:'#7fe6a8', values:trend.map((r)=>pct(Number(r.confirmed||0),Number(r.submits||0))) },
-      { name:'Failure Rate', color:'#ff7b7b', values:trend.map((r)=>pct(Number(r.failures||0),Number(r.submits||0))) }
-    ], { maxY:100, percent:true });
-    renderMultiLineChart('chart-reliability','chart-reliability-legend',labels,[
-      { name:'Submits', color:'#7fe6a8', values:trend.map((r)=>Number(r.submits||0)) },
-      { name:'Failures', color:'#ff7b7b', values:trend.map((r)=>Number(r.failures||0)) }
-    ]);
-
-    renderTrend(trend);
     renderReliabilityTrend(trend);
   }
 
@@ -3977,17 +2553,17 @@
     const target=ev.target&&ev.target.closest?ev.target:null;
     if(!target) return;
 
-    const bookingBtn=target.closest('.fs-booking-save');
-    if(bookingBtn){
-      const bookingId=bookingBtn.getAttribute('data-booking-id')||'';
-      if(bookingId) saveFieldBookingLifecycle(bookingId);
+    const workerPayrollBtn=target.closest('.ops-payroll-worker-close-btn');
+    if(workerPayrollBtn){
+      const workerId=workerPayrollBtn.getAttribute('data-worker-id')||'';
+      if(workerId) closeOpsPayrollWorker(workerId);
       return;
     }
 
-    const deleteExpenseBtn=target.closest('.ops-expense-delete');
-    if(deleteExpenseBtn){
-      const expenseId=deleteExpenseBtn.getAttribute('data-expense-id')||'';
-      if(expenseId) deleteOpsExpense(expenseId);
+    const repPayrollBtn=target.closest('.ops-payroll-rep-close-btn');
+    if(repPayrollBtn){
+      const repId=repPayrollBtn.getAttribute('data-rep-id')||'';
+      if(repId) closeOpsPayrollRep(repId);
       return;
     }
 
@@ -4021,10 +2597,10 @@
     }
   });
   createRepBtn?.addEventListener('click',createRep);
-  saveOpsExpenseBtn?.addEventListener('click',saveOpsExpense);
   saveWorkerBtn?.addEventListener('click',saveWorker);
   saveCompBtn?.addEventListener('click',saveCompPlan);
   opsPayrollCloseBtn?.addEventListener('click',closeOpsWeeklyPayroll);
+  opsPayrollExportCsvBtn?.addEventListener('click',exportOpsPayrollAuditCsv);
   compModelInput?.addEventListener('change',syncCompPlanFormByModel);
   opsJobSearchInput?.addEventListener('input',refreshOpsJobsView);
   opsJobStatusFilterInput?.addEventListener('change',refreshOpsJobsView);
@@ -4043,9 +2619,8 @@
     redirectToSignIn('signed-out');
   });
 
-  const expenseDateInput=document.getElementById('ops-expense-date');
-  if(expenseDateInput && !expenseDateInput.value) expenseDateInput.value=today();
   syncCompPlanFormByModel();
+  setupSectionCollapsibles();
   activateTab('health');
   fetchAnalytics();
 })();

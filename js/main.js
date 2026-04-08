@@ -503,6 +503,7 @@ window.mSubmit=async function(){
   const addonNames=Object.keys(MS.addons).map(id=>ADDONS.find(a=>a.id===id)?.name||id);
   const addonTotal=Object.values(MS.addons).reduce((s,v)=>s+v,0);
   const total=submitSvcPrice+addonTotal;
+  const quotedPriceCents=Math.max(0,Math.round(total*100));
   const addr=`${MS.street}, ${MS.city}, UT ${MS.zip}`;
   const attribution=getAttributionParams();
 
@@ -525,7 +526,11 @@ window.mSubmit=async function(){
         location:addr, metadata:Object.assign({
           phone:MS.phone,
           addons:addonNames.join(', '),
-          channel:attribution.rep_id?'field_sales':''
+          channel:attribution.rep_id?'field_sales':'',
+          total:'$'+total,
+          quoted_price_cents:String(quotedPriceCents),
+          estimated_value_cents:String(quotedPriceCents),
+          total_cents:String(quotedPriceCents)
         }, attribution)
       })
     });

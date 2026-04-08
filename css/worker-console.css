@@ -68,6 +68,13 @@ body{background:var(--bg);color:var(--tx)}
 .wc-nav-link{border:1px solid var(--bdr);background:var(--srf);color:var(--tx2);border-radius:999px;padding:8px 12px;font-size:.78rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;text-decoration:none}
 .wc-nav-link.active{background:linear-gradient(135deg,rgba(225,55,55,.18),rgba(225,55,55,.06));border-color:rgba(225,55,55,.6);color:var(--tx)}
 .wc-nav-link:hover{border-color:rgba(0,0,0,.28);color:var(--tx)}
+.wc-section-toggle-header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.wc-section-toggle-header .section-title{margin-bottom:0}
+.wc-section-toggle-btn{border:1px solid var(--bdr);background:var(--srf2);color:var(--tx2);border-radius:999px;padding:5px 10px;font-size:.68rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;cursor:pointer}
+.wc-section-toggle-btn:hover{background:var(--srf3)}
+.wc-section-toggle-btn:focus-visible{outline:2px solid var(--bdrhi);outline-offset:2px}
+.wc-section-content{margin-top:10px}
+.wc-card.is-collapsed .wc-section-content{display:none}
 
 /* Matches admin console value shimmer behavior */
 .value-loading{position:relative;color:transparent!important;text-shadow:none!important;user-select:none}

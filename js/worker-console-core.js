@@ -12,10 +12,7 @@
   ];
   const WORKER_CONSOLE_ASSETS=[
     '/css/worker-console.css',
-    '/js/worker-console-core.js',
-    '/js/worker-overview.js',
-    '/js/worker-jobs.js',
-    '/js/worker-finance.js'
+    '/js/worker-console-core.js'
   ];
 
   function esc(v){
@@ -89,6 +86,115 @@
     }catch(_e){}
   }
 
+  function setStatusText(el,msg,isErr){
+    if(!el) return;
+    el.textContent=String(msg||'');
+    el.style.color=isErr?'#ff7b7b':'var(--tx2)';
+  }
+
+  function toggleWorkerApp(loginCard, app, logoutBtn, isAuthed){
+    const authed=!!isAuthed;
+    if(loginCard) loginCard.hidden=authed;
+    if(app) app.hidden=!authed;
+    if(logoutBtn) logoutBtn.hidden=!authed;
+  }
+
+  function renderWorkerIdentity(profile,nameEl,rateEl){
+    if(nameEl) nameEl.textContent=String(profile&&profile.fullName||'Worker');
+    if(rateEl) rateEl.textContent=`${fmtMoneyCents(profile&&profile.hourlyRateCents||0)}/hr`;
+  }
+
+  function setWorkerSectionCollapsed(card, collapsed){
+    const content=card.querySelector(':scope > .wc-section-content');
+    const btn=card.querySelector(':scope > .wc-section-toggle-header .wc-section-toggle-btn');
+    if(!content||!btn) return;
+
+    const isCollapsed=!!collapsed;
+    card.classList.toggle('is-collapsed',isCollapsed);
+    content.hidden=isCollapsed;
+    btn.setAttribute('aria-expanded',isCollapsed?'false':'true');
+    btn.textContent=isCollapsed?'Expand':'Collapse';
+  }
+
+  function buildWorkerSectionCollapsible(card,index,defaultCollapsed){
+    if(!card || card.dataset.wcCollapsibleReady==='1') return;
+    const title=card.querySelector(':scope > .section-title');
+    if(!title) return;
+
+    const content=document.createElement('div');
+    content.className='wc-section-content';
+    content.id=`wc-section-content-${index}`;
+
+    while(title.nextSibling){
+      content.appendChild(title.nextSibling);
+    }
+
+    const header=document.createElement('div');
+    header.className='wc-section-toggle-header';
+
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='wc-section-toggle-btn';
+    btn.setAttribute('aria-controls',content.id);
+
+    header.appendChild(title);
+    header.appendChild(btn);
+
+    card.insertBefore(header,card.firstChild);
+    card.appendChild(content);
+    card.dataset.wcCollapsibleReady='1';
+
+    btn.addEventListener('click',()=>{
+      setWorkerSectionCollapsed(card,!card.classList.contains('is-collapsed'));
+    });
+
+    setWorkerSectionCollapsed(card,defaultCollapsed);
+  }
+
+  function setupWorkerSectionCollapsibles(options){
+    if(typeof document==='undefined') return;
+    const opts=Object.assign({
+      rootSelector:'#worker-app',
+      defaultCollapsed:false,
+    },options||{});
+
+    const root=document.querySelector(opts.rootSelector);
+    if(!root) return;
+    const cards=Array.from(root.querySelectorAll('.wc-card'));
+    cards.forEach((card,idx)=>{
+      buildWorkerSectionCollapsible(card,idx+1,!!opts.defaultCollapsed);
+    });
+  }
+
+  function validateWorkerCredentials(workerId,pin){
+    const id=String(workerId||'').trim();
+    const secret=String(pin||'').trim();
+    if(!id || !/^\d{4,12}$/.test(secret)){
+      return { ok:false, error:'Worker ID and a 4-12 digit PIN are required.' };
+    }
+    return { ok:true, workerId:id, pin:secret };
+  }
+
+  async function loginWithStoredSession(workerId,pin){
+    const creds=validateWorkerCredentials(workerId,pin);
+    if(!creds.ok) throw new Error('INVALID_CREDENTIAL_FORMAT');
+    const data=await login(creds.workerId,creds.pin);
+    const token=String(data&&data.token||'').trim();
+    if(!token) throw new Error('Login response did not include a token');
+    storeToken(token);
+    return {
+      token,
+      worker:data&&data.worker?data.worker:null,
+      data:data||{}
+    };
+  }
+
+  async function logoutAndClear(token){
+    try{ await logout(token); }catch(_e){}
+    storeToken('');
+    return { ok:true };
+  }
+
   function buildHeaders(token, extra){
     const headers=Object.assign({}, extra||{});
     const t=String(token||'').trim();
@@ -102,6 +208,10 @@
       jobsDays:Number(opts.jobsDays||45),
       financeDays:Number(opts.financeDays||45),
       financeLimit:Number(opts.financeLimit||120),
+      includeToday:opts.includeToday!==false,
+      includeJobs:opts.includeJobs!==false,
+      includeFinance:opts.includeFinance!==false,
+      includeAvailability:opts.includeAvailability!==false,
       preferCache:opts.preferCache!==false,
       allowStale:opts.allowStale!==false,
       revalidateStale:opts.revalidateStale!==false,
@@ -162,18 +272,31 @@
 
   async function refreshConsoleSnapshot(token, options){
     const opts=normalizeSnapshotOptions(options);
+    const previous=readSnapshotEnvelope(token);
+    const previousSnapshot=previous&&previous.snapshot&&typeof previous.snapshot==='object'
+      ? previous.snapshot
+      : {};
+
     const [todayData,jobsData,financeData,availabilityData]=await Promise.all([
-      fetchToday(token),
-      fetchJobs(token,opts.jobsDays),
-      fetchFinance(token,opts.financeDays,opts.financeLimit),
-      fetchAvailability(token).catch(()=>({timezone:getLocalTimezone(),items:defaultWeeklyAvailability(getLocalTimezone())})),
+      opts.includeToday
+        ? fetchToday(token)
+        : Promise.resolve(null),
+      opts.includeJobs
+        ? fetchJobs(token,opts.jobsDays)
+        : Promise.resolve(null),
+      opts.includeFinance
+        ? fetchFinance(token,opts.financeDays,opts.financeLimit)
+        : Promise.resolve(null),
+      opts.includeAvailability
+        ? fetchAvailability(token).catch(()=>({timezone:getLocalTimezone(),items:defaultWeeklyAvailability(getLocalTimezone())}))
+        : Promise.resolve(null),
     ]);
 
     const snapshot={
-      todayData:todayData||{},
-      jobsData:jobsData||{},
-      financeData:financeData||{},
-      availabilityData:availabilityData||{},
+      todayData:todayData||previousSnapshot.todayData||{},
+      jobsData:jobsData||previousSnapshot.jobsData||{},
+      financeData:financeData||previousSnapshot.financeData||{},
+      availabilityData:availabilityData||previousSnapshot.availabilityData||{},
       jobsDays:opts.jobsDays,
       financeDays:opts.financeDays,
       financeLimit:opts.financeLimit,
@@ -447,6 +570,13 @@
     defaultWeeklyAvailability,
     getStoredToken,
     storeToken,
+    setStatusText,
+    toggleWorkerApp,
+    renderWorkerIdentity,
+    setupWorkerSectionCollapsibles,
+    validateWorkerCredentials,
+    loginWithStoredSession,
+    logoutAndClear,
     clearSnapshotCache,
     readConsoleSnapshot,
     refreshConsoleSnapshot,

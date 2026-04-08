@@ -30,7 +30,7 @@
   <div class="wc-shell">
     <span class="eyebrow">Field Operations</span>
     <h1 class="h2" style="margin-top:6px">Worker Console - Finance</h1>
-    <p class="muted" style="font-size:.9rem">Capture payments first, then track expenses with required receipt proof.</p>
+    <p class="muted" style="font-size:.9rem">Track expenses with required receipt proof and review recent finance activity.</p>
 
     <div class="wc-card" id="worker-login-card">
       <div class="wc-row">
@@ -63,13 +63,6 @@
         </div>
       </div>
 
-      <div class="wc-grid" style="grid-template-columns:repeat(4,minmax(0,1fr));">
-        <div class="wc-card"><div class="wc-k">Entries</div><div class="wc-v" id="k-count">0</div></div>
-        <div class="wc-card"><div class="wc-k">Income</div><div class="wc-v" id="k-income">$0.00</div></div>
-        <div class="wc-card"><div class="wc-k">Expenses</div><div class="wc-v" id="k-expenses">$0.00</div></div>
-        <div class="wc-card"><div class="wc-k">Labor</div><div class="wc-v" id="k-labor">$0.00</div></div>
-      </div>
-
       <div class="wc-card soft">
         <div class="section-title">This Week Payroll</div>
         <div class="wc-grid three">
@@ -78,38 +71,6 @@
           <div class="wc-card"><div class="wc-k">Total</div><div class="wc-v" id="wf-week-total">$0.00</div></div>
         </div>
         <div class="wc-status" id="wf-week-status">Weekly payroll summary will appear here.</div>
-      </div>
-
-      <div class="wc-card">
-        <div class="section-title">Record Payment</div>
-        <div class="wc-finance-grid">
-          <div>
-            <label for="wp-amount">Amount Received</label>
-            <input id="wp-amount" class="inp" type="number" step="0.01" min="0" placeholder="0.00"/>
-          </div>
-          <div>
-            <label for="wp-date">Payment Date</label>
-            <input id="wp-date" class="inp" type="date"/>
-          </div>
-          <div>
-            <label for="wp-job">Job (optional)</label>
-            <select id="wp-job" class="inp">
-              <option value="">No job selected</option>
-            </select>
-          </div>
-          <div>
-            <label for="wp-method">Method</label>
-            <input id="wp-method" class="inp" type="text" placeholder="Cash, card, transfer"/>
-          </div>
-          <div class="full">
-            <label for="wp-note">Note</label>
-            <input id="wp-note" class="inp" type="text" placeholder="Customer payment details"/>
-          </div>
-        </div>
-        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-          <button class="button" id="wp-save-btn" type="button">Save Payment</button>
-        </div>
-        <div class="wc-status" id="wp-status">Ready to save payments.</div>
       </div>
 
       <div class="wc-card">

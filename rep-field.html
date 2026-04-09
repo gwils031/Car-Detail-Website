@@ -514,6 +514,9 @@
   const MAP_HISTORY_DAYS=30;
   const API_TIMEOUT_MS=30000;
   const SLOTS_TIMEOUT_MS=30000;
+  const VEHICLE_PHOTO_MAX_DATA_URL_LEN=500000;
+  const VEHICLE_PHOTO_MAX_EDGE_PX=1280;
+  const VEHICLE_PHOTO_DEFAULT_QUALITY=0.78;
   const GOOGLE_MAPS_KEY_STORAGE='sud_google_maps_api_key';
   const QUICK_OUTCOMES={
     not_home:{label:'Not Home',outcome:'no_answer',wantsFollowup:false,followupHours:0,note:'Quick map log: no one answered.'},
@@ -602,6 +605,7 @@
   let editingDoorEventId='';
   let vehiclePhotoName='';
   let vehiclePhotoPreviewUrl='';
+  let vehiclePhotoDirty=false;
   let watchLocationErrorShown=false;
   let activeWorkflow={
     outcome:'',
@@ -1010,9 +1014,10 @@
     </div>`;
   }
 
-  function clearVehiclePhotoSelection(clearInput){
+  function clearVehiclePhotoSelection(clearInput, markDirty){
     vehiclePhotoName='';
     vehiclePhotoPreviewUrl='';
+    if(markDirty!==false) vehiclePhotoDirty=true;
     if(clearInput&&deVehiclePhotoInput&&typeof deVehiclePhotoInput.value==='string') deVehiclePhotoInput.value='';
     updateVehiclePhotoPreview();
   }
@@ -1024,6 +1029,57 @@
       reader.onerror=()=>reject(new Error('Could not read image file.'));
       reader.readAsDataURL(file);
     });
+  }
+
+  function loadImageFromDataUrl(dataUrl){
+    return new Promise((resolve,reject)=>{
+      const img=new Image();
+      img.onload=()=>resolve(img);
+      img.onerror=()=>reject(new Error('Could not decode selected image.'));
+      img.src=String(dataUrl||'');
+    });
+  }
+
+  async function normalizeVehiclePhotoDataUrl(inputDataUrl){
+    const img=await loadImageFromDataUrl(inputDataUrl);
+    const width=Number(img.naturalWidth||img.width||0);
+    const height=Number(img.naturalHeight||img.height||0);
+    if(!width||!height) throw new Error('Selected image has invalid dimensions.');
+
+    const scale=Math.min(1,VEHICLE_PHOTO_MAX_EDGE_PX/Math.max(width,height));
+    const outW=Math.max(1,Math.round(width*scale));
+    const outH=Math.max(1,Math.round(height*scale));
+    const canvas=document.createElement('canvas');
+    canvas.width=outW;
+    canvas.height=outH;
+    const ctx=canvas.getContext('2d');
+    if(!ctx) throw new Error('Could not prepare image for upload.');
+    ctx.drawImage(img,0,0,outW,outH);
+
+    let out=canvas.toDataURL('image/jpeg',VEHICLE_PHOTO_DEFAULT_QUALITY);
+    if(out.length>VEHICLE_PHOTO_MAX_DATA_URL_LEN){
+      out=canvas.toDataURL('image/jpeg',Math.max(0.55,VEHICLE_PHOTO_DEFAULT_QUALITY-0.2));
+    }
+    if(out.length>VEHICLE_PHOTO_MAX_DATA_URL_LEN){
+      throw new Error('Photo is too large. Try a closer crop or retake the image.');
+    }
+    return out;
+  }
+
+  async function loadDoorEventVehiclePhoto(eventId){
+    const safeId=String(eventId||'').trim();
+    if(!safeId) return;
+    try{
+      const photo=await api(`/field/door-events/${encodeURIComponent(safeId)}/photo`,'GET');
+      const photoName=String(photo&&photo.vehiclePhotoName||'').trim().slice(0,120);
+      const photoDataUrl=String(photo&&photo.vehiclePhotoDataUrl||'').trim();
+      if(photoName) vehiclePhotoName=photoName;
+      if(photoDataUrl) vehiclePhotoPreviewUrl=photoDataUrl;
+      vehiclePhotoDirty=false;
+      updateVehiclePhotoPreview();
+    }catch(_e){
+      // Keep graceful fallback to filename tag when per-event photo read fails.
+    }
   }
 
   async function handleVehiclePhotoChange(){
@@ -1043,7 +1099,9 @@
     }
     try{
       vehiclePhotoName=String(file.name||'vehicle-photo').slice(0,120);
-      vehiclePhotoPreviewUrl=await readFileAsDataUrl(file);
+      const sourceDataUrl=await readFileAsDataUrl(file);
+      vehiclePhotoPreviewUrl=await normalizeVehiclePhotoDataUrl(sourceDataUrl);
+      vehiclePhotoDirty=true;
       updateVehiclePhotoPreview();
       setDoorStatus(`Photo attached: ${vehiclePhotoName}`, false);
     }catch(err){
@@ -1204,6 +1262,8 @@
       `data-dot-lead-name="${esc(encodePopupData(p.leadFirstName||''))}"`,
       `data-dot-lead-phone="${esc(encodePopupData(p.leadPhone||''))}"`,
       `data-dot-lead-email="${esc(encodePopupData(p.leadEmail||''))}"`,
+      `data-dot-photo-name="${esc(encodePopupData(p.vehiclePhotoName||''))}"`,
+      `data-dot-has-photo="${p.hasVehiclePhoto?'1':'0'}"`,
       `data-dot-followup="${p.wantsFollowup?'1':'0'}"`,
       `data-dot-followup-due="${esc(encodePopupData(p.followupDueAt||''))}"`,
       `data-dot-estimated-value-cents="${esc(String(Number(p.estimatedValueCents)||0))}"`,
@@ -1356,6 +1416,8 @@
       `data-dot-outcome="${esc(encodePopupData(outcome||''))}"`,
       `data-dot-detail="${esc(encodePopupData(detail||''))}"`,
       `data-dot-service="${esc(encodePopupData(activeWorkflow.service||''))}"`,
+      `data-dot-photo-name="${esc(encodePopupData(vehiclePhotoName||''))}"`,
+      `data-dot-has-photo="${vehiclePhotoPreviewUrl||vehiclePhotoName?'1':'0'}"`,
       `data-dot-followup="${activeWorkflow.followup?'1':'0'}"`,
       `data-dot-followup-due="${esc(encodePopupData(activeWorkflow.followupDueAt||''))}"`,
       `data-dot-estimated-value-cents="${esc(String(Number.isFinite(estimatedValueCents)?estimatedValueCents:0))}"`,
@@ -1724,6 +1786,8 @@
     const when=item.happenedAt?new Date(item.happenedAt).toLocaleString('en-US'):'Unknown time';
     const addr=popupAddress(item)||'No address';
     const detail=item.outcomeDetail?esc(item.outcomeDetail):'';
+    const photoName=String(item.vehiclePhotoName||'').trim();
+    const hasPhoto=Boolean(item.hasVehiclePhoto);
     const contact=[item.leadFirstName||'', item.leadPhone||''].filter(Boolean).join(' · ');
     const followupText=item.followupDueAt?new Date(item.followupDueAt).toLocaleString('en-US'):'';
     const serviceLabel=item.serviceInterestSlug?esc(item.serviceInterestSlug.replaceAll('-',' ')):'';
@@ -1736,6 +1800,7 @@
       ${contact?`<div class="rep-dot-sub">${esc(contact)}</div>`:''}
       ${serviceLabel?`<div class="rep-dot-sub">Service: ${serviceLabel}</div>`:''}
       ${priceLabel?`<div class="rep-dot-sub">Quoted Price: ${esc(priceLabel)}</div>`:''}
+      ${hasPhoto||photoName?`<div class="rep-dot-sub">Vehicle Photo: ${esc(photoName||'on file')}</div>`:''}
       ${followupText?`<div class="rep-dot-sub">Follow-up: ${esc(followupText)}</div>`:''}
       ${detail?`<div class="rep-dot-detail">${detail}</div>`:''}
       ${popupActionButtons({
@@ -1754,6 +1819,8 @@
         leadFirstName:item.leadFirstName,
         leadPhone:item.leadPhone,
         leadEmail:item.leadEmail,
+        vehiclePhotoName:item.vehiclePhotoName,
+        hasVehiclePhoto:item.hasVehiclePhoto,
         wantsFollowup:Boolean(item.wantsFollowup),
         followupDueAt:item.followupDueAt,
         estimatedValueCents:item.estimatedValueCents,
@@ -2495,14 +2562,29 @@
     }else{
       resetActiveWorkflow('');
     }
-    clearVehiclePhotoSelection(true);
+    clearVehiclePhotoSelection(true,false);
+    const payloadPhotoName=String(data&&data.vehiclePhotoName||'').trim().slice(0,120);
+    const payloadHasPhoto=Boolean(data&&data.hasVehiclePhoto);
+    const payloadEventId=String(data&&data.eventId||'').trim();
+    if(payloadPhotoName){
+      vehiclePhotoName=payloadPhotoName;
+      vehiclePhotoPreviewUrl='';
+      vehiclePhotoDirty=false;
+      updateVehiclePhotoPreview();
+      if(payloadHasPhoto && payloadEventId){
+        loadDoorEventVehiclePhoto(payloadEventId).catch(()=>null);
+      }
+    }
     if(typeof data.outcomeDetail==='string'){
       setVal('de-notes',stripVehiclePhotoTag(data.outcomeDetail));
-      const existingPhoto=extractVehiclePhotoName(data.outcomeDetail);
-      if(existingPhoto){
-        vehiclePhotoName=existingPhoto;
-        vehiclePhotoPreviewUrl='';
-        updateVehiclePhotoPreview();
+      if(!payloadPhotoName){
+        const existingPhoto=extractVehiclePhotoName(data.outcomeDetail);
+        if(existingPhoto){
+          vehiclePhotoName=existingPhoto;
+          vehiclePhotoPreviewUrl='';
+          vehiclePhotoDirty=false;
+          updateVehiclePhotoPreview();
+        }
       }
     }
     if(typeof data.serviceInterestSlug==='string') setVal('de-service',data.serviceInterestSlug);
@@ -2653,6 +2735,7 @@
     const markerId=String(btn.getAttribute('data-dot-marker-id')||'').trim();
     const eventId=String(btn.getAttribute('data-dot-event-id')||markerId).trim();
     const payload={
+      eventId,
       lat:Number(btn.getAttribute('data-dot-lat')),
       lng:Number(btn.getAttribute('data-dot-lng')),
       addressLine1:decodePopupData(btn.getAttribute('data-dot-address')),
@@ -2665,6 +2748,8 @@
       leadFirstName:decodePopupData(btn.getAttribute('data-dot-lead-name')),
       leadPhone:decodePopupData(btn.getAttribute('data-dot-lead-phone')),
       leadEmail:decodePopupData(btn.getAttribute('data-dot-lead-email')),
+      vehiclePhotoName:decodePopupData(btn.getAttribute('data-dot-photo-name')),
+      hasVehiclePhoto:String(btn.getAttribute('data-dot-has-photo')||'').trim()==='1',
       wantsFollowup:String(btn.getAttribute('data-dot-followup')||'').trim()==='1',
       followupDueAt:decodePopupData(btn.getAttribute('data-dot-followup-due')),
       estimatedValueCents:Number(btn.getAttribute('data-dot-estimated-value-cents')),
@@ -2893,7 +2978,7 @@
       if(!Number.isNaN(parsed.getTime())) followupDueAt=parsed.toISOString();
     }
 
-    return {
+    const payload={
       outcome,
       serviceInterestSlug:String(activeWorkflow.service||'').trim(),
       addressLine1:String(latestPin.addressLine1||val('de-address')||'').trim(),
@@ -2904,7 +2989,6 @@
       followupDueAt,
       outcomeDetail:detail,
       estimatedValueCents,
-      vehiclePhotoName,
       lead:{
         firstName:String(activeWorkflow.name||'').trim(),
         phone:String(activeWorkflow.phone||'').trim(),
@@ -2914,6 +2998,14 @@
       lat:Number(latestPin.lat),
       lng:Number(latestPin.lng)
     };
+
+    if(vehiclePhotoDirty){
+      payload.vehiclePhotoName=String(vehiclePhotoName||'').trim().slice(0,120);
+      payload.vehiclePhotoDataUrl=String(vehiclePhotoPreviewUrl||'').trim();
+      payload.clearVehiclePhoto=!payload.vehiclePhotoName && !payload.vehiclePhotoDataUrl;
+    }
+
+    return payload;
   }
 
   async function autoBookSaleMade(payload, doorEventResult){
@@ -3151,13 +3243,18 @@
       wantsFollowup:merged.wantsFollowup!==undefined?Boolean(merged.wantsFollowup):Boolean(document.getElementById('de-followup').checked),
       followupDueAt,
       outcomeDetail,
-      vehiclePhotoName,
       lead:merged.lead!==undefined?merged.lead:{
         firstName:val('de-lead-name').trim(),
         phone:val('de-lead-phone').trim(),
         notes:outcomeDetail
       }
     };
+
+    if(vehiclePhotoDirty){
+      payload.vehiclePhotoName=String(vehiclePhotoName||'').trim().slice(0,120);
+      payload.vehiclePhotoDataUrl=String(vehiclePhotoPreviewUrl||'').trim();
+      payload.clearVehiclePhoto=!payload.vehiclePhotoName && !payload.vehiclePhotoDataUrl;
+    }
 
     if(Object.prototype.hasOwnProperty.call(merged,'estimatedValueCents')){
       const parsedEstimate=Number(merged.estimatedValueCents);

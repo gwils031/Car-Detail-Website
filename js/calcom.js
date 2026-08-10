@@ -150,7 +150,7 @@ async function handleSubmit(e){
         reason:String(err&&err.message?err.message:'submit_failed').slice(0,120)
       });
     }
-    window.__showAlert&&window.__showAlert('Could not confirm your booking. Please try again or call us at (435) 999-4052.','err');
+    window.__showAlert&&window.__showAlert('Could not confirm your booking. Please try again or call us at (810) 336-0371.','err');
   }
 }
 

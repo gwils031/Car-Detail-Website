@@ -554,7 +554,7 @@ window.mSubmit=async function(){
         reason:String(err&&err.message?err.message:'submit_failed').slice(0,120)
       });
     }
-    showAlert('Could not confirm. Please try again or call (810) 336-0371.','err');
+    showAlert('Could not confirm. Please try again or call (801) 336-0371.','err');
     console.error(err);
   }
 };
